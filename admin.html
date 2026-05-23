@@ -3,74 +3,216 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CastWheelz Console Workspace</title>
+<title>CastWheelz Command Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
-    --gold: #c9a84c; --white: #f4f2ee; --muted: #7a7d88; --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
+    --gold: #c9a84c; --gold-light: #e8c97a; --white: #f4f2ee; --muted: #7a7d88;
+    --red: #d63333; --green: #22c55e; --blue: #2563eb;
+    --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--black); color: var(--white); font-family: var(--font-body); padding: 2rem; }
+  body { background: var(--black); color: var(--white); font-family: var(--font-body); padding: 2rem; min-height: 100vh; }
+  
+  /* HEADER & NAVIGATION */
   header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-  h1 { font-family: var(--font-display); font-size: 32px; color: var(--gold); }
+  h1 { font-family: var(--font-display); font-size: 36px; color: var(--gold); letter-spacing: 1px; }
+  .btn-nav-back { background: none; border: 1px solid var(--border); color: var(--white); padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: 600; font-family: var(--font-body); transition: all 0.2s; }
+  .btn-nav-back:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* OVERVIEW METRICS DASHBOARD */
+  .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+  .metric-card { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 10px; text-align: center; }
+  .metric-card h4 { font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; letter-spacing: 0.05em; }
+  .metric-card div { font-family: var(--font-display); font-size: 32px; color: var(--white); }
+  .metric-card div.highlight { color: var(--gold); }
+
+  /* TAB WORKSPACE BAR */
+  .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1px; }
+  .tab-btn { background: none; border: 1px solid transparent; color: var(--muted); padding: 12px 24px; cursor: pointer; text-transform: uppercase; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; font-family: var(--font-body); position: relative; bottom: -1px; }
+  .tab-btn.active { color: var(--gold); border: 1px solid var(--border); border-bottom-color: var(--black); background: var(--black); border-radius: 8px 8px 0 0; }
+
+  /* PANEL MANAGER */
+  .panel { display: none; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .grid-layout { display: grid; grid-template-columns: 380px 1fr; gap: 2rem; align-items: start; }
+  form { display: flex; flex-direction: column; gap: 14px; background: var(--card-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border); position: sticky; top: 2rem; }
+  form h3 { font-family: var(--font-display); font-size: 22px; color: var(--white); margin-bottom: 5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
   
-  .grid-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
-  form { display: flex; flex-direction: column; gap: 12px; background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); }
-  label { font-size: 11px; text-transform: uppercase; color: var(--muted); }
-  input, textarea, select { background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 10px; border-radius: 6px; font-family: var(--font-body); outline: none; }
+  label { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  input, textarea, select { background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 12px; border-radius: 6px; font-family: var(--font-body); outline: none; font-size: 14px; transition: border-color 0.2s; }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); }
   
-  button.submit-btn { background: var(--gold); color: var(--black); border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
-  table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 8px; overflow: hidden; }
-  th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 13px; }
-  th { color: var(--gold); background: #1e2022; font-size: 11px; text-transform: uppercase; }
-  .discount-input-field { width: 95px; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 5px; border-radius: 4px; }
+  button.submit-btn { background: var(--gold); color: var(--black); border: none; padding: 14px; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-body); transition: background 0.2s; }
+  button.submit-btn:hover { background: var(--gold-light); }
+
+  /* DATA SHEETS & TABLES */
+  .table-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th, td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  th { background: #1a1c1d; color: var(--gold); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.01); }
+
+  /* CONTROLS & BADGES */
+  .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; display: inline-block; }
+  .badge.pending { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .badge.paid { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge.failed { background: rgba(214,51,51,0.15); color: var(--red); }
+  .badge.unshipped { background: rgba(37,99,235,0.15); color: var(--blue); }
+  .badge.shipped { background: rgba(232,201,122,0.15); color: var(--gold-light); }
+  .badge.delivered { background: rgba(34,197,94,0.3); color: var(--white); }
+
+  .discount-field { width: 90px; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 6px; border-radius: 4px; text-align: center; }
+  
+  .btn-action-row { display: flex; gap: 6px; }
+  .btn-control { background: none; border: 1px solid var(--border); color: var(--white); padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-family: var(--font-body); font-weight: 500; transition: all 0.2s; }
+  .btn-control:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-control.danger { color: var(--red); }
+  .btn-control.danger:hover { background: var(--red); color: var(--white); border-color: var(--red); }
+  
+  .order-detail-text { font-size: 13px; color: var(--silver); line-height: 1.5; margin-top: 4px; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>CastWheelz Control Center</h1>
-  <button class="submit-btn" style="padding: 6px 12px;" onclick="window.location.href='./'">← View Store</button>
+  <button class="btn-nav-back" onclick="window.location.href='./'">← View Storefront</button>
 </header>
 
-<div class="grid-layout">
-  <!-- MANIFEST CREATION FORM -->
-  <form id="newVehicleForm">
-    <h3>List Premium Model Car</h3>
-    <label>Model Vehicle Name</label><input type="text" id="p-name" required placeholder="Ford Mustang Mach 1">
-    <label>Brand Builder</label><input type="text" id="p-brand" required placeholder="AUTOart Signature">
-    <label>Scale Specification</label>
-    <select id="p-scale">
-      <option>1:64</option><option>1:43</option><option>1:24</option><option selected>1:18</option><option>1:12</option>
-    </select>
-    <label>Base Retail Value (INR Plain)</label><input type="number" id="p-price" required placeholder="8500">
-    <label>Display Badge Tag</label>
-    <select id="p-badge">
-      <option value="">No Badge</option>
-      <option value="New">New</option>
-      <option value="Limited">Limited</option>
-      <option value="Hot">Hot</option>
-    </select>
-    <label>Detailed Specifications Sheet Text</label>
-    <textarea id="p-desc" rows="3" placeholder="Enter engine layout configurations, opening parts details..."></textarea>
-    <button type="submit" class="submit-btn">Push to Live Catalog</button>
-  </form>
+<!-- QUICK STATS OVERVIEW PANEL -->
+<div class="metrics-row">
+  <div class="metric-card"><h4>Active Inventory</h4><div id="statTotalProducts">0</div></div>
+  <div class="metric-card"><h4>Total Categories</h4><div id="statTotalCategories">0</div></div>
+  <div class="metric-card"><h4>Pending Logistics</h4><div id="statPendingOrders" class="highlight">0</div></div>
+  <div class="metric-card"><h4>Gross Revenue</h4><div id="statGrossRevenue" style="color: var(--green)">₹0</div></div>
+</div>
 
-  <!-- LIVE METRICS DATA SHEET -->
-  <div>
-    <h3 style="margin-bottom: 1rem;">Active Storefront Stock & Promotional Discounts</h3>
+<!-- WORKSPACE CONTROLS TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchControlPanel('panel-inventory', this)">Manage Inventory</button>
+  <button class="tab-btn" onclick="switchControlPanel('panel-categories', this)">Manage Categories</button>
+  <button class="tab-btn" onclick="switchTabAndLoadOrders('panel-orders', this)">Fulfillment & Orders</button>
+</div>
+
+<!-- PANEL 1: INVENTORY FLEET CONTROL -->
+<div id="panel-inventory" class="panel active">
+  <div class="grid-layout">
+    <form id="vehicleCreationForm">
+      <h3>List Premium Model</h3>
+      <label>Model Vehicle Name</label>
+      <input type="text" id="p-name" required placeholder="e.g., Porsche 911 GT3 RS">
+      
+      <label>Brand Builder</label>
+      <input type="text" id="p-brand" required placeholder="e.g., Spark Models">
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label>Scale Specification</label>
+          <select id="p-scale">
+            <option>1:64</option><option>1:43</option><option>1:24</option><option selected>1:18</option><option>1:12</option>
+          </select>
+        </div>
+        <div>
+          <label>Category Group</label>
+          <select id="p-category" security="required"><option value="">Select Tag...</option></select>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label>MSRP Price (INR)</label>
+          <input type="number" id="p-price" required placeholder="3499">
+        </div>
+        <div>
+          <label>Stock Count</label>
+          <input type="number" id="p-stock" required placeholder="10" value="5">
+        </div>
+      </div>
+
+      <label>Visual Badge</label>
+      <select id="p-badge">
+        <option value="">No Badge</option>
+        <option value="New">New</option>
+        <option value="Limited">Limited</option>
+        <option value="Hot">Hot</option>
+      </select>
+
+      <label>Specifications Sheet Context</label>
+      <textarea id="p-desc" rows="3" placeholder="Replicated features, openable diecast parameters..."></textarea>
+      
+      <button type="submit" class="submit-btn">Commit to Showcase Grid</button>
+    </form>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Model Vehicle</th>
+            <th>MSRP Scale</th>
+            <th>MSRP Price</th>
+            <th>Promo Price Rule (INR)</th>
+            <th>Control Options</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryGridTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+-- PANEL 2: CATEGORIES CONTROL PANEL -->
+<div id="panel-categories" class="panel">
+  <div class="grid-layout">
+    <form id="categoryConfigForm">
+      <h3>Create Category Group</h3>
+      <label>Category Label Name</label>
+      <input type="text" id="c-name" required placeholder="e.g., Classic Showcase Range">
+      
+      <label>System URL Slug</label>
+      <input type="text" id="c-slug" required placeholder="classic-showcase-range">
+      
+      <label>UI Grid Emoji Icon</label>
+      <input type="text" id="c-icon" value="🏎️" required style="text-align: center; font-size: 18px;">
+
+      <button type="submit" class="submit-btn">Deploy Catalog Node</button>
+    </form>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Symbol Icon</th>
+            <th>Category Group Name</th>
+            <th>URL Route Slug</th>
+            <th>Control Options</th>
+          </tr>
+        </thead>
+        <tbody id="categoriesGridTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 3: MASTER LOGISTICS & ORDERS MANAGEMENT -->
+<div id="panel-orders" class="panel">
+  <div class="table-container">
     <table>
       <thead>
         <tr>
-          <th>Vehicle Profile</th>
-          <th>Scale</th>
-          <th>Base MSRP</th>
-          <th>Promotional Price (INR)</th>
-          <th>Actions</th>
+          <th>Invoice / Time</th>
+          <th>Collector Parameter Details</th>
+          <th>Financial Status</th>
+          <th>Logistics Flow Status</th>
+          <th>Total Invoice</th>
+          <th>Operations Management</th>
         </tr>
       </thead>
-      <tbody id="adminInventoryTableBody"></tbody>
+      <tbody id="ordersLedgerTableBody"></tbody>
     </table>
   </div>
 </div>
@@ -82,33 +224,77 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg'
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-  async function loadAdminWorkspaceDeck() {
-    const { data: fleet } = await supabase.from('products').select('*').order('created_at', { ascending: false })
-    const view = document.getElementById('adminInventoryTableBody')
-    if (!view || !fleet) return
+  window.switchControlPanel = function(panelId, btnElement) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+    document.getElementById(panelId).classList.add('active')
+    btnElement.classList.add('active')
+  }
 
-    view.innerHTML = fleet.map(p => `
+  window.switchTabAndLoadOrders = function(panelId, btnElement) {
+    window.switchControlPanel(panelId, btnElement)
+    downloadOrdersLedger()
+  }
+
+  async function calculateDashboardAnalytics(cachedProducts, cachedCategoriesCount) {
+    document.getElementById('statTotalProducts').textContent = cachedProducts ? cachedProducts.length : 0
+    document.getElementById('statTotalCategories').textContent = cachedCategoriesCount
+    
+    const { data: metrics } = await supabase.from('orders').select('total_amount, payment_status, fulfillment_status')
+    if (metrics) {
+      const pendingCount = metrics.filter(o => o.fulfillment_status !== 'Delivered').length
+      const grossIncome = metrics.filter(o => o.payment_status === 'Paid').reduce((s, o) => s + o.total_amount, 0)
+      
+      document.getElementById('statPendingOrders').textContent = pendingCount
+      document.getElementById('statGrossRevenue').textContent = `₹${(grossIncome / 100).toLocaleString('en-IN')}`
+    }
+  }
+
+  // =========================================================================
+  // WORKSPACE CONTROLLERS: PRODUCT INVENTORY LAYER
+  // =========================================================================
+  async function downloadInventoryData() {
+    const { data: fleet } = await supabase.from('products').select('*').order('created_at', { ascending: false })
+    const { data: tags } = await supabase.from('categories').select('*').order('name', { ascending: true })
+    
+    // Dynamic Dropdown Setup
+    const categoryDropdown = document.getElementById('p-category')
+    if (categoryDropdown && tags) {
+      categoryDropdown.innerHTML = `<option value="">Select Tag...</option>` + tags.map(t => `<option value="${t.id}">${t.name}</option>`).join('')
+    }
+
+    calculateDashboardAnalytics(fleet, tags ? tags.length : 0)
+
+    const tbody = document.getElementById('inventoryGridTableBody')
+    if (!tbody || !fleet) return
+
+    tbody.innerHTML = fleet.map(p => `
       <tr>
         <td><strong>${p.name}</strong><br><small style="color:var(--muted)">${p.brand}</small></td>
         <td><span style="color:var(--gold)">${p.scale}</span></td>
         <td>₹${p.price / 100}</td>
         <td>
-          <input type="number" class="discount-input-field" id="disc-${p.id}" value="${p.discount_price ? p.discount_price / 100 : ''}" placeholder="MSRP Active">
+          <input type="number" class="discount-field" id="promo-price-${p.id}" value="${p.discount_price ? p.discount_price / 100 : ''}" placeholder="MSRP Active">
         </td>
         <td>
-          <button class="submit-btn" style="padding:5px 10px; font-size:11px;" onclick="window.applyLiveProductDiscount('${p.id}')">Apply</button>
+          <div class="btn-action-row">
+            <button class="btn-control" onclick="window.commitPromotionalRule('${p.id}')">Apply</button>
+            <button class="btn-control danger" onclick="window.wipeProductRecord('${p.id}')">Remove</button>
+          </div>
         </td>
       </tr>
     `).join('')
   }
 
-  document.getElementById('newVehicleForm').onsubmit = async (e) => {
+  document.getElementById('newVehicleForm')?.addEventListener('submit', async (e) => {
     e.preventDefault()
     const payload = {
       name: document.getElementById('p-name').value,
       brand: document.getElementById('p-brand').value,
       scale: document.getElementById('p-scale').value,
+      category_id: document.getElementById('p-category').value || null,
       price: parseInt(document.getElementById('p-price').value) * 100,
+      stock_quantity: parseInt(document.getElementById('p-stock').value),
       badge: document.getElementById('p-badge').value || null,
       description: document.getElementById('p-desc').value || undefined
     }
@@ -116,22 +302,149 @@
     const { error } = await supabase.from('products').insert([payload])
     if (!error) {
       document.getElementById('newVehicleForm').reset()
-      await loadAdminWorkspaceDeck()
+      await downloadInventoryData()
     } else { alert(error.message) }
-  }
+  })
 
-  window.applyLiveProductDiscount = async function(id) {
-    const fieldInput = document.getElementById(`disc-${id}`).value
-    const activeDiscountPrice = fieldInput ? parseInt(fieldInput) * 100 : null
+  window.commitPromotionalRule = async function(productId) {
+    const rawVal = document.getElementById(`promo-price-${productId}`).value
+    const discountPricePaisa = rawVal ? parseInt(rawVal) * 100 : null
 
-    const { error } = await supabase.from('products').update({ discount_price: activeDiscountPrice }).eq('id', id)
+    const { error } = await supabase.from('products').update({ discount_price: discountPricePaisa }).eq('id', productId)
     if (!error) {
-      alert('Promotional price rule committed successfully!')
-      await loadAdminWorkspaceDeck()
+      alert('Promotional discount updated live on storefront.')
+      await downloadInventoryData()
     } else { alert(error.message) }
   }
 
-  document.addEventListener('DOMContentLoaded', loadAdminWorkspaceDeck)
+  window.wipeProductRecord = async function(productId) {
+    if (!confirm('Are you completely sure you want to remove this model replica from the storefront catalog?')) return
+    const { error } = await supabase.from('products').delete().eq('id', productId)
+    if (!error) {
+      await downloadInventoryData()
+    } else { alert(error.message) }
+  }
+
+  // =========================================================================
+  // WORKSPACE CONTROLLERS: CATALOG CATEGORIES LAYER
+  // =========================================================================
+  async function downloadCategoriesData() {
+    const { data: tags } = await supabase.from('categories').select('*').order('name', { ascending: true })
+    const tbody = document.getElementById('categoriesGridTableBody')
+    if (!tbody || !tags) return
+
+    tbody.innerHTML = tags.map(t => `
+      <tr>
+        <td style="font-size: 20px;">${t.display_icon}</td>
+        <td><strong>${t.name}</strong></td>
+        <td><code>/${t.slug}</code></td>
+        <td>
+          <button class="btn-control danger" onclick="window.wipeCategoryRecord('${t.id}')">Wipe Node</button>
+        </td>
+      </tr>
+    `).join('')
+  }
+
+  document.getElementById('categoryConfigForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const payload = {
+      name: document.getElementById('c-name').value,
+      slug: document.getElementById('c-slug').value,
+      display_icon: document.getElementById('c-icon').value
+    }
+
+    const { error } = await supabase.from('categories').insert([payload])
+    if (!error) {
+      document.getElementById('categoryConfigForm').reset()
+      await downloadCategoriesData()
+      await downloadInventoryData()
+    } else { alert(error.message) }
+  })
+
+  window.wipeCategoryRecord = async function(categoryId) {
+    if (!confirm('Are you sure you want to delete this category node? Items linked to it will revert to an unassigned category state.')) return
+    const { error } = await supabase.from('categories').delete().eq('id', categoryId)
+    if (!error) {
+      await downloadCategoriesData()
+      await downloadInventoryData()
+    } else { alert(error.message) }
+  }
+
+  // =========================================================================
+  // WORKSPACE CONTROLLERS: LOGISTICS & CHECKOUT ORDERS LAYER
+  // =========================================================================
+  async function downloadOrdersLedger() {
+    const { data: sales, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false })
+    const tbody = document.getElementById('ordersLedgerTableBody')
+    if (!tbody || !sales) return
+
+    if (sales.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--muted); padding:3rem 0;">No purchase sessions logged via Razorpay yet.</td></tr>`
+      return
+    }
+
+    tbody.innerHTML = sales.map(o => {
+      const paymentStyle = o.payment_status === 'Paid' ? 'paid' : 'pending'
+      const deliveryStyle = o.fulfillment_status.toLowerCase()
+      const timeString = new Date(o.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+      
+      return `
+        <tr>
+          <td>
+            <code>#${o.id.substring(0,8).toUpperCase()}</code>
+            <div style="font-size:11px; color:var(--muted); margin-top:2px;">${timeString}</div>
+          </td>
+          <td>
+            <strong>${o.customer_name}</strong>
+            <div class="order-detail-text">📞 ${o.customer_phone}</div>
+            <div class="order-detail-text" style="max-width:280px; color:var(--muted)">📍 ${o.delivery_address}</div>
+          </td>
+          <td><span class="badge ${paymentStyle}">${o.payment_status}</span></td>
+          <td>
+            <span class="badge ${deliveryStyle}">${o.fulfillment_status}</span>
+            ${o.tracking_number ? `<div style="font-size:11px; color:var(--gold); margin-top:4px; font-family:monospace;">Track: ${o.tracking_number}</div>` : ''}
+          </td>
+          <td><strong style="color:var(--gold)">₹${o.total_amount / 100}</strong></td>
+          <td>
+            <div class="btn-action-row">
+              <button class="btn-control" onclick="window.dispatchLogisticsRoute('${o.id}')">Attach Tracking</button>
+              <button class="btn-control" style="border-color:var(--green); color:var(--green);" onclick="window.completeOrderFulfillment('${o.id}')">Mark Delivered</button>
+            </div>
+          </td>
+        </tr>
+      `
+    }).join('')
+  }
+
+  window.dispatchLogisticsRoute = async function(orderId) {
+    const courierCode = prompt("Enter AWb tracking number / Carrier parameters for this parcel package:")
+    if (courierCode === null) return
+    
+    const { error } = await supabase.from('orders').update({
+      fulfillment_status: 'Shipped',
+      tracking_number: courierCode
+    }).eq('id', orderId)
+
+    if (!error) {
+      await downloadOrdersLedger()
+    } else { alert(error.message) }
+  }
+
+  window.completeOrderFulfillment = async function(orderId) {
+    const { error } = await supabase.from('orders').update({
+      fulfillment_status: 'Delivered'
+    }).eq('id', orderId)
+
+    if (!error) {
+      await downloadOrdersLedger()
+    } else { alert(error.message) }
+  }
+
+  // Runtime Initializer
+  document.addEventListener('DOMContentLoaded', () => {
+    downloadInventoryData()
+    downloadCategoriesData()
+  })
 </script>
 </body>
 </html>
