@@ -13,9 +13,11 @@
   }
   body { background: var(--black); color: var(--white); font-family: var(--font-body); margin: 0; padding-top: 80px; }
   
-  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; padding: 0 2rem; z-index: 100; }
+  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 3rem; z-index: 100; }
   .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
   .logo span { color: var(--white); }
+  .nav-btn { background: none; border: 1px solid var(--border); color: var(--silver); border-radius: 6px; padding: 7px 16px; font-size: 13px; font-weight: 500; cursor: pointer; text-transform: uppercase; transition: color 0.2s; color: var(--white); text-decoration: none;}
+  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
   
   .container { max-width: 1100px; margin: 4rem auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
   .img-box { background: linear-gradient(135deg, var(--card-bg) 0%, #1c1e22 100%); border: 1px solid var(--border); border-radius: 16px; padding: 5rem 3rem; text-align: center; }
@@ -32,7 +34,10 @@
 </head>
 <body>
 
-<nav><a href="index.html" class="logo">CAST<span>WHEELZ</span></a></nav>
+<nav>
+  <a href="index.html" class="logo">CAST<span>WHEELZ</span></a>
+  <a href="cart.html" class="nav-btn">View Cart</a>
+</nav>
 
 <div class="container" id="content">
   <div style="grid-column: 1/-1; text-align:center; color:var(--muted); padding: 5rem 0;">Synchronizing specifications layer...</div>
@@ -65,14 +70,18 @@
         <div class="meta">${p.brand} · ${p.scale} Precision Scale</div>
         <div class="desc">${p.description || 'Museum grade precision scaled metal layout configuration. Accurate mechanical modeling built to last.'}</div>
         <div class="price">₹${activePrice / 100}</div>
-        <button class="add-btn" onclick="addToCart('${p.id}')">Allocate to Cart Ledger</button>
+        <button class="add-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
       </div>
     `
   }
 
   window.addToCart = async function(pid) {
     const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return alert("Please access your account via Login to secure allocations.")
+    if (!session) {
+        alert("Please login first to allocate items to your cart.");
+        window.location.href = 'login.html';
+        return;
+    }
     await supabase.from('cart_items').upsert({ profile_id: session.user.id, product_id: pid, quantity: 1 })
     window.location.href = 'cart.html'
   }
