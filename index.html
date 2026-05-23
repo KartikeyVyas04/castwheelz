@@ -118,7 +118,7 @@
     <div class="hero-content">
       <div class="hero-label">Live Cloud Fleet Connection</div>
       <h1>Precision<br><span class="accent">Die-Cast</span> Legends</h1>
-      <p class="hero-sub">Museum-grade scale replicas. Handcrafted precision metal engineering loops synced live with client state wrappers.</p>
+      <p class="hero-sub">Museum-grade scale replicas. Handcrafted metal precision synchronized directly to secure system state maps.</p>
       <button class="btn-nav" style="border-color:var(--gold); color:var(--gold);" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Explore Gallery</button>
     </div>
     <div class="hero-visual">
@@ -168,7 +168,7 @@
   </div>
 </section>
 
-<!-- PRODUCT DETAILS VIEWPORT MODAL -->
+<!-- PRODUCT DETAILS MODAL VIEWPORT -->
 <div class="modal-overlay" id="productDetailsModal">
   <div class="modal-surface">
     <button class="modal-close" onclick="closeActiveModalWindow('productDetailsModal')">✕</button>
@@ -177,7 +177,7 @@
     </div>
     <h2 id="modalTargetTitle" style="font-family: var(--font-display); font-size: 36px; color: var(--white); margin-bottom: 4px;">Vehicle</h2>
     <div id="modalTargetMeta" style="font-size: 13px; color: var(--gold); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing:0.05em;">Brand Spec</div>
-    <p id="modalTargetDescription" style="color: var(--silver); line-height: 1.7; margin-bottom: 2rem; font-size: 14px;">Context sheet detailing technical specs.</p>
+    <p id="modalTargetDescription" style="color: var(--silver); line-height: 1.7; margin-bottom: 2rem; font-size: 14px;">Detailed scale properties matrix.</p>
     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1.5rem;">
       <div>
         <span style="font-size: 11px; color: var(--muted); display: block; text-transform: uppercase;">MSRP Value</span>
@@ -331,15 +331,15 @@
     const { data: p } = await supabase.from('products').select('*').eq('id', id).single()
     if (!p) return
     document.getElementById('modalTargetTitle').textContent = p.name
-    document.getElementById('modalTargetMeta').textContent = `${p.brand} · ${p.scale} Architectural Series`
-    document.getElementById('modalTargetDescription').textContent = p.description || 'Premium scale replica configuration.'
+    document.getElementById('modalTargetMeta').textContent = `${p.brand} · ${p.scale} Specifications Sheet`
+    document.getElementById('modalTargetDescription').textContent = p.description || 'Premium precision scaled metal layout configuration.'
     document.getElementById('modalTargetPrice').textContent = `₹${(p.discount_price ? p.discount_price : p.price) / 100}`
     document.getElementById('modalAddToCartAction').onclick = () => { closeActiveModalWindow('productDetailsModal'); window.pushToCloudCart(p.id, p.name); }
     document.getElementById('productDetailsModal').classList.add('active')
   }
 
   window.pushToCloudCart = async function(id, name) {
-    if (!window.LocalState.sessionUser) return alert('Authorize profile connection via Google login container.')
+    if (!window.LocalState.sessionUser) return alert('Authorize profile connection via Google login container first.')
     await supabase.from('cart_items').upsert({ profile_id: window.LocalState.sessionUser.id, product_id: id, quantity: 1 })
     const toast = document.getElementById('toastComponent')
     document.getElementById('toastTargetItemName').textContent = name
