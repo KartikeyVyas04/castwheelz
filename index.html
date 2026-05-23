@@ -5,311 +5,642 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CastWheelz — Premium Die Cast Models</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<!-- Inject Razorpay Web Standard Frame -->
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+<!-- Razorpay Standard Web Frame Core Integration SDK -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
   :root {
-    --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
-    --gold: #c9a84c; --gold-light: #e8c97a; --silver: #b8bcc8; --red: #d63333;
-    --white: #f4f2ee; --muted: #7a7d88; --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
+    --black: #0a0a0a;
+    --dark: #111214;
+    --card-bg: #161819;
+    --border: #2a2b2e;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dark: #8a6a22;
+    --silver: #b8bcc8;
+    --red: #d63333;
+    --white: #f4f2ee;
+    --muted: #7a7d88;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-serif: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
   }
+
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { background: var(--black); color: var(--white); font-family: var(--font-body); font-size: 14px; overflow-x: hidden; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
 
-  /* NAV */
-  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; }
-  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; width: 100%; display: flex; align-items: center; justify-content: space-between; }
-  .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 1px; }
+  /* NAV CODE BLOCK */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    height: 68px;
+    display: flex; align-items: center;
+  }
+  .nav-inner {
+    max-width: 1280px; margin: 0 auto; padding: 0 2rem;
+    width: 100%; display: flex; align-items: center; gap: 2rem;
+  }
+  .logo {
+    font-family: var(--font-display);
+    font-size: 26px; letter-spacing: 2px;
+    color: var(--gold); text-decoration: none;
+    flex-shrink: 0;
+    line-height: 1;
+  }
   .logo span { color: var(--white); }
-  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  .nav-links {
+    display: flex; align-items: center; gap: 0; list-style: none;
+    margin-left: 1rem;
+  }
+  .nav-links a {
+    text-decoration: none; color: var(--silver);
+    font-size: 13px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 0.4rem 1rem;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-right {
+    margin-left: auto; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .search-bar {
+    display: flex; align-items: center;
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; gap: 8px;
+  }
+  .search-bar input {
+    background: none; border: none; outline: none;
+    color: var(--white); font-size: 13px; width: 160px;
+    font-family: var(--font-body);
+  }
+  .search-bar input::placeholder { color: var(--muted); }
+  .search-bar svg { color: var(--muted); flex-shrink: 0; }
+  .btn-nav {
+    background: none; border: 1px solid var(--border);
+    color: var(--silver); border-radius: 6px;
+    padding: 7px 14px; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: var(--font-body);
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .btn-nav:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-cart {
+    background: var(--gold); border: none;
+    color: var(--black); border-radius: 6px;
+    padding: 7px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: var(--font-body);
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.2s; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .btn-cart:hover { background: var(--gold-light); }
+  .cart-badge {
+    background: var(--red); color: white; border-radius: 50%;
+    width: 18px; height: 18px; font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* HERO HEADER INTERFACE */
+  .hero {
+    min-height: 100vh; padding-top: 68px;
+    display: flex; align-items: center; position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 60% 40%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 80% at 80% 80%, rgba(201,168,76,0.04) 0%, transparent 50%),
+      linear-gradient(160deg, #0a0a0a 0%, #111214 40%, #0e0f11 100%);
+  }
+  .hero-grid-lines {
+    position: absolute; inset: 0; z-index: 0; opacity: 0.04;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-inner {
+    max-width: 1280px; margin: 0 auto; padding: 0 2rem;
+    width: 100%; position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+    min-height: calc(100vh - 68px);
+  }
+  .hero-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25);
+    color: var(--gold); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 100px; margin-bottom: 1.4rem;
+  }
+  .hero-label::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(52px, 7vw, 88px);
+    line-height: 0.95; letter-spacing: 1px;
+    color: var(--white); margin-bottom: 1rem;
+  }
+  .hero h1 .accent { color: var(--gold); display: block; }
+  .hero-sub {
+    font-size: 16px; color: var(--muted); max-width: 400px;
+    line-height: 1.7; margin-bottom: 2rem;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary, .btn-outline {
+    background: var(--gold); color: var(--black);
+    border: none; border-radius: 6px;
+    padding: 14px 28px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: var(--font-body);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .btn-outline {
+    background: none; color: var(--white);
+    border: 1px solid var(--border); font-weight: 500;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
   
-  .btn-nav, .btn-cart { background: none; border: 1px solid var(--border); color: var(--silver); padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: 600; font-family: var(--font-body); }
-  .btn-cart { background: var(--gold); color: var(--black); border: none; }
+  .hero-stats { display: flex; gap: 2.5rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .stat-num { font-family: var(--font-display); font-size: 32px; color: var(--gold); line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
 
-  /* HERO */
-  .hero { min-height: 50vh; padding-top: 68px; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; }
-  .hero-inner h1 { font-family: var(--font-display); font-size: clamp(48px, 6vw, 80px); line-height: 0.95; color: var(--white); margin-bottom: 1rem; }
-  .hero-inner h1 span { color: var(--gold); }
-  .hero-inner p { color: var(--muted); max-width: 500px; margin: 0 auto 2rem; font-size: 16px; }
-
-  /* GRID SYSTEMS */
-  .section { padding: 4rem 2rem; max-width: 1280px; margin: 0 auto; }
-  .section-title { font-family: var(--font-display); font-size: 32px; color: var(--white); margin-bottom: 2rem; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
-  .product-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; padding: 1rem; position: relative; transition: border-color 0.3s; }
-  .product-card:hover { border-color: var(--gold); }
-  .product-img-box { background: #1a1c20; height: 160px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
-  .product-name { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
-  .product-meta { font-size: 12px; color: var(--muted); margin-bottom: 1rem; }
+  /* SHOWCASE ELEMENTS */
+  .hero-visual { position: relative; }
+  .hero-car-showcase {
+    position: relative;
+    background: linear-gradient(135deg, var(--card-bg) 0%, #1c1e22 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 3rem 2rem; text-align: center; overflow: hidden;
+  }
+  .hero-car-showcase::before {
+    content: ''; position: absolute; top: -40%; left: -20%; right: -20%; height: 80%;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .car-svg-wrap { position: relative; z-index: 1; }
+  .car-svg-wrap svg { width: 100%; max-width: 380px; filter: drop-shadow(0 20px 40px rgba(201,168,76,0.15)); }
+  .scale-badge { position: absolute; top: 1rem; right: 1rem; background: var(--gold); color: var(--black); font-family: var(--font-display); font-size: 18px; letter-spacing: 1px; padding: 6px 14px; border-radius: 6px; }
   
-  .price-strip { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
-  .current-price { font-family: var(--font-display); font-size: 22px; color: var(--gold); }
-  .slashed-price { text-decoration: line-through; color: var(--muted); font-size: 13px; }
-  .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .btn-action { background: none; border: 1px solid var(--border); color: var(--white); padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; text-transform: uppercase; font-family: var(--font-body); font-weight: 600; }
-  .btn-action.primary { background: var(--gold); color: var(--black); border: none; }
+  .hero-floating-card {
+    position: absolute; bottom: -1rem; left: -1.5rem;
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .hero-floating-card .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+  .hero-floating-card .fc-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .hero-floating-card .fc-val { font-size: 15px; font-weight: 600; color: var(--white); }
 
-  /* DIALOG MODALS */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
+  /* LAYOUT BLOCKS & SECTIONS */
+  .section { padding: 6rem 0; }
+  .section-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+  .section-header { margin-bottom: 3rem; }
+  .section-eyebrow { font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .section-title { font-family: var(--font-display); font-size: clamp(36px, 5vw, 54px); letter-spacing: 1px; line-height: 1; color: var(--white); }
+  .section-sub { font-size: 15px; color: var(--muted); margin-top: 0.6rem; max-width: 520px; }
+
+  /* SCALE NAVIGATION SECTION */
+  .categories-bg { background: var(--dark); }
+  .cat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+  .cat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem 1rem 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+  .cat-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--gold); transform: scaleX(0); transition: transform 0.3s; transform-origin: center; }
+  .cat-card:hover { border-color: rgba(201,168,76,0.4); transform: translateY(-4px); }
+  .cat-card:hover::before { transform: scaleX(1); }
+  .cat-icon { width: 52px; height: 52px; border-radius: 12px; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 22px; }
+  .cat-name { font-weight: 600; font-size: 14px; color: var(--white); margin-bottom: 2px; }
+
+  /* PRODUCT DISPLAY GRID SYSTEM */
+  .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+  .product-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; cursor: pointer; transition: all 0.3s; position: relative; }
+  .product-card:hover { border-color: rgba(201,168,76,0.35); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  .product-img { background: linear-gradient(135deg, #1a1c20, #222428); height: 200px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .product-img::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.08) 0%, transparent 65%); }
+  .product-img svg { width: 75%; max-height: 130px; position: relative; z-index: 1; }
+  .product-badge { position: absolute; top: 10px; left: 10px; z-index: 2; background: var(--red); color: white; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 4px; }
+  .product-badge.new { background: #2563eb; }
+  .product-badge.limited { background: var(--gold-dark); }
+  
+  .product-info { padding: 1rem 1.1rem 1.1rem; }
+  .product-scale { font-size: 10px; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
+  .product-name { font-weight: 600; font-size: 14px; color: var(--white); line-height: 1.3; margin-bottom: 4px; }
+  .product-brand { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .product-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .price-wrapper { display: flex; flex-direction: column; }
+  .price { font-family: var(--font-display); font-size: 22px; color: var(--gold); letter-spacing: 0.5px; }
+  .price-old { font-size: 12px; color: var(--muted); text-decoration: line-through; }
+  
+  .btn-add { background: none; border: 1px solid var(--border); color: var(--white); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-body); text-transform: uppercase; letter-spacing: 0.06em; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+  .btn-add:hover { background: var(--gold); border-color: var(--gold); color: var(--black); }
+
+  /* OVERLAY MODAL INTERFACES */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(12px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
   .modal-overlay.active { display: flex; }
-  .modal-box { background: var(--card-bg); border: 1px solid var(--border); width: 100%; max-width: 500px; border-radius: 16px; padding: 2rem; position: relative; }
-  .close-modal { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+  .modal-surface { background: var(--card-bg); border: 1px solid var(--border); width: 100%; max-width: 520px; border-radius: 16px; padding: 2.5rem; position: relative; box-shadow: 0 24px 64px rgba(0,0,0,0.7); }
+  .modal-close { position: absolute; top: 1.25rem; right: 1.25rem; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; transition: color 0.2s; }
+  .modal-close:hover { color: var(--white); }
   
-  .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 1.25rem; }
-  .form-group label { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-  .form-group input, .form-group textarea { background: var(--black); border: 1px solid var(--border); padding: 12px; border-radius: 6px; color: var(--white); outline: none; font-family: var(--font-body); }
-  .form-group input:focus { border-color: var(--gold); }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.25rem; }
+  .form-group label { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600; letter-spacing: 0.05em; }
+  .form-group input, .form-group textarea { background: var(--black); border: 1px solid var(--border); padding: 12px; border-radius: 6px; color: var(--white); outline: none; font-family: var(--font-body); font-size: 14px; transition: border-color 0.2s; }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--gold); }
 
-  /* OVERLAY PANELS */
-  .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 999; background: var(--card-bg); border: 1px solid var(--gold); border-radius: 10px; padding: 14px 20px; transform: translateX(120%); transition: transform 0.4s ease; }
+  /* MARQUEE RUNNING INFOBAR */
+  .marquee-band { background: var(--gold); padding: 12px 0; overflow: hidden; border-top: 1px solid var(--gold-dark); border-bottom: 1px solid var(--gold-dark); }
+  .marquee-track { display: flex; gap: 0; white-space: nowrap; animation: marquee 30s linear infinite; }
+  .marquee-item { display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: 15px; letter-spacing: 2px; color: var(--black); padding: 0 2rem; flex-shrink: 0; }
+  .marquee-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--black); opacity: 0.4; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* GENERAL NOTIFICATIONS INFOBAR */
+  .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 1100; background: var(--card-bg); border: 1px solid rgba(201,168,76,0.4); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); max-width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
   .toast.show { transform: translateX(0); }
+  .toast-icon { font-size: 22px; }
+  
+  footer { background: var(--dark); border-top: 1px solid var(--border); padding: 4rem 0 2rem; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
 </style>
 </head>
 <body>
 
+<!-- NAVIGATION COMPONENT -->
 <nav>
   <div class="nav-inner">
     <a href="#" class="logo">CAST<span>WHEELZ</span></a>
+    <ul class="nav-links">
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#categories">Scales</a></li>
+      <li><a href="#products">Catalog</a></li>
+      <li><a href="admin.html" style="color: var(--gold);">Console</a></li>
+    </ul>
     <div class="nav-right">
-      <button class="btn-nav" id="authBtn"><span>Google Login</span></button>
-      <button class="btn-cart" id="cartTriggerBtn">Cart (<span id="cartCount">0</span>)</button>
+      <button class="btn-nav" id="authButtonNode">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Secure Access</span>
+      </button>
+      <button class="btn-cart" id="cartOverlayTrigger">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Cart <span class="cart-badge" id="cartIndicatorBadge">0</span>
+      </button>
     </div>
   </div>
 </nav>
 
-<section class="hero">
+<!-- HERO SCREEN -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
   <div class="hero-inner">
-    <h1>Precision <span>Die-Cast</span> Room</h1>
-    <p>Premium scalemodels. Managed directly on the Vercel architecture.</p>
+    <div class="hero-content">
+      <div class="hero-label">Live Cloud Inventory Tracked</div>
+      <h1>Precision<br><span class="accent">Die-Cast</span> Replicas</h1>
+      <p class="hero-sub">Museum-grade scale replicas. Handcrafted precision engineering synced straight with your database workflows.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Explore Gallery</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-car-showcase">
+        <div class="scale-badge">1:18</div>
+        <div class="car-svg-wrap">
+          <svg viewBox="0 0 420 220" fill="none">
+            <ellipse cx="210" cy="205" rx="160" ry="12" fill="rgba(0,0,0,0.4)"/>
+            <path d="M60 155 L80 120 L120 95 L160 82 L260 80 L310 85 L350 110 L370 140 L370 165 L60 165 Z" fill="#1a1a2e" stroke="#c9a84c" stroke-width="1.5"/>
+            <path d="M130 120 L155 90 L175 78 L250 76 L280 82 L310 100 L340 120 Z" fill="#12122a" stroke="#c9a84c" stroke-width="1"/>
+            <circle cx="130" cy="168" r="28" fill="#0a0a15" stroke="#888" stroke-width="2"/>
+            <circle cx="300" cy="168" r="28" fill="#0a0a15" stroke="#888" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<main class="section">
-  <h2 class="section-title">Active Inventory</h2>
-  <div class="products-grid" id="productsLayoutGrid"></div>
-</main>
-
-<!-- MODAL 1: PRODUCT VEHICLE DETAILS -->
-<div class="modal-overlay" id="detailsModal">
-  <div class="modal-box">
-    <button class="close-modal" onclick="closeActiveModal('detailsModal')">✕</button>
-    <h2 id="m-title" style="font-family: var(--font-display); font-size: 28px; color: var(--gold); margin-bottom: 5px;">Model</h2>
-    <div id="m-meta" style="font-size: 12px; color: var(--muted); margin-bottom: 1rem;">Brand</div>
-    <p id="m-desc" style="color: var(--silver); line-height: 1.6; margin-bottom: 1.5rem;">Description content.</p>
-    <div class="price-strip">
-      <span class="current-price" id="m-price">₹0</span>
-    </div>
-    <button class="btn-action primary" id="m-cart-btn" style="width:100%;">Add Allocation To Cart</button>
+<!-- MARQUEE BAR -->
+<div class="marquee-band">
+  <div class="marquee-track">
+    <div class="marquee-item"><span class="marquee-dot"></span> 1:18 Prestige Range</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Integrated Razorpay Gateway</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> 1:43 Classic Series</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Direct Vercel Deployment</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> 1:18 Prestige Range</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Integrated Razorpay Gateway</div>
   </div>
 </div>
 
-<!-- MODAL 2: CHECKOUT SHIPPING PARAMETERS FORM -->
-<div class="modal-overlay" id="checkoutModal">
-  <div class="modal-box">
-    <button class="close-modal" onclick="closeActiveModal('checkoutModal')">✕</button>
-    <h2 style="font-family: var(--font-display); font-size: 28px; color: var(--white); margin-bottom: 1.5rem;">Delivery Destination</h2>
-    <form id="shippingForm">
+<!-- SCALE CATEGORIES GRID -->
+<section class="section categories-bg" id="categories">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-eyebrow">Sort Collection</div>
+      <div class="section-title">Filter by Scale</div>
+    </div>
+    <div class="cat-grid" id="scalesFilterGrid"></div>
+  </div>
+</section>
+
+<!-- DYNAMIC INVENTORY GALLERY -->
+<section class="section" id="products">
+  <div class="section-inner">
+    <div class="section-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
+      <div>
+        <div class="section-eyebrow">Live Catalog</div>
+        <div class="section-title">Active Bestsellers</div>
+      </div>
+      <button class="btn-outline" onclick="window.clearProductSorting()" style="padding: 10px 20px; font-size: 12px;">Reset Filters</button>
+    </div>
+    <div class="products-grid" id="productsDynamicGrid"></div>
+  </div>
+</section>
+
+<!-- MODAL 1: VEHICLE SPECIFICATIONS SHEET -->
+<div class="modal-overlay" id="productDetailsModal">
+  <div class="modal-surface">
+    <button class="modal-close" onclick="closeActiveModalWindow('productDetailsModal')">✕</button>
+    <h2 id="modalTargetTitle" style="font-family: var(--font-display); font-size: 32px; color: var(--gold); margin-bottom: 4px;">Model Name</h2>
+    <div id="modalTargetMeta" style="font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Brand Details</div>
+    <p id="modalTargetDescription" style="color: var(--silver); line-height: 1.7; margin-bottom: 2rem; font-size: 14px;">Detailed descriptions loading dynamic strings from context maps.</p>
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+      <div>
+        <span style="font-size: 12px; color: var(--muted); display: block; text-transform: uppercase;">Collector Valuation</span>
+        <strong style="font-family: var(--font-display); font-size: 28px; color: var(--white);" id="modalTargetPrice">₹0</strong>
+      </div>
+      <button class="btn-primary" id="modalAddToCartAction" style="padding: 12px 24px;">Secure Allocation</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: SHIPMENT AND DELIVERY MANIFEST -->
+<div class="modal-overlay" id="checkoutFlowModal">
+  <div class="modal-surface">
+    <button class="modal-close" onclick="closeActiveModalWindow('checkoutFlowModal')">✕</button>
+    <h2 style="font-family: var(--font-display); font-size: 28px; color: var(--white); margin-bottom: 1.5rem; letter-spacing: 1px;">Delivery Parameters</h2>
+    <form id="shippingManifestForm">
       <div class="form-group">
-        <label>Collector's Full Name</label>
-        <input type="text" id="ship-name" required>
+        <label>Full Name</label>
+        <input type="text" id="cust-name" required placeholder="Kartikey Vyas">
       </div>
       <div class="form-group">
-        <label>Contact Phone Number</label>
-        <input type="tel" id="ship-phone" required placeholder="+91 XXXXX XXXXX">
+        <label>Primary Contact Phone Number</label>
+        <input type="tel" id="cust-phone" required placeholder="+91 XXXXX XXXXX">
       </div>
       <div class="form-group">
-        <label>Complete Shipping Address</label>
-        <textarea id="ship-address" rows="3" required placeholder="Flat, Street, Landmark, City, State, Pincode"></textarea>
+        <label>Destination Delivery Address</label>
+        <textarea id="cust-address" rows="3" required placeholder="Flat/House No, Building, Street Name, Pincode, Maharashtra"></textarea>
       </div>
-      <div style="margin: 1.5rem 0; font-size: 16px; display:flex; justify-content:space-between;">
-        <span>Payable Total:</span>
-        <strong style="color: var(--gold)" id="checkoutSummaryTotal">₹0</strong>
+      <div style="margin: 1.5rem 0; padding: 1rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: var(--muted); text-transform: uppercase; font-size: 12px; font-weight: 600;">Total Payable Invoice:</span>
+        <strong style="color: var(--gold); font-size: 22px;" id="manifestInvoiceTotal">₹0</strong>
       </div>
-      <button type="submit" class="btn-action primary" style="width: 100%;">Initialize Secure Razorpay Interface</button>
+      <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px;">Initialize Razorpay Checkout Gateway</button>
     </form>
   </div>
 </div>
 
-<div class="toast" id="toast">🛒 <strong id="toastName">Model</strong> updated in your profile cart ledger.</div>
+<!-- DYNAMIC TOAST -->
+<div class="toast" id="toastComponent">
+  <span class="toast-icon">🛒</span>
+  <div class="toast-msg"><strong id="toastTargetItemName">Model</strong> updated in cloud cart.</div>
+</div>
 
+<!-- FOOTER -->
 <footer>
-  <div class="footer-inner" style="text-align: center; padding: 4rem 0 2rem; border-top: 1px solid var(--border);">
-    <h3>CAST<span>WHEELZ</span></h3>
-    <p style="color: var(--muted); margin-top: 10px;">© 2026 CastWheelz Core Engine. Powered by Vercel.</p>
+  <div class="section-inner" style="text-align: center;">
+    <a href="#" class="logo" style="font-size: 32px;">CAST<span>WHEELZ</span></a>
+    <p style="color: var(--muted); font-size: 13px; margin-top: 1rem;">Premium scale collections. Synchronized client-side state maps via Supabase PostgreSQL engine.</p>
+    <hr class="divider">
+    <p style="font-size: 12px; color: var(--muted);">© 2026 CastWheelz Master Control Room. Engineered flawlessly for Vercel servers.</p>
   </div>
 </footer>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-  // Vercel handles window injection safely when using public prefixes
   const SUPABASE_URL = 'https://cjzvweakirjbmmacrqpk.supabase.co'
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg'
   const RAZORPAY_KEY_ID = 'rzp_live_SskOYlu2pHt0Qp'
-  
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  window.AppState = { user: null, cartItemsList: [] }
 
-  async function appInit() {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  window.LocalState = { sessionUser: null, cartItemsCache: [], scaleFilter: null }
+
+  async function bootAppRuntime() {
     const { data: { session } } = await supabase.auth.getSession()
-    window.AppState.user = session?.user || null
+    window.LocalState.sessionUser = session?.user || null
     
-    syncAuthVisuals()
-    await loadShowcaseCatalog()
-    if (window.AppState.user) await updateCartMetrics()
+    evaluateAuthContextUI()
+    await downloadCategoriesMatrix()
+    await downloadInventoryGrid()
+    if (window.LocalState.sessionUser) await recalculateCartMetrics()
 
     supabase.auth.onAuthStateChange((event, session) => {
-      window.AppState.user = session?.user || null
-      syncAuthVisuals()
-      if (event === 'SIGNED_IN') updateCartMetrics()
+      window.LocalState.sessionUser = session?.user || null
+      evaluateAuthContextUI()
+      if (event === 'SIGNED_IN') recalculateCartMetrics()
     })
   }
 
-  function syncAuthVisuals() {
-    const el = document.getElementById('authBtn')
-    if (!el) return
-    if (window.AppState.user) {
-      el.querySelector('span').textContent = 'Logout'
-      el.onclick = () => supabase.auth.signOut().then(() => window.location.reload())
+  function evaluateAuthContextUI() {
+    const btn = document.getElementById('authButtonNode')
+    if (!btn) return
+    if (window.LocalState.sessionUser) {
+      btn.querySelector('span').textContent = 'Disconnect'
+      btn.onclick = () => supabase.auth.signOut().then(() => window.location.reload())
     } else {
-      el.querySelector('span').textContent = 'Google Auth Connect'
-      el.onclick = () => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
+      btn.querySelector('span').textContent = 'Google Login'
+      btn.onclick = () => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
     }
   }
 
-  async function loadShowcaseCatalog() {
-    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false })
-    const grid = document.getElementById('productsLayoutGrid')
-    if (!grid || !data) return
+  async function downloadCategoriesMatrix() {
+    const scales = ['1:64', '1:43', '1:24', '1:18', '1:12']
+    const grid = document.getElementById('scalesFilterGrid')
+    if (!grid) return
+    grid.innerHTML = scales.map(s => `
+      <div class="cat-card" onclick="window.applyScaleFilter('${s}')">
+        <div class="cat-icon">🏎️</div>
+        <div class="cat-name">${s}</div>
+      </div>
+    `).join('')
+  }
 
-    grid.innerHTML = data.map(p => {
-      const activePrice = p.discount_price ? p.discount_price : p.price
+  window.applyScaleFilter = function(scaleValue) {
+    window.LocalState.scaleFilter = scaleValue
+    downloadInventoryGrid()
+    document.getElementById('products').scrollIntoView({ behavior: 'smooth' })
+  }
+
+  window.clearProductSorting = function() {
+    window.LocalState.scaleFilter = null
+    downloadInventoryGrid()
+  }
+
+  async function downloadInventoryGrid() {
+    let query = supabase.from('products').select('*')
+    if (window.LocalState.scaleFilter) {
+      query = query.eq('scale', window.LocalState.scaleFilter)
+    } else {
+      query = query.order('created_at', { ascending: false })
+    }
+    
+    const { data: products } = await query
+    const targetGrid = document.getElementById('productsDynamicGrid')
+    if (!targetGrid) return
+
+    if (!products || products.length === 0) {
+      targetGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 3rem 0;">No high-end configurations listed in this scale block yet.</div>`
+      return
+    }
+
+    targetGrid.innerHTML = products.map(p => {
+      const salePrice = p.discount_price ? p.discount_price : p.price
       return `
         <div class="product-card">
-          <div class="product-img-box">
-            <svg width="60" height="60" fill="none" stroke="var(--gold)" stroke-width="1" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 1 13v3c0 .6.4 1 1 1h2m10 0h4"/></svg>
+          <div class="product-img" onclick="window.launchSpecificationsSheet('${p.id}')">
+            ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
+            <svg viewBox="0 0 280 160" fill="none">
+              <ellipse cx="140" cy="148" rx="100" ry="8" fill="rgba(0,0,0,0.4)"/>
+              <path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#1a1a2e" stroke="#c9a84c" stroke-width="1.2"/>
+            </svg>
           </div>
-          <div class="product-name">${p.name}</div>
-          <div class="product-meta">${p.brand} · ${p.scale} Scale</div>
-          <div class="price-strip">
-            <span class="current-price">₹${activePrice / 100}</span>
-            ${p.discount_price ? `<span class="slashed-price">₹${p.price / 100}</span>` : ''}
-          </div>
-          <div class="action-row">
-            <button class="btn-action" onclick="window.triggerDetailsView('${p.id}')">Details</button>
-            <button class="btn-action primary" onclick="window.allocateCartItem('${p.id}', '${p.name}')">+ Cart</button>
+          <div class="product-info">
+            <div class="product-scale">${p.scale} Scale</div>
+            <div class="product-name" onclick="window.launchSpecificationsSheet('${p.id}')">${p.name}</div>
+            <div class="product-brand">${p.brand}</div>
+            <div class="product-footer">
+              <div class="price-wrapper">
+                <span class="price">₹${salePrice / 100}</span>
+                ${p.discount_price ? `<span class="price-old">₹${p.price / 100}</span>` : ''}
+              </div>
+              <button class="btn-add" onclick="window.pushToCloudCart('${p.id}', '${p.name}')">+ Cart</button>
+            </div>
           </div>
         </div>
       `
     }).join('')
   }
 
-  window.triggerDetailsView = async function(id) {
-    const { data: p } = await supabase.from('products').select('*').eq('id', id).single()
+  window.launchSpecificationsSheet = async function(productId) {
+    const { data: p } = await supabase.from('products').select('*').eq('id', productId).single()
     if (!p) return
+
+    document.getElementById('modalTargetTitle').textContent = p.name
+    document.getElementById('modalTargetMeta').textContent = `${p.brand} | Professional Scale Die-Cast`
+    document.getElementById('modalTargetDescription').textContent = p.description || 'Premium authentic museum-grade collector die-cast model car featuring openable panels and authentic factory spec metrics.'
+    document.getElementById('modalTargetPrice').textContent = `₹${(p.discount_price ? p.discount_price : p.price) / 100}`
     
-    document.getElementById('m-title').textContent = p.name
-    document.getElementById('m-meta').textContent = `${p.brand} | ${p.scale} Engine Replicas`
-    document.getElementById('m-desc').textContent = p.description
-    document.getElementById('m-price').textContent = `₹${(p.discount_price ? p.discount_price : p.price) / 100}`
-    
-    const cartBtn = document.getElementById('m-cart-btn')
-    cartBtn.onclick = () => {
-      closeActiveModal('detailsModal')
-      window.allocateCartItem(p.id, p.name)
+    const actionBtn = document.getElementById('modalAddToCartAction')
+    actionBtn.onclick = () => {
+      closeActiveModalWindow('productDetailsModal')
+      window.pushToCloudCart(p.id, p.name)
     }
-    
-    document.getElementById('detailsModal').classList.add('active')
+
+    document.getElementById('productDetailsModal').classList.add('active')
   }
 
-  window.allocateCartItem = async function(id, name) {
-    if (!window.AppState.user) return alert('Please authorize profile via Google login container.')
-    await supabase.from('cart_items').upsert({ profile_id: window.AppState.user.id, product_id: id, quantity: 1 })
+  window.pushToCloudCart = async function(id, name) {
+    if (!window.LocalState.sessionUser) return alert('Please authorize profile metrics via Google login loop first.')
     
-    const t = document.getElementById('toast')
-    document.getElementById('toastName').textContent = name
-    t.classList.add('show')
-    setTimeout(() => t.classList.remove('show'), 2000)
-    
-    await updateCartMetrics()
+    await supabase.from('cart_items').upsert({
+      profile_id: window.LocalState.sessionUser.id,
+      product_id: id,
+      quantity: 1
+    }, { onConflict: 'profile_id,product_id' })
+
+    const toast = document.getElementById('toastComponent')
+    document.getElementById('toastTargetItemName').textContent = name
+    toast.classList.add('show')
+    setTimeout(() => toast.classList.remove('show'), 2500)
+
+    await recalculateCartMetrics()
   }
 
-  async function updateCartMetrics() {
-    const { data } = await supabase.from('cart_items').select('quantity, products(id, name, price, discount_price)').eq('profile_id', window.AppState.user.id)
-    window.AppState.cartItemsList = data || []
-    const count = window.AppState.cartItemsList.reduce((acc, i) => acc + i.quantity, 0)
-    document.getElementById('cartCount').textContent = count
+  async function recalculateCartMetrics() {
+    const { data } = await supabase.from('cart_items').select('quantity, products(id, name, price, discount_price)').eq('profile_id', window.LocalState.sessionUser.id)
+    window.LocalState.cartItemsCache = data || []
+    document.getElementById('cartIndicatorBadge').textContent = window.LocalState.cartItemsCache.reduce((a, b) => a + b.quantity, 0)
   }
 
-  window.closeActiveModal = function(id) {
-    document.getElementById(id).classList.remove('active')
+  window.closeActiveModalWindow = function(elementId) {
+    document.getElementById(elementId).classList.remove('active')
   }
 
-  document.getElementById('cartTriggerBtn').onclick = function() {
-    if (window.AppState.cartItemsList.length === 0) return alert('Your cloud cart is empty.')
+  document.getElementById('cartOverlayTrigger').onclick = function() {
+    if (window.LocalState.cartItemsCache.length === 0) return alert('Your cart ledger is currently empty. Add models to proceed.')
     
-    let grossTotal = window.AppState.cartItemsList.reduce((sum, item) => {
-      const activeAmt = item.products.discount_price ? item.products.discount_price : item.products.price
-      return sum + (activeAmt * item.quantity)
+    let compoundTotal = window.LocalState.cartItemsCache.reduce((sum, item) => {
+      const runtimeCost = item.products.discount_price ? item.products.discount_price : item.products.price
+      return sum + (runtimeCost * item.quantity)
     }, 0)
 
-    document.getElementById('checkoutSummaryTotal').textContent = `₹${grossTotal / 100}`
-    document.getElementById('checkoutModal').classList.add('active')
+    document.getElementById('manifestInvoiceTotal').textContent = `₹${compoundTotal / 100}`
+    document.getElementById('checkoutFlowModal').classList.add('active')
   }
 
-  document.getElementById('shippingForm').onsubmit = async function(e) {
+  document.getElementById('shippingManifestForm').onsubmit = async function(e) {
     e.preventDefault()
     
-    const name = document.getElementById('ship-name').value
-    const phone = document.getElementById('ship-phone').value
-    const addr = document.getElementById('ship-address').value
-    
-    let finalAmount = window.AppState.cartItemsList.reduce((sum, item) => {
-      const activeAmt = item.products.discount_price ? item.products.discount_price : item.products.price
-      return sum + (activeAmt * item.quantity)
+    const name = document.getElementById('cust-name').value
+    const phone = document.getElementById('cust-phone').value
+    const address = document.getElementById('cust-address').value
+
+    let grandTotalPaisa = window.LocalState.cartItemsCache.reduce((sum, item) => {
+      const activeCost = item.products.discount_price ? item.products.discount_price : item.products.price
+      return sum + (activeCost * item.quantity)
     }, 0)
 
-    document.getElementById('checkoutModal').classList.remove('active')
+    document.getElementById('checkoutFlowModal').classList.remove('active')
 
-    const options = {
+    const configurations = {
       "key": RAZORPAY_KEY_ID,
-      "amount": finalAmount, 
+      "amount": grandTotalPaisa,
       "currency": "INR",
-      "name": "CastWheelz Premium",
-      "description": "Die-Cast Procurement Suite",
-      "handler": async function (response){
-        const { data: order, error } = await supabase.from('orders').insert([{
-          profile_id: window.AppState.user.id,
+      "name": "CastWheelz HQ",
+      "description": "Premium Scale Procurement",
+      "handler": async function (paymentResponse) {
+        const { data: processedOrder, error } = await supabase.from('orders').insert([{
+          profile_id: window.LocalState.sessionUser.id,
           customer_name: name,
-          customer_email: window.AppState.user.email,
+          customer_email: window.LocalState.sessionUser.email,
           customer_phone: phone,
-          delivery_address: addr,
-          total_amount: finalAmount,
-          razorpay_payment_id: response.razorpay_payment_id,
+          delivery_address: address,
+          total_amount: grandTotalPaisa,
+          razorpay_payment_id: paymentResponse.razorpay_payment_id,
           payment_status: 'Paid'
         }]).select().single()
 
         if (!error) {
-          await supabase.from('cart_items').delete().eq('profile_id', window.AppState.user.id)
-          alert(`Order successfully registered! ID Ref: ${order.id.substring(0,8)}`)
+          await supabase.from('cart_items').delete().eq('profile_id', window.LocalState.sessionUser.id)
+          alert('Allocation Confirmed! Tracking ID: ' + processedOrder.id.substring(0, 8).toUpperCase())
           window.location.reload()
         }
       },
       "prefill": {
         "name": name,
-        "email": window.AppState.user.email,
+        "email": window.LocalState.sessionUser.email,
         "contact": phone
       },
       "theme": { "color": "#c9a84c" }
     }
 
-    const rzp1 = new Razorpay(options)
-    rzp1.open()
+    const gatewaySession = new Razorpay(configurations)
+    gatewaySession.open()
   }
 
-  document.addEventListener('DOMContentLoaded', appInit)
+  document.addEventListener('DOMContentLoaded', bootAppRuntime)
 </script>
 </body>
 </html>
