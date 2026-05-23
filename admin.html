@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CastWheelz Console Workspace</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
+    --gold: #c9a84c; --white: #f4f2ee; --muted: #7a7d88; --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--black); color: var(--white); font-family: var(--font-body); padding: 2rem; }
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+  h1 { font-family: var(--font-display); font-size: 32px; color: var(--gold); }
+  
+  .grid-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
+  form { display: flex; flex-direction: column; gap: 12px; background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); }
+  label { font-size: 11px; text-transform: uppercase; color: var(--muted); }
+  input, textarea { background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 10px; border-radius: 6px; font-family: var(--font-body); }
+  
+  button.submit-btn { background: var(--gold); color: var(--black); border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
+  table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 8px; overflow: hidden; }
+  th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 13px; }
+  th { color: var(--gold); background: #1e2022; font-size: 11px; text-transform: uppercase; }
+  .discount-input-field { width: 90px; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CastWheelz Admin Panel</h1>
+  <button class="submit-btn" style="padding: 6px 12px;" onclick="window.location.href='./'">← Storefront</button>
+</header>
+
+<div class="grid-layout">
+  <form id="productForm">
+    <h3>Add Scale Replica</h3>
+    <label>Model Vehicle Name</label><input type="text" id="p-name" required placeholder="Ferrari 488 Pista">
+    <label>Brand Builder</label><input type="text" id="p-brand" required placeholder="Bburago Prestige">
+    <label>Scale Category</label><input type="text" id="p-scale" required placeholder="1:18">
+    <label>Standard Base Price (Plain INR)</label><input type="number" id="p-price" required placeholder="4299">
+    <label>Detailed Context Description</label><textarea id="p-desc" rows="3" placeholder="Enter engine room detail layout parameters..."></textarea>
+    <button type="submit" class="submit-btn">Publish to Live Store</button>
+  </form>
+
+  <div>
+    <h3 style="margin-bottom: 1rem;">Active Inventory & Promotional Pricing Layout</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Vehicle Model</th>
+          <th>Scale</th>
+          <th>Base Price</th>
+          <th>Promo Price (INR)</th>
+          <th>Update Actions</th>
+        </tr>
+      </thead>
+      <tbody id="adminInventoryTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+  const SUPABASE_URL = 'https://cjzvweakirjbmmacrqpk.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg'
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  async function loadAdminWorkspace() {
+    const { data: fleet } = await supabase.from('products').select('*').order('created_at', { ascending: false })
+    const view = document.getElementById('adminInventoryTableBody')
+    if (!view || !fleet) return
+
+    view.innerHTML = fleet.map(p => `
+      <tr>
+        <td><strong>${p.name}</strong><br><small style="color:var(--muted)">${p.brand}</small></td>
+        <td><span style="color:var(--gold)">${p.scale}</span></td>
+        <td>₹${p.price / 100}</td>
+        <td>
+          <input type="number" class="discount-input-field" id="disc-${p.id}" value="${p.discount_price ? p.discount_price / 100 : ''}" placeholder="No Discount">
+        </td>
+        <td>
+          <button class="submit-btn" style="padding:4px 8px; font-size:11px;" onclick="window.applyProductDiscount('${p.id}')">Apply</button>
+        </td>
+      </tr>
+    `).join('')
+  }
+
+  document.getElementById('productForm').onsubmit = async (e) => {
+    e.preventDefault()
+    const payload = {
+      name: document.getElementById('p-name').value,
+      brand: document.getElementById('p-brand').value,
+      scale: document.getElementById('p-scale').value,
+      price: parseInt(document.getElementById('p-price').value) * 100,
+      description: document.getElementById('p-desc').value || undefined
+    }
+
+    const { error } = await supabase.from('products').insert([payload])
+    if (!error) {
+      document.getElementById('productForm').reset()
+      await loadAdminWorkspace()
+    } else { alert(error.message) }
+  }
+
+  window.applyProductDiscount = async function(id) {
+    const rawVal = document.getElementById(`disc-${id}`).value
+    const finalDiscountVal = rawVal ? parseInt(rawVal) * 100 : null
+
+    const { error } = await supabase.from('products').update({ discount_price: finalDiscountVal }).eq('id', id)
+    if (!error) {
+      alert('Promotional discount applied successfully!');
+      await loadAdminWorkspace()
+    } else { alert(error.message) }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadAdminWorkspace)
+</script>
+</body>
+</html>
