@@ -18,43 +18,56 @@
   .grid-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
   form { display: flex; flex-direction: column; gap: 12px; background: var(--card-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); }
   label { font-size: 11px; text-transform: uppercase; color: var(--muted); }
-  input, textarea { background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 10px; border-radius: 6px; font-family: var(--font-body); }
+  input, textarea, select { background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 10px; border-radius: 6px; font-family: var(--font-body); outline: none; }
   
   button.submit-btn { background: var(--gold); color: var(--black); border: none; padding: 12px; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
   table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 8px; overflow: hidden; }
   th, td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 13px; }
   th { color: var(--gold); background: #1e2022; font-size: 11px; text-transform: uppercase; }
-  .discount-input-field { width: 90px; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 5px; border-radius: 4px; }
+  .discount-input-field { width: 95px; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 5px; border-radius: 4px; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>CastWheelz Admin Panel</h1>
-  <button class="submit-btn" style="padding: 6px 12px;" onclick="window.location.href='./'">← Storefront</button>
+  <h1>CastWheelz Control Center</h1>
+  <button class="submit-btn" style="padding: 6px 12px;" onclick="window.location.href='./'">← View Store</button>
 </header>
 
 <div class="grid-layout">
-  <form id="productForm">
-    <h3>Add Scale Replica</h3>
-    <label>Model Vehicle Name</label><input type="text" id="p-name" required placeholder="Ferrari 488 Pista">
-    <label>Brand Builder</label><input type="text" id="p-brand" required placeholder="Bburago Prestige">
-    <label>Scale Category</label><input type="text" id="p-scale" required placeholder="1:18">
-    <label>Standard Base Price (Plain INR)</label><input type="number" id="p-price" required placeholder="4299">
-    <label>Detailed Context Description</label><textarea id="p-desc" rows="3" placeholder="Enter engine room detail layout parameters..."></textarea>
-    <button type="submit" class="submit-btn">Publish to Live Store</button>
+  <!-- MANIFEST CREATION FORM -->
+  <form id="newVehicleForm">
+    <h3>List Premium Model Car</h3>
+    <label>Model Vehicle Name</label><input type="text" id="p-name" required placeholder="Ford Mustang Mach 1">
+    <label>Brand Builder</label><input type="text" id="p-brand" required placeholder="AUTOart Signature">
+    <label>Scale Specification</label>
+    <select id="p-scale">
+      <option>1:64</option><option>1:43</option><option>1:24</option><option selected>1:18</option><option>1:12</option>
+    </select>
+    <label>Base Retail Value (INR Plain)</label><input type="number" id="p-price" required placeholder="8500">
+    <label>Display Badge Tag</label>
+    <select id="p-badge">
+      <option value="">No Badge</option>
+      <option value="New">New</option>
+      <option value="Limited">Limited</option>
+      <option value="Hot">Hot</option>
+    </select>
+    <label>Detailed Specifications Sheet Text</label>
+    <textarea id="p-desc" rows="3" placeholder="Enter engine layout configurations, opening parts details..."></textarea>
+    <button type="submit" class="submit-btn">Push to Live Catalog</button>
   </form>
 
+  <!-- LIVE METRICS DATA SHEET -->
   <div>
-    <h3 style="margin-bottom: 1rem;">Active Inventory & Promotional Pricing Layout</h3>
+    <h3 style="margin-bottom: 1rem;">Active Storefront Stock & Promotional Discounts</h3>
     <table>
       <thead>
         <tr>
-          <th>Vehicle Model</th>
+          <th>Vehicle Profile</th>
           <th>Scale</th>
-          <th>Base Price</th>
-          <th>Promo Price (INR)</th>
-          <th>Update Actions</th>
+          <th>Base MSRP</th>
+          <th>Promotional Price (INR)</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="adminInventoryTableBody"></tbody>
@@ -69,7 +82,7 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg'
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-  async function loadAdminWorkspace() {
+  async function loadAdminWorkspaceDeck() {
     const { data: fleet } = await supabase.from('products').select('*').order('created_at', { ascending: false })
     const view = document.getElementById('adminInventoryTableBody')
     if (!view || !fleet) return
@@ -80,44 +93,45 @@
         <td><span style="color:var(--gold)">${p.scale}</span></td>
         <td>₹${p.price / 100}</td>
         <td>
-          <input type="number" class="discount-input-field" id="disc-${p.id}" value="${p.discount_price ? p.discount_price / 100 : ''}" placeholder="No Discount">
+          <input type="number" class="discount-input-field" id="disc-${p.id}" value="${p.discount_price ? p.discount_price / 100 : ''}" placeholder="MSRP Active">
         </td>
         <td>
-          <button class="submit-btn" style="padding:4px 8px; font-size:11px;" onclick="window.applyProductDiscount('${p.id}')">Apply</button>
+          <button class="submit-btn" style="padding:5px 10px; font-size:11px;" onclick="window.applyLiveProductDiscount('${p.id}')">Apply</button>
         </td>
       </tr>
     `).join('')
   }
 
-  document.getElementById('productForm').onsubmit = async (e) => {
+  document.getElementById('newVehicleForm').onsubmit = async (e) => {
     e.preventDefault()
     const payload = {
       name: document.getElementById('p-name').value,
       brand: document.getElementById('p-brand').value,
       scale: document.getElementById('p-scale').value,
       price: parseInt(document.getElementById('p-price').value) * 100,
+      badge: document.getElementById('p-badge').value || null,
       description: document.getElementById('p-desc').value || undefined
     }
 
     const { error } = await supabase.from('products').insert([payload])
     if (!error) {
-      document.getElementById('productForm').reset()
-      await loadAdminWorkspace()
+      document.getElementById('newVehicleForm').reset()
+      await loadAdminWorkspaceDeck()
     } else { alert(error.message) }
   }
 
-  window.applyProductDiscount = async function(id) {
-    const rawVal = document.getElementById(`disc-${id}`).value
-    const finalDiscountVal = rawVal ? parseInt(rawVal) * 100 : null
+  window.applyLiveProductDiscount = async function(id) {
+    const fieldInput = document.getElementById(`disc-${id}`).value
+    const activeDiscountPrice = fieldInput ? parseInt(fieldInput) * 100 : null
 
-    const { error } = await supabase.from('products').update({ discount_price: finalDiscountVal }).eq('id', id)
+    const { error } = await supabase.from('products').update({ discount_price: activeDiscountPrice }).eq('id', id)
     if (!error) {
-      alert('Promotional discount applied successfully!');
-      await loadAdminWorkspace()
+      alert('Promotional price rule committed successfully!')
+      await loadAdminWorkspaceDeck()
     } else { alert(error.message) }
   }
 
-  document.addEventListener('DOMContentLoaded', loadAdminWorkspace)
+  document.addEventListener('DOMContentLoaded', loadAdminWorkspaceDeck)
 </script>
 </body>
 </html>
