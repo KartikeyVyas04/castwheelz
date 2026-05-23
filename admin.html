@@ -151,8 +151,8 @@
     const { data: { session } } = await supabase.auth.getSession()
     const currentUserObj = session?.user || null
 
-    // TARGET FIREWALL: Update this exact comparison string with your authorized Google operator mail parameters
-    if (currentUserObj && currentUserObj.email === 'your-admin-email@gmail.com') {
+    // TARGET FIREWALL CLEARED FOR SPECIFIC OPERATOR IDENTITY
+    if (currentUserObj && currentUserObj.email === 'prakior@gmail.com') {
       document.getElementById('adminAuthGatewayBlock').classList.add('hidden')
       await initializeAdminConsoleData()
     } else {
