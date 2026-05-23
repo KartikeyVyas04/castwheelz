@@ -48,21 +48,20 @@
   .car-svg-wrap svg { width: 100%; max-width: 380px; filter: drop-shadow(0 20px 40px rgba(201,168,76,0.15)); }
   .scale-badge { position: absolute; top: 1rem; right: 1rem; background: var(--gold); color: var(--black); font-family: var(--font-display); font-size: 18px; padding: 6px 14px; border-radius: 6px; }
 
-  /* RESPONSIVE LAYOUT GRIDS */
+  /* GRIDS */
   .section { padding: 6rem 0; }
   .section-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
   .section-header { margin-bottom: 3rem; }
   .section-eyebrow { font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem; }
   .section-title { font-family: var(--font-display); font-size: clamp(36px, 5vw, 54px); letter-spacing: 1px; color: var(--white); }
   
-  /* Anti-collapse clean layout setup */
-  .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; min-height: 50px; }
+  .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
   .cat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem 1rem 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s; }
   .cat-card:hover { border-color: var(--gold); transform: translateY(-4px); }
   .cat-icon { width: 52px; height: 52px; border-radius: 12px; background: rgba(201,168,76,0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 22px; }
   .cat-name { font-weight: 600; font-size: 14px; color: var(--white); }
 
-  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; min-height: 100px; }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
   .product-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; cursor: pointer; transition: all 0.3s; position: relative; }
   .product-card:hover { border-color: rgba(201,168,76,0.35); transform: translateY(-6px); }
   .product-img { background: linear-gradient(135deg, #1a1c20, #222428); height: 200px; display: flex; align-items: center; justify-content: center; position: relative; }
@@ -71,32 +70,24 @@
   
   .product-info { padding: 1rem 1.1rem 1.1rem; }
   .product-scale { font-size: 10px; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
-  .product-name { font-weight: 600; font-size: 14px; color: var(--white); line-height: 1.3; margin-bottom: 4px; }
+  .product-name { font-weight: 600; font-size: 14px; color: var(--white); line-height: 1.3; margin-bottom: 4px; cursor: pointer; }
+  .product-name:hover { color: var(--gold); }
   .product-brand { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
   .product-footer { display: flex; align-items: center; justify-content: space-between; }
   .price { font-family: var(--font-display); font-size: 22px; color: var(--gold); }
   .price-old { font-size: 12px; color: var(--muted); text-decoration: line-through; margin-left: 4px; }
   
-  .btn-add, .btn-action { background: none; border: 1px solid var(--border); color: var(--white); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase; transition: all 0.2s; font-family: var(--font-body); }
-  .btn-add:hover { background: var(--gold); border-color: var(--gold); color: var(--black); }
-
-  /* OVERLAY SYSTEM MODALS */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(5,5,5,0.85); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
+  /* MODAL CONTAINER SHEETS */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(5,5,5,0.88); backdrop-filter: blur(12px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
   .modal-overlay.active { display: flex; }
-  .modal-surface { background: var(--card-bg); border: 1px solid var(--border); width: 100%; max-width: 520px; border-radius: 16px; padding: 2.5rem; position: relative; box-shadow: 0 24px 64px rgba(0,0,0,0.7); }
-  .modal-close { position: absolute; top: 1.25rem; right: 1.25rem; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; }
+  .modal-surface { background: var(--card-bg); border: 1px solid var(--border); width: 100%; max-width: 580px; border-radius: 16px; padding: 2.5rem; position: relative; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
+  .modal-close { position: absolute; top: 1.25rem; right: 1.25rem; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; transition: color 0.2s; }
+  .modal-close:hover { color: var(--white); }
   
   .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.25rem; }
   .form-group label { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
   .form-group input, .form-group textarea { background: var(--black); border: 1px solid var(--border); padding: 12px; border-radius: 6px; color: var(--white); outline: none; font-family: var(--font-body); }
   .form-group input:focus, .form-group textarea:focus { border-color: var(--gold); }
-
-  /* RUNNING MARQUEE RUNWAY */
-  .marquee-band { background: var(--gold); padding: 12px 0; overflow: hidden; border-top: 1px solid var(--gold-dark); border-bottom: 1px solid var(--gold-dark); }
-  .marquee-track { display: flex; gap: 0; white-space: nowrap; animation: marquee 30s linear infinite; }
-  .marquee-item { display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: 15px; letter-spacing: 2px; color: var(--black); padding: 0 2rem; flex-shrink: 0; }
-  .marquee-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--black); opacity: 0.4; }
-  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 1100; background: var(--card-bg); border: 1px solid var(--gold); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; transform: translateX(120%); transition: transform 0.4s ease; }
   .toast.show { transform: translateX(0); }
@@ -125,10 +116,10 @@
   <div class="hero-grid-lines"></div>
   <div class="hero-inner">
     <div class="hero-content">
-      <div class="hero-label">Live Inventory Synchronized</div>
-      <h1>Precision<br><span class="accent">Die-Cast</span> Room</h1>
-      <p class="hero-sub">Museum-grade scale replicas. Handcrafted precision engineering loops synced right with live system states.</p>
-      <button class="btn-primary" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Explore Gallery</button>
+      <div class="hero-label">Live Cloud Fleet Connection</div>
+      <h1>Precision<br><span class="accent">Die-Cast</span> Legends</h1>
+      <p class="hero-sub">Museum-grade scale replicas. Handcrafted precision metal engineering loops synced live with client state wrappers.</p>
+      <button class="btn-nav" style="border-color:var(--gold); color:var(--gold);" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Explore Gallery</button>
     </div>
     <div class="hero-visual">
       <div class="hero-car-showcase">
@@ -148,17 +139,16 @@
 
 <div class="marquee-band">
   <div class="marquee-track">
-    <div class="marquee-item"><span class="marquee-dot"></span> 1:18 Prestige Range</div>
-    <div class="marquee-item"><span class="marquee-dot"></span> Razorpay Live Merchant Key</div>
-    <div class="marquee-item"><span class="marquee-dot"></span> 1:43 Classic Series</div>
-    <div class="marquee-item"><span class="marquee-dot"></span> Direct Vercel Engine Deployment</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> 1:18 Prestige Fleet</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Razorpay Standard Checkout SDK</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Dynamic Details Modules Active</div>
   </div>
 </div>
 
 <section class="section categories-bg" id="categories">
   <div class="section-inner">
     <div class="section-header">
-      <div class="section-eyebrow">Sort Engine Fleet</div>
+      <div class="section-eyebrow">Sort Fleet</div>
       <div class="section-title">Scale Categories</div>
     </div>
     <div class="cat-grid" id="scalesFilterGrid"></div>
@@ -170,7 +160,7 @@
     <div class="section-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
       <div>
         <div class="section-eyebrow">Live Catalog</div>
-        <div class="section-title">Active Bestsellers</div>
+        <div class="section-title">Active Fleet</div>
       </div>
       <button class="btn-nav" onclick="window.clearActiveScaleFilters()">Show All Replicas</button>
     </div>
@@ -178,23 +168,27 @@
   </div>
 </section>
 
-<!-- MODALS -->
+<!-- PRODUCT DETAILS VIEWPORT MODAL -->
 <div class="modal-overlay" id="productDetailsModal">
   <div class="modal-surface">
     <button class="modal-close" onclick="closeActiveModalWindow('productDetailsModal')">✕</button>
-    <h2 id="modalTargetTitle" style="font-family: var(--font-display); font-size: 32px; color: var(--gold); margin-bottom: 4px;">Vehicle</h2>
-    <div id="modalTargetMeta" style="font-size: 12px; color: var(--muted); margin-bottom: 1.5rem; text-transform: uppercase;">Brand</div>
-    <p id="modalTargetDescription" style="color: var(--silver); line-height: 1.7; margin-bottom: 2rem; font-size: 14px;">Context string.</p>
+    <div style="background:#1a1c20; height:220px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:1.5rem; border:1px solid var(--border);">
+      <svg width="100" height="100" fill="none" stroke="var(--gold)" stroke-width="1" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 1 13v3c0 .6.4 1 1 1h2m10 0h4"/></svg>
+    </div>
+    <h2 id="modalTargetTitle" style="font-family: var(--font-display); font-size: 36px; color: var(--white); margin-bottom: 4px;">Vehicle</h2>
+    <div id="modalTargetMeta" style="font-size: 13px; color: var(--gold); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing:0.05em;">Brand Spec</div>
+    <p id="modalTargetDescription" style="color: var(--silver); line-height: 1.7; margin-bottom: 2rem; font-size: 14px;">Context sheet detailing technical specs.</p>
     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1.5rem;">
       <div>
         <span style="font-size: 11px; color: var(--muted); display: block; text-transform: uppercase;">MSRP Value</span>
-        <strong style="font-family: var(--font-display); font-size: 28px; color: var(--white);" id="modalTargetPrice">₹0</strong>
+        <strong style="font-family: var(--font-display); font-size: 28px; color: var(--gold);" id="modalTargetPrice">₹0</strong>
       </div>
-      <button class="btn-add" id="modalAddToCartAction" style="padding: 12px 24px; background: var(--gold); color: var(--black); border: none;">Add to Cart Allocation</button>
+      <button class="btn-cart" id="modalAddToCartAction" style="padding: 12px 24px;">Add to Cart Allocation</button>
     </div>
   </div>
 </div>
 
+<!-- SHIPPING MANIFEST CONTROL MODAL -->
 <div class="modal-overlay" id="checkoutFlowModal">
   <div class="modal-surface">
     <button class="modal-close" onclick="closeActiveModalWindow('checkoutFlowModal')">✕</button>
@@ -204,25 +198,22 @@
       <div class="form-group"><label>Primary Contact Phone Number</label><input type="tel" id="cust-phone" required placeholder="+91 XXXXX XXXXX"></div>
       <div class="form-group"><label>Destination Shipping Address</label><textarea id="cust-address" rows="3" required placeholder="Flat, Street, Area, City, Pincode, Maharashtra"></textarea></div>
       <div style="margin: 1.5rem 0; padding: 1rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Compound Bill Total:</span>
+        <span style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Compound Total:</span>
         <strong style="color: var(--gold); font-size: 22px;" id="manifestInvoiceTotal">₹0</strong>
       </div>
-      <button type="submit" class="btn-add" style="width: 100%; justify-content: center; padding: 14px; background: var(--gold); color: var(--black); border: none;">Authorize Razorpay Secure Session</button>
+      <button type="submit" class="btn-cart" style="width: 100%; justify-content: center; padding: 14px;">Authorize Razorpay Secure Session</button>
     </form>
   </div>
 </div>
 
 <div class="toast" id="toastComponent">
   <span class="toast-icon">🛒</span>
-  <div class="toast-msg"><strong id="toastTargetItemName">Model</strong> locked to profile ledger.</div>
+  <div class="toast-msg"><strong id="toastTargetItemName">Model</strong> locked to cloud profile ledger.</div>
 </div>
 
-<footer style="margin-top: 5rem; border-top: 1px solid var(--border); padding: 4rem 0 2rem; background: var(--dark);">
-  <div style="max-width:1280px; margin:0 auto; padding:0 2rem; text-align: center;">
-    <a href="#" class="logo" style="font-size: 32px;">CAST<span>WHEELZ</span></a>
-    <hr style="border: none; border-top: 1px solid var(--border); margin: 2rem 0;">
-    <p style="font-size: 12px; color: var(--muted);">© 2026 CastWheelz Master Control Room.</p>
-  </div>
+<footer style="margin-top: 5rem; border-top: 1px solid var(--border); padding: 4rem 0 2rem; background: var(--dark); text-align:center;">
+  <a href="#" class="logo" style="font-size: 32px;">CAST<span>WHEELZ</span></a>
+  <p style="font-size: 12px; color: var(--muted); margin-top:1rem;">© 2026 CastWheelz Master Control Suite.</p>
 </footer>
 
 <script type="module">
@@ -269,7 +260,7 @@
     if (!grid) return
     
     if (error || !data || data.length === 0) {
-      grid.innerHTML = `<div style="grid-column: 1/-1; color: var(--muted); text-align:center; width:100%; padding: 1rem 0; font-size:14px;">No active scale category groups configured in the admin dashboard yet.</div>`
+      grid.innerHTML = `<div style="grid-column: 1/-1; color: var(--muted); text-align:center; width:100%; padding: 1rem 0; font-size:14px;">No active category groups loaded in database yet.</div>`
       return
     }
     grid.innerHTML = data.map(c => `
@@ -303,8 +294,7 @@
     if (error || !data || data.length === 0) {
       targetGrid.innerHTML = `
         <div style="grid-column: 1/-1; text-align: center; color: var(--muted); width:100%; padding: 4rem 0;">
-          No premium models located in this catalog view yet.<br>
-          <small style="color: var(--gold); margin-top: 8px; display: block;">(Make sure to disable RLS or add data via admin panel console)</small>
+          No items located in this catalog block view yet.
         </div>`
       return
     }
@@ -321,7 +311,7 @@
             </svg>
           </div>
           <div class="product-info">
-            <div class="product-scale">${p.scale} Class</div>
+            <div class="product-scale">${p.scale} Scale</div>
             <div class="product-name" onclick="window.launchSpecificationsSheet('${p.id}')">${p.name}</div>
             <div class="product-brand">${p.brand}</div>
             <div class="product-footer">
@@ -341,15 +331,15 @@
     const { data: p } = await supabase.from('products').select('*').eq('id', id).single()
     if (!p) return
     document.getElementById('modalTargetTitle').textContent = p.name
-    document.getElementById('modalTargetMeta').textContent = `${p.brand} · ${p.scale} Replicas`
-    document.getElementById('modalTargetDescription').textContent = p.description || 'Premium precision scaled design layout.'
+    document.getElementById('modalTargetMeta').textContent = `${p.brand} · ${p.scale} Architectural Series`
+    document.getElementById('modalTargetDescription').textContent = p.description || 'Premium scale replica configuration.'
     document.getElementById('modalTargetPrice').textContent = `₹${(p.discount_price ? p.discount_price : p.price) / 100}`
     document.getElementById('modalAddToCartAction').onclick = () => { closeActiveModalWindow('productDetailsModal'); window.pushToCloudCart(p.id, p.name); }
     document.getElementById('productDetailsModal').classList.add('active')
   }
 
   window.pushToCloudCart = async function(id, name) {
-    if (!window.LocalState.sessionUser) return alert('Authorize profile connection via Google login first.')
+    if (!window.LocalState.sessionUser) return alert('Authorize profile connection via Google login container.')
     await supabase.from('cart_items').upsert({ profile_id: window.LocalState.sessionUser.id, product_id: id, quantity: 1 })
     const toast = document.getElementById('toastComponent')
     document.getElementById('toastTargetItemName').textContent = name
