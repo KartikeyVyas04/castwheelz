@@ -14,22 +14,27 @@
   }
   body { background: var(--black); color: var(--white); font-family: var(--font-body); margin: 0; padding-top: 80px; }
   
-  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; padding: 0 2rem; z-index: 100; }
+  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; padding: 0 3rem; z-index: 100; }
   .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
   .logo span { color: var(--white); }
   
-  .container { max-width: 1100px; margin: 3rem auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 400px; gap: 3rem; align-items: start; }
+  .container { max-width: 1100px; margin: 3rem auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 420px; gap: 4rem; align-items: start; }
   h1 { font-family: var(--font-display); font-size: 42px; margin: 0 0 2rem; }
   
   .cart-item { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
   .cart-item strong { font-size: 16px; }
   .cart-item .price { color: var(--gold); font-family: var(--font-display); font-size: 26px; }
   
-  .checkout-card { background: var(--card-bg); border: 1px solid var(--border); padding: 2.5rem; border-radius: 16px; position: sticky; top: 100px; }
+  .summary-card { background: var(--card-bg); border: 1px solid var(--border); padding: 2.5rem; border-radius: 16px; position: sticky; top: 100px; }
+  .summary-card h2 { font-family: var(--font-display); font-size: 28px; color: var(--white); margin: 0 0 1.5rem; }
+  
+  .checkout-form { display: none; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+  
   input, textarea { width: 100%; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 14px; border-radius: 6px; margin-bottom: 15px; outline: none; font-family: inherit; font-size: 14px; box-sizing: border-box; }
   input:focus, textarea:focus { border-color: var(--gold); }
   
-  button.submit-btn { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 16px; font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; }
+  button.submit-btn { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 16px; font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; transition: opacity 0.2s; }
+  button.submit-btn:hover { opacity: 0.9; }
 </style>
 </head>
 <body>
@@ -38,21 +43,31 @@
 
 <div class="container">
   <div>
-    <h1>Allocation Ledger</h1>
+    <h1>Active Cart</h1>
     <div id="itemsBox"><p style="color:var(--muted);">Synchronizing secure ledger cache...</p></div>
   </div>
   
-  <div class="checkout-card" id="checkoutForm" style="display:none;">
-    <h2 style="font-family:var(--font-display); font-size:28px; color:var(--white); margin:0 0 1.5rem;">Logistics Destination</h2>
-    <input type="text" id="c-name" required placeholder="Collector's Full Name">
-    <input type="tel" id="c-phone" required placeholder="Primary Contact Number">
-    <textarea id="c-address" rows="3" required placeholder="Destination Shipping Address (Area, City, Pincode)"></textarea>
+  <div class="summary-card" id="summaryBox" style="display:none;">
+    <h2>Order Summary</h2>
     
-    <div style="display:flex; justify-content:space-between; align-items:center; margin: 1.5rem 0; padding-top:1.5rem; border-top:1px solid var(--border);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin: 1.5rem 0; padding-bottom: 1.5rem; border-bottom:1px solid var(--border);">
       <span style="font-size:12px; font-weight:600; text-transform:uppercase; color:var(--muted);">Compound Total</span>
       <span style="font-family:var(--font-display); font-size:36px; color:var(--gold);" id="totalDisplay">₹0</span>
     </div>
-    <button class="submit-btn" onclick="processCheckout()">Authorize Secure Payment</button>
+
+    <!-- Step 1 Button -->
+    <button class="submit-btn" id="startCheckoutBtn" onclick="revealCheckoutForm()">Checkout</button>
+    
+    <!-- Step 2 Form (Hidden until Checkout is clicked) -->
+    <div class="checkout-form" id="checkoutFormBlock">
+      <h3 style="font-size: 14px; text-transform: uppercase; color: var(--muted); margin-top: 0;">Delivery Address Details</h3>
+      <input type="text" id="c-name" required placeholder="Full Legal Name">
+      <input type="tel" id="c-phone" required placeholder="Contact Number">
+      <textarea id="c-address" rows="3" required placeholder="Complete Shipping Address (Area, City, Pincode)"></textarea>
+      
+      <button class="submit-btn" onclick="processPayment()">Place Order & Pay</button>
+    </div>
+
   </div>
 </div>
 
@@ -65,13 +80,16 @@
 
   async function load() {
     const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return document.getElementById('itemsBox').innerHTML = "<p style='color:var(--gold)'>Please log in to view active ledgers.</p>"
+    if (!session) {
+      document.getElementById('itemsBox').innerHTML = "<p style='color:var(--gold)'>Please log in to view active ledgers.</p>"
+      return;
+    }
     userSession = session;
 
     const { data } = await supabase.from('cart_items').select('quantity, products(id, name, price, discount_price)').eq('profile_id', session.user.id)
     cartData = data || [];
     
-    if (cartData.length === 0) return document.getElementById('itemsBox').innerHTML = "Your logistics ledger is completely empty."
+    if (cartData.length === 0) return document.getElementById('itemsBox').innerHTML = "Your logistics cart is empty."
     
     document.getElementById('itemsBox').innerHTML = cartData.map(i => `
       <div class="cart-item">
@@ -82,14 +100,19 @@
     
     let totalPaisa = cartData.reduce((s, i) => s + ((i.products.discount_price || i.products.price) * i.quantity), 0)
     document.getElementById('totalDisplay').textContent = `₹${totalPaisa / 100}`
-    document.getElementById('checkoutForm').style.display = 'block'
+    document.getElementById('summaryBox').style.display = 'block'
   }
 
-  window.processCheckout = function() {
+  window.revealCheckoutForm = function() {
+    document.getElementById('startCheckoutBtn').style.display = 'none';
+    document.getElementById('checkoutFormBlock').style.display = 'block';
+  }
+
+  window.processPayment = function() {
     const name = document.getElementById('c-name').value
     const phone = document.getElementById('c-phone').value
     const address = document.getElementById('c-address').value
-    if(!name || !phone || !address) return alert("Fill out all logistics manifest parameters.");
+    if(!name || !phone || !address) return alert("Please fill out all logistics delivery details.");
 
     let totalPaisa = cartData.reduce((s, i) => s + ((i.products.discount_price || i.products.price) * i.quantity), 0)
 
@@ -103,7 +126,7 @@
         }]).select().single()
         
         await supabase.from('cart_items').delete().eq('profile_id', userSession.user.id)
-        alert('Payment Confirmed! Tracking Invoice: ' + order.id.substring(0,8).toUpperCase())
+        alert('Payment Processed Successfully! Tracking ID: ' + order.id.substring(0,8).toUpperCase())
         window.location.href = 'index.html'
       },
       "prefill": { "name": name, "email": userSession.user.email, "contact": phone },
