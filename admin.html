@@ -9,7 +9,7 @@
   :root {
     --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
     --gold: #c9a84c; --gold-light: #e8c97a; --white: #f4f2ee; --muted: #7a7d88;
-    --red: #d63333; --green: #22c55e; --blue: #2563eb;
+    --red: #d63333; --green: #22c55e;
     --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,14 +19,16 @@
   h1 { font-family: var(--font-display); font-size: 36px; color: var(--gold); letter-spacing: 1px; }
   .btn-nav-back { background: none; border: 1px solid var(--border); color: var(--white); padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: 600; }
 
-  /* ADMIN FIREWALL OVERLAY GATEWAY */
-  .auth-gate-overlay { position: fixed; inset: 0; background: rgba(5,5,5,0.95); backdrop-filter: blur(20px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 1.5rem; padding: 2rem; }
+  /* RESTRICTED ADMIN FIREWALL */
+  .auth-gate-overlay { position: fixed; inset: 0; background: rgba(5,5,5,0.95); backdrop-filter: blur(20px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
   .auth-gate-overlay.hidden { display: none; }
-  .auth-gate-card { background: var(--card-bg); border: 1px solid var(--border); padding: 3rem; border-radius: 16px; max-width: 440px; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
+  .auth-gate-card { background: var(--card-bg); border: 1px solid var(--border); padding: 3rem; border-radius: 16px; width: 100%; max-width: 440px; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
+  .auth-gate-card input { width: 100%; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 14px; border-radius: 6px; margin-bottom: 15px; outline: none; font-family: inherit; font-size: 14px; box-sizing: border-box;}
+  .auth-gate-card input:focus { border-color: var(--gold); }
 
   .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
   .metric-card { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 10px; text-align: center; }
-  .metric-card h4 { font-size: 11px; text-transform: uppercase; color: var(--muted); }
+  .metric-card h4 { font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
   .metric-card div { font-family: var(--font-display); font-size: 32px; color: var(--white); }
 
   .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); }
@@ -40,28 +42,35 @@
   form h3 { font-family: var(--font-display); font-size: 22px; margin-bottom: 5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
   
   label { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-  input, textarea, select { background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 12px; border-radius: 6px; font-size: 14px; }
+  input, textarea, select { background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 12px; border-radius: 6px; font-size: 14px; font-family: inherit; }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); outline: none; }
+  button.submit-btn { background: var(--gold); color: var(--black); border: none; padding: 14px; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: inherit; font-size: 14px; }
   
-  .table-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; width: 100%; }
+  .table-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   table { width: 100%; border-collapse: collapse; text-align: left; }
-  th, td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: middle; white-space: nowrap; }
+  th, td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: middle; white-space: nowrap;}
   th { background: #1a1c1d; color: var(--gold); font-size: 11px; text-transform: uppercase; }
   
   .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
   .badge.paid { background: rgba(34,197,94,0.15); color: var(--green); }
   .badge.shipped { background: rgba(232,201,122,0.15); color: var(--gold-light); }
   .badge.delivered { background: rgba(34,197,94,0.3); color: var(--white); }
-  .discount-field { width: 90px; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 6px; border-radius: 4px; text-align: center; }
+  .discount-field { width: 90px; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 6px; border-radius: 4px; text-align: center; font-family: inherit; }
+  .btn-control { background: none; border: 1px solid var(--border); color: var(--white); padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .btn-control:hover { border-color: var(--gold); color: var(--gold); }
 </style>
 </head>
 <body>
 
-<!-- SECURE ADMIN GATEWAY LOOKUP COVER LAYER -->
 <div class="auth-gate-overlay" id="adminAuthGatewayBlock">
   <div class="auth-gate-card">
-    <h2 style="font-family:var(--font-display); font-size:36px; color:var(--gold); margin-bottom:10px;">CastWheelz HQ</h2>
-    <p style="color:var(--muted); font-size:14px; margin-bottom:2rem;">Restricted area configuration workspace. Authenticate via authorized administrative Google Account credentials.</p>
-    <button class="submit-btn" id="gatewayLoginActionBtn" style="width:100%; padding:14px; background:var(--gold); color:var(--black); border:none; font-weight:600; text-transform:uppercase; border-radius:6px; cursor:pointer;">Authorize via Google</button>
+    <h2 style="font-family:var(--font-display); font-size:42px; color:var(--gold); margin:0 0 10px; letter-spacing: 2px;">CASTWHEELZ HQ</h2>
+    <p style="color:var(--muted); font-size:14px; margin-bottom:2rem;">Restricted admin zone dashboard.</p>
+    <!-- Explicit hardcode lock to prakior@gmail.com -->
+    <input type="email" id="adminEmail" value="prakior@gmail.com" readonly style="color:var(--muted); cursor: not-allowed;">
+    <input type="password" id="adminPassword" placeholder="Admin Gateway Password" required>
+    <button class="submit-btn" id="gatewayLoginBtn" style="width:100%;">Authorize Terminal Sync</button>
+    <div id="adminErr" style="color:var(--red); font-size:13px; margin-top:15px;"></div>
   </div>
 </div>
 
@@ -83,58 +92,54 @@
   <button class="tab-btn" onclick="switchTabAndLoadOrders('panel-orders', this)">Fulfillment & Orders</button>
 </div>
 
-<!-- INVENTORY FLEET -->
 <div id="panel-inventory" class="panel active">
   <div class="grid-layout">
     <form id="vehicleCreationForm">
       <h3>List Premium Model</h3>
-      <label>Model Vehicle Name</label><input type="text" id="p-name" required placeholder="Porsche 911 GT3 RS">
-      <label>Brand Builder</label><input type="text" id="p-brand" required placeholder="Spark Models">
+      <label>Vehicle Name</label><input type="text" id="p-name" required placeholder="McLaren P1">
+      <label>Brand Builder</label><input type="text" id="p-brand" required placeholder="AUTOart">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
         <div><label>Scale Spec</label><select id="p-scale"><option>1:64</option><option>1:43</option><option>1:24</option><option selected>1:18</option><option>1:12</option></select></div>
-        <div><label>Category Group</label><select id="p-category" required></select></div>
+        <div><label>Category</label><select id="p-category" required></select></div>
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div><label>MSRP Price (INR)</label><input type="number" id="p-price" required></div>
+        <div><label>MSRP (INR)</label><input type="number" id="p-price" required></div>
         <div><label>Stock Count</label><input type="number" id="p-stock" required value="5"></div>
       </div>
-      <label>Badge</label><select id="p-badge"><option value="">No Badge</option><option value="New">New</option><option value="Limited">Limited</option><option value="Hot">Hot</option></select>
-      <label>Specifications Text</label><textarea id="p-desc" rows="3"></textarea>
-      <button type="submit" class="submit-btn">Commit to Grid</button>
+      <label>Specs / Details</label><textarea id="p-desc" rows="3"></textarea>
+      <button type="submit" class="submit-btn">Commit to Database</button>
     </form>
     <div class="table-container">
       <table>
-        <thead><tr><th>Model Vehicle</th><th>Scale</th><th>MSRP Price</th><th>Promo Price</th><th>Options</th></tr></thead>
+        <thead><tr><th>Model Identity</th><th>Scale</th><th>MSRP Value</th><th>Active Discount</th><th>Options</th></tr></thead>
         <tbody id="inventoryGridTableBody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- CATEGORIES -->
 <div id="panel-categories" class="panel">
   <div class="grid-layout">
     <form id="categoryConfigForm">
       <h3>Create Category Group</h3>
-      <label>Category Name</label><input type="text" id="c-name" required>
-      <label>System URL Slug</label><input type="text" id="c-slug" required>
+      <label>Group Name</label><input type="text" id="c-name" required placeholder="Exotic Hypercars">
+      <label>URL Slug</label><input type="text" id="c-slug" required placeholder="exotic-hypercars">
       <label>UI Emoji Icon</label><input type="text" id="c-icon" value="🏎️" required>
-      <button type="submit" class="submit-btn">Deploy Catalog Node</button>
+      <button type="submit" class="submit-btn">Deploy Matrix Node</button>
     </form>
     <div class="table-container">
       <table>
-        <thead><tr><th>Symbol</th><th>Category Group Name</th><th>Slug Route</th><th>Options</th></tr></thead>
+        <thead><tr><th>Symbol</th><th>Category Name</th><th>Slug Route</th><th>Options</th></tr></thead>
         <tbody id="categoriesGridTableBody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- ORDERS -->
 <div id="panel-orders" class="panel">
   <div class="table-container">
     <table>
-      <thead><tr><th>Invoice</th><th>Collector Details</th><th>Financials</th><th>Logistics Status</th><th>Total Invoice</th><th>Management</th></tr></thead>
+      <thead><tr><th>Invoice ID</th><th>Collector Details</th><th>Financial Status</th><th>Total Amount</th><th>Fulfillment Routing</th></tr></thead>
       <tbody id="ordersLedgerTableBody"></tbody>
     </table>
   </div>
@@ -142,132 +147,80 @@
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
 
-  const SUPABASE_URL = 'https://cjzvweakirjbmmacrqpk.supabase.co'
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg'
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-  async function adminAuthLifecycleCheck() {
+  async function checkAuth() {
     const { data: { session } } = await supabase.auth.getSession()
-    const currentUserObj = session?.user || null
-
-    // TARGET FIREWALL CLEARED FOR SPECIFIC OPERATOR IDENTITY
-    if (currentUserObj && currentUserObj.email === 'prakior@gmail.com') {
+    if (session?.user?.email === 'prakior@gmail.com') {
       document.getElementById('adminAuthGatewayBlock').classList.add('hidden')
-      await initializeAdminConsoleData()
+      loadAll()
     } else {
       document.getElementById('adminAuthGatewayBlock').classList.remove('hidden')
-      document.getElementById('gatewayLoginActionBtn').onclick = () => {
-        supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } })
-      }
     }
   }
 
-  window.switchControlPanel = function(panelId, btnElement) {
+  document.getElementById('gatewayLoginBtn').onclick = async () => {
+    const p = document.getElementById('adminPassword').value;
+    document.getElementById('adminErr').textContent = "Authenticating keys...";
+    const { error } = await supabase.auth.signInWithPassword({ email: 'prakior@gmail.com', password: p })
+    if (error) {
+      document.getElementById('adminErr').textContent = error.message;
+    } else {
+      checkAuth();
+    }
+  }
+
+  window.switchControlPanel = function(id, btn) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
-    document.getElementById(panelId).classList.add('active'); btnElement.classList.add('active')
+    document.getElementById(id).classList.add('active'); btn.classList.add('active')
+    if(id === 'panel-orders') downloadOrders();
   }
 
-  window.switchTabAndLoadOrders = function(panelId, btnElement) { window.switchControlPanel(panelId, btnElement); downloadOrdersLedger(); }
+  async function loadAll() {
+    const { data: fleet } = await supabase.from('products').select('*').order('created_at', { ascending: false })
+    const { data: tags } = await supabase.from('categories').select('*').order('name', { ascending: true })
+    const { data: orders } = await supabase.from('orders').select('total_amount, payment_status, fulfillment_status')
 
-  async function initializeAdminConsoleData() {
-    await downloadInventoryData()
-    await downloadCategoriesData()
-  }
+    document.getElementById('statTotalProducts').textContent = fleet?.length || 0;
+    document.getElementById('statTotalCategories').textContent = tags?.length || 0;
+    if(orders) {
+      document.getElementById('statPendingOrders').textContent = orders.filter(o => o.fulfillment_status !== 'Delivered').length;
+      document.getElementById('statGrossRevenue').textContent = `₹${(orders.filter(o => o.payment_status === 'Paid').reduce((s, o) => s + o.total_amount, 0) / 100).toLocaleString('en-IN')}`;
+    }
 
-  async function calculateDashboardAnalytics(fleet, tagsCount) {
-    document.getElementById('statTotalProducts').textContent = fleet ? fleet.length : 0
-    document.getElementById('statTotalCategories').textContent = tagsCount
-    const { data } = await supabase.from('orders').select('total_amount, payment_status, fulfillment_status')
-    if (data) {
-      document.getElementById('statPendingOrders').textContent = data.filter(o => o.fulfillment_status !== 'Delivered').length
-      document.getElementById('statGrossRevenue').textContent = `₹${(data.filter(o => o.payment_status === 'Paid').reduce((s, o) => s + o.total_amount, 0) / 100).toLocaleString('en-IN')}`
+    if(tags) {
+      document.getElementById('p-category').innerHTML = tags.map(t => `<option value="${t.id}">${t.name}</option>`).join('')
+      document.getElementById('categoriesGridTableBody').innerHTML = tags.map(t => `<tr><td><span style="font-size:18px;">${t.display_icon}</span></td><td><strong>${t.name}</strong></td><td><code>/${t.slug}</code></td><td><button class="btn-control" style="color:var(--red); border-color:var(--red);" onclick="delCat('${t.id}')">Delete</button></td></tr>`).join('')
+    }
+    if(fleet) {
+      document.getElementById('inventoryGridTableBody').innerHTML = fleet.map(p => `<tr><td><strong>${p.name}</strong><br><small style="color:var(--muted)">${p.brand}</small></td><td><span style="color:var(--gold)">${p.scale}</span></td><td>₹${p.price/100}</td><td><div style="display:flex;gap:6px;"><input type="number" class="discount-field" id="promo-${p.id}" value="${p.discount_price ? p.discount_price/100 : ''}"><button class="btn-control" onclick="applyPromo('${p.id}')">Set</button></div></td><td><button class="btn-control" style="color:var(--red); border-color:var(--red);" onclick="delProd('${p.id}')">Delete</button></td></tr>`).join('')
     }
   }
 
-  async function downloadInventoryData() {
-    const { data: fleet } = await supabase.from('products').select('*').order('created_at', { ascending: false })
-    const { data: tags } = await supabase.from('categories').select('*').order('name', { ascending: true })
-    
-    if (tags) document.getElementById('p-category').innerHTML = tags.map(t => `<option value="${t.id}">${t.name}</option>`).join('')
-    calculateDashboardAnalytics(fleet, tags ? tags.length : 0)
-
-    const tbody = document.getElementById('inventoryGridTableBody')
-    if (!tbody || !fleet) return
-    tbody.innerHTML = fleet.map(p => `
-      <tr>
-        <td><strong>${p.name}</strong><br><small style="color:var(--muted)">${p.brand}</small></td>
-        <td>${p.scale}</td><td>₹${p.price / 100}</td>
-        <td><input type="number" class="discount-field" id="promo-${p.id}" value="${p.discount_price ? p.discount_price / 100 : ''}"></td>
-        <td><div class="btn-action-row"><button class="btn-control" onclick="window.commitPromotionalRule('${p.id}')">Apply</button><button class="btn-control danger" onclick="window.wipeProductRecord('${p.id}')">Remove</button></div></td>
-      </tr>
-    `).join('')
-  }
-
-  document.getElementById('vehicleCreationForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault()
+  document.getElementById('vehicleCreationForm').onsubmit = async (e) => {
+    e.preventDefault();
     await supabase.from('products').insert([{
-      name: document.getElementById('p-name').value, brand: document.getElementById('p-brand').value, scale: document.getElementById('p-scale').value,
-      category_id: document.getElementById('p-category').value, price: parseInt(document.getElementById('p-price').value) * 100,
-      stock_quantity: parseInt(document.getElementById('p-stock').value), badge: document.getElementById('p-badge').value || null, description: document.getElementById('p-desc').value || undefined
-    }])
-    document.getElementById('vehicleCreationForm').reset(); await downloadInventoryData()
-  })
-
-  window.commitPromotionalRule = async function(id) {
-    const val = document.getElementById(`promo-${id}`).value
-    await supabase.from('products').update({ discount_price: val ? parseInt(val) * 100 : null }).eq('id', id)
-    alert('Promotional configuration updated.'); await downloadInventoryData()
+      name: document.getElementById('p-name').value, brand: document.getElementById('p-brand').value, scale: document.getElementById('p-scale').value, category_id: document.getElementById('p-category').value, price: parseInt(document.getElementById('p-price').value)*100, stock_quantity: parseInt(document.getElementById('p-stock').value), description: document.getElementById('p-desc').value
+    }]); document.getElementById('vehicleCreationForm').reset(); loadAll();
   }
 
-  window.wipeProductRecord = async function(id) {
-    if (confirm('Delete item?')) { await supabase.from('products').delete().eq('id', id); await downloadInventoryData(); }
+  document.getElementById('categoryConfigForm').onsubmit = async (e) => {
+    e.preventDefault();
+    await supabase.from('categories').insert([{ name: document.getElementById('c-name').value, slug: document.getElementById('c-slug').value, display_icon: document.getElementById('c-icon').value }]); document.getElementById('categoryConfigForm').reset(); loadAll();
   }
 
-  async function downloadCategoriesData() {
-    const { data: tags } = await supabase.from('categories').select('*').order('name', { ascending: true })
-    const tbody = document.getElementById('categoriesGridTableBody')
-    if (!tbody || !tags) return
-    tbody.innerHTML = tags.map(t => `<tr><td>${t.display_icon}</td><td><strong>${t.name}</strong></td><td>/${t.slug}</td><td><button class="btn-control danger" onclick="window.wipeCategoryRecord('${t.id}')">Delete</button></td></tr>`).join('')
+  window.applyPromo = async (id) => { const v = document.getElementById(`promo-${id}`).value; await supabase.from('products').update({ discount_price: v ? parseInt(v)*100 : null }).eq('id', id); loadAll(); }
+  window.delProd = async (id) => { if(confirm('Delete active model?')) { await supabase.from('products').delete().eq('id', id); loadAll(); } }
+  window.delCat = async (id) => { if(confirm('Delete category link?')) { await supabase.from('categories').delete().eq('id', id); loadAll(); } }
+
+  async function downloadOrders() {
+    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false })
+    if(data) document.getElementById('ordersLedgerTableBody').innerHTML = data.map(o => `<tr><td><code>#${o.id.substring(0,8).toUpperCase()}</code></td><td><strong>${o.customer_name}</strong><div style="font-size:12px; color:var(--muted)">📞 ${o.customer_phone} <br> 📍 ${o.delivery_address}</div></td><td><span class="badge paid">${o.fulfillment_status}</span></td><td><strong style="color:var(--gold)">₹${o.total_amount/100}</strong></td><td><button class="btn-control" style="color:var(--green); border-color:var(--green);" onclick="markDelivered('${o.id}')">Mark Delivered</button></td></tr>`).join('')
   }
+  window.markDelivered = async (id) => { await supabase.from('orders').update({ fulfillment_status: 'Delivered' }).eq('id', id); downloadOrders(); }
 
-  document.getElementById('categoryConfigForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    await supabase.from('categories').insert([{ name: document.getElementById('c-name').value, slug: document.getElementById('c-slug').value, display_icon: document.getElementById('c-icon').value }])
-    document.getElementById('categoryConfigForm').reset(); await downloadCategoriesData(); await downloadInventoryData()
-  })
-
-  window.wipeCategoryRecord = async function(id) {
-    if (confirm('Delete category?')) { await supabase.from('categories').delete().eq('id', id); await downloadCategoriesData(); await downloadInventoryData(); }
-  }
-
-  async function downloadOrdersLedger() {
-    const { data: sales } = await supabase.from('orders').select('*').order('created_at', { ascending: false })
-    const tbody = document.getElementById('ordersLedgerTableBody')
-    if (!tbody || !sales) return
-    tbody.innerHTML = sales.map(o => `
-      <tr>
-        <td><code>#${o.id.substring(0,8).toUpperCase()}</code></td>
-        <td><strong>${o.customer_name}</strong><div style="font-size:12px; color:var(--muted)">📞 ${o.customer_phone} | 📍 ${o.delivery_address}</div></td>
-        <td><span class="badge paid">${o.payment_status}</span></td>
-        <td><span class="badge ${o.fulfillment_status.toLowerCase()}">${o.fulfillment_status}</span>${o.tracking_number ? `<br><small style="color:var(--gold)">${o.tracking_number}</small>` : ''}</td>
-        <td><strong>₹${o.total_amount / 100}</strong></td>
-        <td><div class="btn-action-row"><button class="btn-control" onclick="window.dispatchLogisticsRoute('${o.id}')">Track</button><button class="btn-control" onclick="window.completeOrderFulfillment('${o.id}')">Deliver</button></div></td>
-      </tr>
-    `).join('')
-  }
-
-  window.dispatchLogisticsRoute = async function(id) {
-    const code = prompt("Enter courier tracking code:")
-    if (code) { await supabase.from('orders').update({ fulfillment_status: 'Shipped', tracking_number: code }).eq('id', id); downloadOrdersLedger(); }
-  }
-
-  window.completeOrderFulfillment = async function(id) {
-    await supabase.from('orders').update({ fulfillment_status: 'Delivered' }).eq('id', id); downloadOrdersLedger();
-  }
-
-  document.addEventListener('DOMContentLoaded', adminAuthLifecycleCheck)
+  checkAuth()
 </script>
 </body>
 </html>
