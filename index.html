@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1267,6 +1267,322 @@
   }, { threshold: 0.12 });
 
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CastWheelz — Premium Die Cast Models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Inject Razorpay Web Standard Frame -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+  :root {
+    --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
+    --gold: #c9a84c; --gold-light: #e8c97a; --silver: #b8bcc8; --red: #d63333;
+    --white: #f4f2ee; --muted: #7a7d88; --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: var(--font-body); font-size: 14px; overflow-x: hidden; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 1px; }
+  .logo span { color: var(--white); }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+  .nav-links a { text-decoration: none; color: var(--silver); text-transform: uppercase; font-size: 13px; font-weight: 500; letter-spacing: 0.05em; }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
+  
+  .btn-nav, .btn-cart { background: none; border: 1px solid var(--border); color: var(--silver); padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: 600; font-family: var(--font-body); }
+  .btn-cart { background: var(--gold); color: var(--black); border: none; }
+
+  /* HERO */
+  .hero { min-height: 50vh; padding-top: 68px; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; }
+  .hero-inner h1 { font-family: var(--font-display); font-size: clamp(48px, 6vw, 80px); line-height: 0.95; color: var(--white); margin-bottom: 1rem; }
+  .hero-inner h1 span { color: var(--gold); }
+  .hero-inner p { color: var(--muted); max-width: 500px; margin: 0 auto 2rem; font-size: 16px; }
+
+  /* GRID SYSTEMS */
+  .section { padding: 4rem 2rem; max-width: 1280px; margin: 0 auto; }
+  .section-title { font-family: var(--font-display); font-size: 32px; color: var(--white); margin-bottom: 2rem; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+  .product-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; padding: 1rem; position: relative; transition: border-color 0.3s; }
+  .product-card:hover { border-color: var(--gold); }
+  .product-img-box { background: #1a1c20; height: 160px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+  .product-name { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+  .product-meta { font-size: 12px; color: var(--muted); margin-bottom: 1rem; }
+  
+  .price-strip { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+  .current-price { font-family: var(--font-display); font-size: 22px; color: var(--gold); }
+  .slashed-price { text-decoration: line-through; color: var(--muted); font-size: 13px; }
+  .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-action { background: none; border: 1px solid var(--border); color: var(--white); padding: 8px; border-radius: 6px; font-size: 12px; cursor: pointer; text-transform: uppercase; font-family: var(--font-body); font-weight: 600; }
+  .btn-action.primary { background: var(--gold); color: var(--black); border: none; }
+
+  /* DIALOG MODALS */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: var(--card-bg); border: 1px solid var(--border); width: 100%; max-width: 500px; border-radius: 16px; padding: 2rem; position: relative; }
+  .close-modal { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+  
+  .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 1.25rem; }
+  .form-group label { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .form-group input, .form-group textarea { background: var(--black); border: 1px solid var(--border); padding: 12px; border-radius: 6px; color: var(--white); outline: none; font-family: var(--font-body); }
+  .form-group input:focus { border-color: var(--gold); }
+
+  /* OVERLAY PANELS */
+  .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 999; background: var(--card-bg); border: 1px solid var(--gold); border-radius: 10px; padding: 14px 20px; transform: translateX(120%); transition: transform 0.4s ease; }
+  .toast.show { transform: translateX(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">CAST<span>WHEELZ</span></a>
+    <div class="nav-right">
+      <button class="btn-nav" id="authBtn"><span>Google Login</span></button>
+      <button class="btn-cart" id="cartTriggerBtn">Cart (<span id="cartCount">0</span>)</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <h1>Precision <span>Die-Cast</span> Room</h1>
+    <p>Premium scalemodels. Managed directly on the database cloud architecture.</p>
+  </div>
+</section>
+
+<main class="section">
+  <h2 class="section-title">Active Inventory</h2>
+  <div class="products-grid" id="productsLayoutGrid"></div>
+</main>
+
+<!-- MODAL 1: PRODUCT VEHICLE DETAILS -->
+<div class="modal-overlay" id="detailsModal">
+  <div class="modal-box">
+    <button class="close-modal" onclick="closeActiveModal('detailsModal')">✕</button>
+    <h2 id="m-title" style="font-family: var(--font-display); font-size: 28px; color: var(--gold); margin-bottom: 5px;">Model</h2>
+    <div id="m-meta" style="font-size: 12px; color: var(--muted); margin-bottom: 1rem;">Brand</div>
+    <p id="m-desc" style="color: var(--silver); line-height: 1.6; margin-bottom: 1.5rem;">Description content.</p>
+    <div class="price-strip">
+      <span class="current-price" id="m-price">₹0</span>
+    </div>
+    <button class="btn-action primary" id="m-cart-btn" style="width:100%;">Add Allocation To Cart</button>
+  </div>
+</div>
+
+<!-- MODAL 2: CHECKOUT SHIPPING PARAMETERS FORM -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal-box">
+    <button class="close-modal" onclick="closeActiveModal('checkoutModal')">✕</button>
+    <h2 style="font-family: var(--font-display); font-size: 28px; color: var(--white); margin-bottom: 1.5rem;">Delivery Destination</h2>
+    <form id="shippingForm">
+      <div class="form-group">
+        <label>Collector's Full Name</label>
+        <input type="text" id="ship-name" required>
+      </div>
+      <div class="form-group">
+        <label>Contact Phone Number</label>
+        <input type="tel" id="ship-phone" required placeholder="+91 XXXXX XXXXX">
+      </div>
+      <div class="form-group">
+        <label>Complete Shipping Address</label>
+        <textarea id="ship-address" rows="3" required placeholder="Flat, Street, Landmark, City, State, Pincode"></textarea>
+      </div>
+      <div style="margin: 1.5rem 0; font-size: 16px; display:flex; justify-content:space-between;">
+        <span>Payable Total:</span>
+        <strong style="color: var(--gold)" id="checkoutSummaryTotal">₹0</strong>
+      </div>
+      <button type="submit" class="btn-action primary" style="width: 100%;">Initialize Secure Razorpay Interface</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast">🛒 <strong id="toastName">Model</strong> updated in your profile cart ledger.</div>
+
+<footer>
+  <div class="footer-inner" style="text-align: center; padding: 4rem 0 2rem; border-top: 1px solid var(--border);">
+    <h3>CAST<span>WHEELZ</span></h3>
+    <p style="color: var(--muted); margin-top: 10px;">© 2026 CastWheelz Core Engine. All rights reserved.</p>
+  </div>
+</footer>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+  const SUPABASE_URL = 'https://cjzvweakirjbmmacrqpk.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg'
+  const RAZORPAY_KEY_ID = 'rzp_live_SskOYlu2pHt0Qp'
+  
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  window.AppState = { user: null, cartItemsList: [] }
+
+  async function appInit() {
+    const { data: { session } } = await supabase.auth.getSession()
+    window.AppState.user = session?.user || null
+    
+    syncAuthVisuals()
+    await loadShowcaseCatalog()
+    if (window.AppState.user) await updateCartMetrics()
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      window.AppState.user = session?.user || null
+      syncAuthVisuals()
+      if (event === 'SIGNED_IN') updateCartMetrics()
+    })
+  }
+
+  function syncAuthVisuals() {
+    const el = document.getElementById('authBtn')
+    if (!el) return
+    if (window.AppState.user) {
+      el.querySelector('span').textContent = 'Logout'
+      el.onclick = () => supabase.auth.signOut().then(() => window.location.reload())
+    } else {
+      el.querySelector('span').textContent = 'Google Auth Connect'
+      el.onclick = () => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
+    }
+  }
+
+  async function loadShowcaseCatalog() {
+    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false })
+    const grid = document.getElementById('productsLayoutGrid')
+    if (!grid || !data) return
+
+    grid.innerHTML = data.map(p => {
+      const activePrice = p.discount_price ? p.discount_price : p.price
+      return `
+        <div class="product-card">
+          <div class="product-img-box">
+            <svg width="60" height="60" fill="none" stroke="var(--gold)" stroke-width="1" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 1 13v3c0 .6.4 1 1 1h2m10 0h4"/></svg>
+          </div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-meta">${p.brand} · ${p.scale} Scale</div>
+          <div class="price-strip">
+            <span class="current-price">₹${activePrice / 100}</span>
+            ${p.discount_price ? `<span class="slashed-price">₹${p.price / 100}</span>` : ''}
+          </div>
+          <div class="action-row">
+            <button class="btn-action" onclick="window.triggerDetailsView('${p.id}')">Details</button>
+            <button class="btn-action primary" onclick="window.allocateCartItem('${p.id}', '${p.name}')">+ Cart</button>
+          </div>
+        </div>
+      `
+    }).join('')
+  }
+
+  window.triggerDetailsView = async function(id) {
+    const { data: p } = await supabase.from('products').select('*').eq('id', id).single()
+    if (!p) return
+    
+    document.getElementById('m-title').textContent = p.name
+    document.getElementById('m-meta').textContent = `${p.brand} | ${p.scale} Engine Replicas`
+    document.getElementById('m-desc').textContent = p.description
+    document.getElementById('m-price').textContent = `₹${(p.discount_price ? p.discount_price : p.price) / 100}`
+    
+    const cartBtn = document.getElementById('m-cart-btn')
+    cartBtn.onclick = () => {
+      closeActiveModal('detailsModal')
+      window.allocateCartItem(p.id, p.name)
+    }
+    
+    document.getElementById('detailsModal').classList.add('active')
+  }
+
+  window.allocateCartItem = async function(id, name) {
+    if (!window.AppState.user) return alert('Please authorize profile via Google login container.')
+    await supabase.from('cart_items').upsert({ profile_id: window.AppState.user.id, product_id: id, quantity: 1 })
+    
+    const t = document.getElementById('toast')
+    document.getElementById('toastName').textContent = name
+    t.classList.add('show')
+    setTimeout(() => t.classList.remove('show'), 2000)
+    
+    await updateCartMetrics()
+  }
+
+  async function updateCartMetrics() {
+    const { data } = await supabase.from('cart_items').select('quantity, products(id, name, price, discount_price)').eq('profile_id', window.AppState.user.id)
+    window.AppState.cartItemsList = data || []
+    const count = window.AppState.cartItemsList.reduce((acc, i) => acc + i.quantity, 0)
+    document.getElementById('cartCount').textContent = count
+  }
+
+  window.closeActiveModal = function(id) {
+    document.getElementById(id).classList.remove('active')
+  }
+
+  document.getElementById('cartTriggerBtn').onclick = function() {
+    if (window.AppState.cartItemsList.length === 0) return alert('Your cloud cart is empty.')
+    
+    let grossTotal = window.AppState.cartItemsList.reduce((sum, item) => {
+      const activeAmt = item.products.discount_price ? item.products.discount_price : item.products.price
+      return sum + (activeAmt * item.quantity)
+    }, 0)
+
+    document.getElementById('checkoutSummaryTotal').textContent = `₹${grossTotal / 100}`
+    document.getElementById('checkoutModal').classList.add('active')
+  }
+
+  document.getElementById('shippingForm').onsubmit = async function(e) {
+    e.preventDefault()
+    
+    const name = document.getElementById('ship-name').value
+    const phone = document.getElementById('ship-phone').value
+    const addr = document.getElementById('ship-address').value
+    
+    let finalAmount = window.AppState.cartItemsList.reduce((sum, item) => {
+      const activeAmt = item.products.discount_price ? item.products.discount_price : item.products.price
+      return sum + (activeAmt * item.quantity)
+    }, 0)
+
+    document.getElementById('checkoutModal').classList.remove('active')
+
+    const options = {
+      "key": RAZORPAY_KEY_ID,
+      "amount": finalAmount, 
+      "currency": "INR",
+      "name": "CastWheelz Premium",
+      "description": "Die-Cast Procurement Suite",
+      "handler": async function (response){
+        const { data: order, error } = await supabase.from('orders').insert([{
+          profile_id: window.AppState.user.id,
+          customer_name: name,
+          customer_email: window.AppState.user.email,
+          customer_phone: phone,
+          delivery_address: addr,
+          total_amount: finalAmount,
+          razorpay_payment_id: response.razorpay_payment_id,
+          payment_status: 'Paid'
+        }]).select().single()
+
+        if (!error) {
+          await supabase.from('cart_items').delete().eq('profile_id', window.AppState.user.id)
+          alert(`Order successfully registered! ID Ref: ${order.id.substring(0,8)}`)
+          window.location.reload()
+        }
+      },
+      "prefill": {
+        "name": name,
+        "email": window.AppState.user.email,
+        "contact": phone
+      },
+      "theme": { "color": "#c9a84c" }
+    }
+
+    const rzp1 = new Razorpay(options)
+    rzp1.open()
+  }
+
+  document.addEventListener('DOMContentLoaded', appInit)
 </script>
 </body>
 </html>
