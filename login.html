@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — CastWheelz</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
+    --gold: #c9a84c; --white: #f4f2ee; --muted: #7a7d88;
+  }
+  body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+  
+  .auth-card { background: var(--card-bg); border: 1px solid var(--border); padding: 3rem; border-radius: 16px; width: 100%; max-width: 440px; text-align: center; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--gold); margin: 0 0 10px; letter-spacing: 2px; }
+  
+  input { width: 100%; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 14px; border-radius: 6px; margin-bottom: 15px; outline: none; font-family: inherit; font-size: 14px; box-sizing: border-box; }
+  input:focus { border-color: var(--gold); }
+  
+  button { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 14px; font-weight: 600; cursor: pointer; text-transform: uppercase; border-radius: 6px; margin-bottom: 12px; font-size: 14px; }
+  button.outline { background: transparent; border: 1px solid var(--border); color: var(--white); }
+  button.outline:hover { border-color: var(--gold); color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="auth-card">
+  <h1 onclick="window.location.href='index.html'" style="cursor:pointer;">CASTWHEELZ</h1>
+  <p style="color:var(--muted); font-size:14px; margin-bottom:2rem;">Access your collector profile and active ledgers.</p>
+  <form id="authForm">
+    <input type="email" id="email" required placeholder="Collector Email Address">
+    <input type="password" id="password" required placeholder="Secure Password">
+    <button type="submit" id="loginBtn">Authorize Entry</button>
+    <button type="button" class="outline" id="registerBtn">Register New Profile</button>
+  </form>
+  <div id="msg" style="margin-top: 15px; font-size: 13px; color: var(--gold);"></div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
+  
+  const msg = document.getElementById('msg')
+
+  document.getElementById('authForm').onsubmit = async (e) => {
+    e.preventDefault();
+    msg.textContent = "Authenticating secure keys...";
+    const { error } = await supabase.auth.signInWithPassword({
+      email: document.getElementById('email').value,
+      password: document.getElementById('password').value
+    })
+    if (error) msg.textContent = error.message;
+    else window.location.href = 'index.html';
+  }
+
+  document.getElementById('registerBtn').onclick = async () => {
+    msg.textContent = "Writing profile to cloud...";
+    const { error } = await supabase.auth.signUp({
+      email: document.getElementById('email').value,
+      password: document.getElementById('password').value
+    })
+    if (error) msg.textContent = error.message;
+    else msg.textContent = "Success! Verify your email, then login.";
+  }
+</script>
+</body>
+</html>
