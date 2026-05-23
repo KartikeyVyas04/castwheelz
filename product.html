@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Details — CastWheelz</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
+    --gold: #c9a84c; --white: #f4f2ee; --muted: #7a7d88;
+    --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--black); color: var(--white); font-family: var(--font-body); margin: 0; padding-top: 80px; }
+  
+  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; padding: 0 2rem; z-index: 100; }
+  .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
+  .logo span { color: var(--white); }
+  
+  .container { max-width: 1100px; margin: 4rem auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+  .img-box { background: linear-gradient(135deg, var(--card-bg) 0%, #1c1e22 100%); border: 1px solid var(--border); border-radius: 16px; padding: 5rem 3rem; text-align: center; }
+  .img-box svg { width: 100%; max-width: 480px; filter: drop-shadow(0 20px 40px rgba(201,168,76,0.15)); }
+  
+  h1 { font-family: var(--font-display); font-size: 54px; margin: 0 0 10px; line-height: 1; }
+  .meta { color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2rem; font-weight: 600; }
+  .desc { color: var(--silver); line-height: 1.8; margin-bottom: 2.5rem; font-size: 15px; color: #b8bcc8; }
+  .price { font-family: var(--font-display); font-size: 48px; color: var(--white); margin-bottom: 2rem; }
+  
+  button.add-btn { background: var(--gold); color: var(--black); border: none; padding: 16px 32px; font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; width: 100%; transition: opacity 0.2s; }
+  button.add-btn:hover { opacity: 0.9; }
+</style>
+</head>
+<body>
+
+<nav><a href="index.html" class="logo">CAST<span>WHEELZ</span></a></nav>
+
+<div class="container" id="content">
+  <div style="grid-column: 1/-1; text-align:center; color:var(--muted); padding: 5rem 0;">Synchronizing specifications layer...</div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
+  
+  const id = new URLSearchParams(window.location.search).get('id')
+  
+  async function load() {
+    if (!id) return document.getElementById('content').innerHTML = "Invalid Route Configuration."
+    const { data: p } = await supabase.from('products').select('*').eq('id', id).single()
+    if (!p) return document.getElementById('content').innerHTML = "Product matrix not found."
+    
+    const activePrice = p.discount_price || p.price;
+    
+    document.getElementById('content').innerHTML = `
+      <div class="img-box">
+        <svg viewBox="0 0 420 220" fill="none">
+          <ellipse cx="210" cy="205" rx="160" ry="12" fill="rgba(0,0,0,0.4)"/>
+          <path d="M60 155 L80 120 L120 95 L160 82 L260 80 L310 85 L350 110 L370 140 L370 165 L60 165 Z" fill="#1a1a2e" stroke="#c9a84c" stroke-width="1.5"/>
+          <circle cx="130" cy="168" r="28" fill="#0a0a15" stroke="#888" stroke-width="2"/>
+          <circle cx="300" cy="168" r="28" fill="#0a0a15" stroke="#888" stroke-width="2"/>
+        </svg>
+      </div>
+      <div>
+        <h1>${p.name}</h1>
+        <div class="meta">${p.brand} · ${p.scale} Precision Scale</div>
+        <div class="desc">${p.description || 'Museum grade precision scaled metal layout configuration. Accurate mechanical modeling built to last.'}</div>
+        <div class="price">₹${activePrice / 100}</div>
+        <button class="add-btn" onclick="addToCart('${p.id}')">Allocate to Cart Ledger</button>
+      </div>
+    `
+  }
+
+  window.addToCart = async function(pid) {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return alert("Please access your account via Login to secure allocations.")
+    await supabase.from('cart_items').upsert({ profile_id: session.user.id, product_id: pid, quantity: 1 })
+    window.location.href = 'cart.html'
+  }
+
+  load()
+</script>
+</body>
+</html>
