@@ -4,16 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CastWheelz — Premium Die Cast Models</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
-<!-- Inject Razorpay Standard Web Checkout Integration SDK -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
     --gold: #c9a84c; --gold-light: #e8c97a; --gold-dark: #8a6a22; --silver: #b8bcc8; 
     --red: #d63333; --white: #f4f2ee; --muted: #7a7d88;
-    --font-display: 'Bebas Neue', sans-serif; --font-serif: 'Playfair Display', serif; --font-body: 'DM Sans', sans-serif;
+    --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -24,8 +21,8 @@
   .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; width: 100%; display: flex; align-items: center; gap: 2rem; }
   .logo { font-family: var(--font-display); font-size: 26px; letter-spacing: 2px; color: var(--gold); text-decoration: none; line-height: 1; }
   .logo span { color: var(--white); }
-  .nav-links { display: flex; align-items: center; list-style: none; margin-left: 1rem; }
-  .nav-links a { text-decoration: none; color: var(--silver); font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 1rem; transition: color 0.2s; }
+  .nav-links { display: flex; align-items: center; list-style: none; margin-left: 1rem; gap: 1rem;}
+  .nav-links a { text-decoration: none; color: var(--silver); font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
   .nav-links a:hover { color: var(--gold); }
   .nav-right { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
   
@@ -33,7 +30,6 @@
   .btn-nav:hover { border-color: var(--gold); color: var(--gold); }
   .btn-cart { background: var(--gold); border: none; color: var(--black); border-radius: 6px; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font-body); display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
   .btn-cart:hover { background: var(--gold-light); }
-  .cart-badge { background: var(--red); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 
   /* HERO AREA */
   .hero { min-height: 80vh; padding-top: 68px; display: flex; align-items: center; position: relative; overflow: hidden; }
@@ -47,6 +43,13 @@
   .hero-car-showcase { position: relative; background: linear-gradient(135deg, var(--card-bg) 0%, #1c1e22 100%); border: 1px solid var(--border); border-radius: 16px; padding: 3rem 2rem; text-align: center; }
   .car-svg-wrap svg { width: 100%; max-width: 380px; filter: drop-shadow(0 20px 40px rgba(201,168,76,0.15)); }
   .scale-badge { position: absolute; top: 1rem; right: 1rem; background: var(--gold); color: var(--black); font-family: var(--font-display); font-size: 18px; padding: 6px 14px; border-radius: 6px; }
+
+  /* MARQUEE RUNWAY */
+  .marquee-band { background: var(--gold); padding: 12px 0; overflow: hidden; border-top: 1px solid var(--gold-dark); border-bottom: 1px solid var(--gold-dark); }
+  .marquee-track { display: flex; gap: 0; white-space: nowrap; animation: marquee 30s linear infinite; }
+  .marquee-item { display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: 15px; letter-spacing: 2px; color: var(--black); padding: 0 2rem; flex-shrink: 0; }
+  .marquee-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--black); opacity: 0.4; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   /* GRIDS */
   .section { padding: 6rem 0; }
@@ -70,43 +73,27 @@
   
   .product-info { padding: 1rem 1.1rem 1.1rem; }
   .product-scale { font-size: 10px; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
-  .product-name { font-weight: 600; font-size: 14px; color: var(--white); line-height: 1.3; margin-bottom: 4px; cursor: pointer; }
-  .product-name:hover { color: var(--gold); }
+  .product-name { font-weight: 600; font-size: 14px; color: var(--white); line-height: 1.3; margin-bottom: 4px; }
   .product-brand { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
-  .product-footer { display: flex; align-items: center; justify-content: space-between; }
   .price { font-family: var(--font-display); font-size: 22px; color: var(--gold); }
   .price-old { font-size: 12px; color: var(--muted); text-decoration: line-through; margin-left: 4px; }
-  
-  /* MODAL CONTAINER SHEETS */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(5,5,5,0.88); backdrop-filter: blur(12px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
-  .modal-overlay.active { display: flex; }
-  .modal-surface { background: var(--card-bg); border: 1px solid var(--border); width: 100%; max-width: 580px; border-radius: 16px; padding: 2.5rem; position: relative; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
-  .modal-close { position: absolute; top: 1.25rem; right: 1.25rem; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; transition: color 0.2s; }
-  .modal-close:hover { color: var(--white); }
-  
-  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.25rem; }
-  .form-group label { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-  .form-group input, .form-group textarea { background: var(--black); border: 1px solid var(--border); padding: 12px; border-radius: 6px; color: var(--white); outline: none; font-family: var(--font-body); }
-  .form-group input:focus, .form-group textarea:focus { border-color: var(--gold); }
 
-  .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 1100; background: var(--card-bg); border: 1px solid var(--gold); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; transform: translateX(120%); transition: transform 0.4s ease; }
-  .toast.show { transform: translateX(0); }
+  footer { margin-top: 5rem; border-top: 1px solid var(--border); padding: 4rem 0 2rem; background: var(--dark); text-align:center; }
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <a href="#" class="logo">CAST<span>WHEELZ</span></a>
+    <a href="index.html" class="logo">CAST<span>WHEELZ</span></a>
     <ul class="nav-links">
-      <li><a href="#hero">Home</a></li>
       <li><a href="#categories">Scales</a></li>
       <li><a href="#products">Shop</a></li>
       <li><a href="admin.html" style="color: var(--gold);">Console</a></li>
     </ul>
     <div class="nav-right">
-      <button class="btn-nav" id="authButtonNode"><span>Google Login</span></button>
-      <button class="btn-cart" id="cartOverlayTrigger">Cart (<span id="cartIndicatorBadge">0</span>)</button>
+      <button class="btn-nav" id="authBtn" onclick="window.location.href='login.html'">Login</button>
+      <button class="btn-cart" onclick="window.location.href='cart.html'">Cart (<span id="cartBadge">0</span>)</button>
     </div>
   </div>
 </nav>
@@ -116,7 +103,7 @@
   <div class="hero-grid-lines"></div>
   <div class="hero-inner">
     <div class="hero-content">
-      <div class="hero-label">Live Cloud Fleet Connection</div>
+      <div style="font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem;">Live Cloud Fleet Connection</div>
       <h1>Precision<br><span class="accent">Die-Cast</span> Legends</h1>
       <p class="hero-sub">Museum-grade scale replicas. Handcrafted metal precision synchronized directly to secure system state maps.</p>
       <button class="btn-nav" style="border-color:var(--gold); color:var(--gold);" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Explore Gallery</button>
@@ -140,8 +127,10 @@
 <div class="marquee-band">
   <div class="marquee-track">
     <div class="marquee-item"><span class="marquee-dot"></span> 1:18 Prestige Fleet</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Secure Auth Modules</div>
     <div class="marquee-item"><span class="marquee-dot"></span> Razorpay Standard Checkout SDK</div>
-    <div class="marquee-item"><span class="marquee-dot"></span> Dynamic Details Modules Active</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> 1:43 Classic Series</div>
+    <div class="marquee-item"><span class="marquee-dot"></span> Live PostgreSQL State Engine</div>
   </div>
 </div>
 
@@ -168,228 +157,72 @@
   </div>
 </section>
 
-<!-- PRODUCT DETAILS MODAL VIEWPORT -->
-<div class="modal-overlay" id="productDetailsModal">
-  <div class="modal-surface">
-    <button class="modal-close" onclick="closeActiveModalWindow('productDetailsModal')">✕</button>
-    <div style="background:#1a1c20; height:220px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:1.5rem; border:1px solid var(--border);">
-      <svg width="100" height="100" fill="none" stroke="var(--gold)" stroke-width="1" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 1 13v3c0 .6.4 1 1 1h2m10 0h4"/></svg>
-    </div>
-    <h2 id="modalTargetTitle" style="font-family: var(--font-display); font-size: 36px; color: var(--white); margin-bottom: 4px;">Vehicle</h2>
-    <div id="modalTargetMeta" style="font-size: 13px; color: var(--gold); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing:0.05em;">Brand Spec</div>
-    <p id="modalTargetDescription" style="color: var(--silver); line-height: 1.7; margin-bottom: 2rem; font-size: 14px;">Detailed scale properties matrix.</p>
-    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-      <div>
-        <span style="font-size: 11px; color: var(--muted); display: block; text-transform: uppercase;">MSRP Value</span>
-        <strong style="font-family: var(--font-display); font-size: 28px; color: var(--gold);" id="modalTargetPrice">₹0</strong>
-      </div>
-      <button class="btn-cart" id="modalAddToCartAction" style="padding: 12px 24px;">Add to Cart Allocation</button>
-    </div>
-  </div>
-</div>
-
-<!-- SHIPPING MANIFEST CONTROL MODAL -->
-<div class="modal-overlay" id="checkoutFlowModal">
-  <div class="modal-surface">
-    <button class="modal-close" onclick="closeActiveModalWindow('checkoutFlowModal')">✕</button>
-    <h2 style="font-family: var(--font-display); font-size: 28px; color: var(--white); margin-bottom: 1.5rem;">Logistics Destination</h2>
-    <form id="shippingManifestForm">
-      <div class="form-group"><label>Collector's Full Name</label><input type="text" id="cust-name" required placeholder="Kartikey Vyas"></div>
-      <div class="form-group"><label>Primary Contact Phone Number</label><input type="tel" id="cust-phone" required placeholder="+91 XXXXX XXXXX"></div>
-      <div class="form-group"><label>Destination Shipping Address</label><textarea id="cust-address" rows="3" required placeholder="Flat, Street, Area, City, Pincode, Maharashtra"></textarea></div>
-      <div style="margin: 1.5rem 0; padding: 1rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase;">Compound Total:</span>
-        <strong style="color: var(--gold); font-size: 22px;" id="manifestInvoiceTotal">₹0</strong>
-      </div>
-      <button type="submit" class="btn-cart" style="width: 100%; justify-content: center; padding: 14px;">Authorize Razorpay Secure Session</button>
-    </form>
-  </div>
-</div>
-
-<div class="toast" id="toastComponent">
-  <span class="toast-icon">🛒</span>
-  <div class="toast-msg"><strong id="toastTargetItemName">Model</strong> locked to cloud profile ledger.</div>
-</div>
-
-<footer style="margin-top: 5rem; border-top: 1px solid var(--border); padding: 4rem 0 2rem; background: var(--dark); text-align:center;">
-  <a href="#" class="logo" style="font-size: 32px;">CAST<span>WHEELZ</span></a>
+<footer>
+  <a href="index.html" class="logo" style="font-size: 32px;">CAST<span>WHEELZ</span></a>
   <p style="font-size: 12px; color: var(--muted); margin-top:1rem;">© 2026 CastWheelz Master Control Suite.</p>
 </footer>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-  const SUPABASE_URL = 'https://cjzvweakirjbmmacrqpk.supabase.co'
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg'
-  const RAZORPAY_KEY_ID = 'rzp_live_SskOYlu2pHt0Qp'
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  window.LocalState = { sessionUser: null, cartItemsCache: [], scaleFilter: null }
+  const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
+  
+  let scaleFilter = null
 
   async function appInit() {
     const { data: { session } } = await supabase.auth.getSession()
-    window.LocalState.sessionUser = session?.user || null
-    
-    evaluateAuthContextUI()
-    await downloadCategoriesMatrix()
-    await downloadInventoryGrid()
-    if (window.LocalState.sessionUser) await recalculateCartMetrics()
+    if (session) {
+      const btn = document.getElementById('authBtn')
+      btn.textContent = 'Logout'
+      btn.onclick = async () => { await supabase.auth.signOut(); window.location.reload(); }
+      
+      const { data } = await supabase.from('cart_items').select('quantity').eq('profile_id', session.user.id)
+      if(data) document.getElementById('cartBadge').textContent = data.reduce((a, b) => a + b.quantity, 0)
+    }
 
-    supabase.auth.onAuthStateChange((event, session) => {
-      window.LocalState.sessionUser = session?.user || null
-      evaluateAuthContextUI()
-      if (event === 'SIGNED_IN') recalculateCartMetrics()
-    })
+    await loadCats()
+    await loadProducts()
   }
 
-  function evaluateAuthContextUI() {
-    const btn = document.getElementById('authButtonNode')
-    if (!btn) return
-    if (window.LocalState.sessionUser) {
-      btn.querySelector('span').textContent = 'Logout'
-      btn.onclick = () => supabase.auth.signOut().then(() => window.location.reload())
-    } else {
-      btn.querySelector('span').textContent = 'Google Login'
-      btn.onclick = () => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })
+  async function loadCats() {
+    const { data } = await supabase.from('categories').select('*').order('name')
+    if(data) {
+      document.getElementById('scalesFilterGrid').innerHTML = data.map(c => `
+        <div class="cat-card" onclick="window.filterByCat('${c.id}')">
+          <div class="cat-icon">${c.display_icon}</div>
+          <div class="cat-name">${c.name}</div>
+        </div>
+      `).join('')
     }
   }
 
-  async function downloadCategoriesMatrix() {
-    const { data, error } = await supabase.from('categories').select('*').order('name', { ascending: true })
-    const grid = document.getElementById('scalesFilterGrid')
-    if (!grid) return
+  window.filterByCat = function(id) { scaleFilter = id; loadProducts(); document.getElementById('products').scrollIntoView({behavior:'smooth'})}
+  window.clearActiveScaleFilters = function() { scaleFilter = null; loadProducts(); }
+
+  async function loadProducts() {
+    let q = supabase.from('products').select('*').order('created_at', { ascending: false })
+    if (scaleFilter) q = q.eq('category_id', scaleFilter)
+    const { data } = await q
     
-    if (error || !data || data.length === 0) {
-      grid.innerHTML = `<div style="grid-column: 1/-1; color: var(--muted); text-align:center; width:100%; padding: 1rem 0; font-size:14px;">No active category groups loaded in database yet.</div>`
-      return
-    }
-    grid.innerHTML = data.map(c => `
-      <div class="cat-card" onclick="window.applyCategoryFilter('${c.id}')">
-        <div class="cat-icon">${c.display_icon}</div>
-        <div class="cat-name">${c.name}</div>
-      </div>
-    `).join('')
-  }
-
-  window.applyCategoryFilter = function(catId) {
-    window.LocalState.scaleFilter = catId
-    downloadInventoryGrid()
-    document.getElementById('products').scrollIntoView({ behavior: 'smooth' })
-  }
-
-  window.clearActiveScaleFilters = function() {
-    window.LocalState.scaleFilter = null
-    downloadInventoryGrid()
-  }
-
-  async function downloadInventoryGrid() {
-    let query = supabase.from('products').select('*')
-    if (window.LocalState.scaleFilter) query = query.eq('category_id', window.LocalState.scaleFilter)
-    query = query.order('created_at', { ascending: false })
-    
-    const { data, error } = await query
-    const targetGrid = document.getElementById('productsDynamicGrid')
-    if (!targetGrid) return
-
-    if (error || !data || data.length === 0) {
-      targetGrid.innerHTML = `
-        <div style="grid-column: 1/-1; text-align: center; color: var(--muted); width:100%; padding: 4rem 0;">
-          No items located in this catalog block view yet.
-        </div>`
-      return
-    }
-
-    targetGrid.innerHTML = data.map(p => {
-      const activePrice = p.discount_price ? p.discount_price : p.price
-      return `
-        <div class="product-card">
-          <div class="product-img" onclick="window.launchSpecificationsSheet('${p.id}')">
-            ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
-            <svg viewBox="0 0 280 160" fill="none">
-              <ellipse cx="140" cy="148" rx="100" ry="8" fill="rgba(0,0,0,0.4)"/>
-              <path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#16163a" stroke="#c9a84c" stroke-width="1.2"/>
-            </svg>
-          </div>
-          <div class="product-info">
-            <div class="product-scale">${p.scale} Scale</div>
-            <div class="product-name" onclick="window.launchSpecificationsSheet('${p.id}')">${p.name}</div>
-            <div class="product-brand">${p.brand}</div>
-            <div class="product-footer">
-              <div style="display:flex; flex-direction:column;">
-                <span class="price">₹${activePrice / 100}</span>
-                ${p.discount_price ? `<span class="price-old">₹${p.price / 100}</span>` : ''}
-              </div>
-              <button class="btn-add" onclick="window.pushToCloudCart('${p.id}', '${p.name}')">+ Cart</button>
-            </div>
+    document.getElementById('productsDynamicGrid').innerHTML = data ? data.map(p => `
+      <div class="product-card" onclick="window.location.href='product.html?id=${p.id}'">
+        <div class="product-img">
+          ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
+          <svg viewBox="0 0 280 160" fill="none"><ellipse cx="140" cy="148" rx="100" ry="8" fill="rgba(0,0,0,0.4)"/><path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#16163a" stroke="#c9a84c" stroke-width="1.2"/></svg>
+        </div>
+        <div class="product-info">
+          <div class="product-scale">${p.scale} Scale</div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-brand">${p.brand}</div>
+          <div style="display:flex; flex-direction:column;">
+            <span class="price">₹${(p.discount_price || p.price) / 100}</span>
+            ${p.discount_price ? `<span class="price-old">₹${p.price / 100}</span>` : ''}
           </div>
         </div>
-      `
-    }).join('')
+      </div>
+    `).join('') : '<p style="grid-column:1/-1; text-align:center; color:var(--muted)">No items found.</p>'
   }
 
-  window.launchSpecificationsSheet = async function(id) {
-    const { data: p } = await supabase.from('products').select('*').eq('id', id).single()
-    if (!p) return
-    document.getElementById('modalTargetTitle').textContent = p.name
-    document.getElementById('modalTargetMeta').textContent = `${p.brand} · ${p.scale} Specifications Sheet`
-    document.getElementById('modalTargetDescription').textContent = p.description || 'Premium precision scaled metal layout configuration.'
-    document.getElementById('modalTargetPrice').textContent = `₹${(p.discount_price ? p.discount_price : p.price) / 100}`
-    document.getElementById('modalAddToCartAction').onclick = () => { closeActiveModalWindow('productDetailsModal'); window.pushToCloudCart(p.id, p.name); }
-    document.getElementById('productDetailsModal').classList.add('active')
-  }
-
-  window.pushToCloudCart = async function(id, name) {
-    if (!window.LocalState.sessionUser) return alert('Authorize profile connection via Google login container first.')
-    await supabase.from('cart_items').upsert({ profile_id: window.LocalState.sessionUser.id, product_id: id, quantity: 1 })
-    const toast = document.getElementById('toastComponent')
-    document.getElementById('toastTargetItemName').textContent = name
-    toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000)
-    await recalculateCartMetrics()
-  }
-
-  async function recalculateCartMetrics() {
-    const { data } = await supabase.from('cart_items').select('quantity, products(id, name, price, discount_price)').eq('profile_id', window.LocalState.sessionUser.id)
-    window.LocalState.cartItemsCache = data || []
-    document.getElementById('cartIndicatorBadge').textContent = window.LocalState.cartItemsCache.reduce((a, b) => a + b.quantity, 0)
-  }
-
-  window.closeActiveModalWindow = function(id) { document.getElementById(id).classList.remove('active') }
-
-  document.getElementById('cartOverlayTrigger').onclick = function() {
-    if (window.LocalState.cartItemsCache.length === 0) return alert('Your cart ledger is currently empty.')
-    let compoundTotal = window.LocalState.cartItemsCache.reduce((s, i) => s + ((i.products.discount_price ? i.products.discount_price : i.products.price) * i.quantity), 0)
-    document.getElementById('manifestInvoiceTotal').textContent = `₹${compoundTotal / 100}`
-    document.getElementById('checkoutFlowModal').classList.add('active')
-  }
-
-  document.getElementById('shippingManifestForm').onsubmit = function(e) {
-    e.preventDefault()
-    const name = document.getElementById('cust-name').value
-    const phone = document.getElementById('cust-phone').value
-    const address = document.getElementById('cust-address').value
-    let finalPaisa = window.LocalState.cartItemsCache.reduce((s, i) => s + ((i.products.discount_price ? i.products.discount_price : i.products.price) * i.quantity), 0)
-    document.getElementById('checkoutFlowModal').classList.remove('active')
-
-    const configurations = {
-      "key": RAZORPAY_KEY_ID, "amount": finalPaisa, "currency": "INR", "name": "CastWheelz Premium", "description": "Procurement Allocation System",
-      "handler": async function (resp) {
-        const { data: order, error } = await supabase.from('orders').insert([{
-          profile_id: window.LocalState.sessionUser.id, customer_name: name, customer_email: window.LocalState.sessionUser.email,
-          customer_phone: phone, delivery_address: address, total_amount: finalPaisa, razorpay_payment_id: resp.razorpay_payment_id, payment_status: 'Paid'
-        }]).select().single()
-        if (!error) {
-          await supabase.from('cart_items').delete().eq('profile_id', window.LocalState.sessionUser.id)
-          alert('Allocation Confirmed! Invoice ID: ' + order.id.substring(0,8).toUpperCase())
-          window.location.reload()
-        }
-      },
-      "prefill": { "name": name, "email": window.LocalState.sessionUser.email, "contact": phone },
-      "theme": { "color": "#c9a84c" }
-    }
-    const gateway = new Razorpay(configurations); gateway.open()
-  }
-
-  document.addEventListener('DOMContentLoaded', appInit)
+  appInit()
 </script>
 </body>
 </html>
