@@ -243,6 +243,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CastWheelz — Premium Die Cast Models</title>
+<!-- Mutes the 404 favicon error -->
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -334,7 +336,7 @@
     <div class="hero-content">
       <h1>Precision<br><span class="accent">Die-Cast</span> Fleet</h1>
       <p class="hero-sub">Museum-grade scaling architectures. Handcrafted mechanical precision mapped straight to remote state ledgers.</p>
-      <button class="btn-cart" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Explore Gallery</button>
+      <button class="btn-cart" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})" style="margin: 0 auto;">Explore Gallery</button>
     </div>
     <div class="hero-visual">
       <div class="hero-car-showcase">
@@ -442,11 +444,14 @@
       window.location.href = 'login.html';
       return;
     }
-    const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', sessionUser.id).eq('product_id', pid).single()
-    if (exist) {
-      await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('profile_id', sessionUser.id).eq('product_id', pid)
+    
+    // BULLETPROOF CART LOGIC: Use a standard array check to prevent the 406 & 409 errors
+    const { data: existingItems } = await supabase.from('cart_items').select('*').eq('profile_id', sessionUser.id).eq('product_id', pid);
+    
+    if (existingItems && existingItems.length > 0) {
+      await supabase.from('cart_items').update({ quantity: existingItems[0].quantity + 1 }).eq('profile_id', sessionUser.id).eq('product_id', pid);
     } else {
-      await supabase.from('cart_items').insert({ profile_id: sessionUser.id, product_id: pid, quantity: 1 })
+      await supabase.from('cart_items').insert([{ profile_id: sessionUser.id, product_id: pid, quantity: 1 }]);
     }
     
     const { data } = await supabase.from('cart_items').select('quantity').eq('profile_id', sessionUser.id)
@@ -460,4 +465,4 @@
   appInit()
 </script>
 </body>
-</html>        
+</html>
