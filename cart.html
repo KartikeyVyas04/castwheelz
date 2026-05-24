@@ -14,27 +14,29 @@
   }
   body { background: var(--black); color: var(--white); font-family: var(--font-body); margin: 0; padding-top: 80px; }
   
-  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; padding: 0 3rem; z-index: 100; }
+  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; padding: 0 2rem; z-index: 100; }
   .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
   .logo span { color: var(--white); }
   
-  .container { max-width: 1100px; margin: 3rem auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 420px; gap: 4rem; align-items: start; }
+  .container { max-width: 1100px; margin: 3rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr 420px; gap: 3rem; align-items: start; }
   h1 { font-family: var(--font-display); font-size: 42px; margin: 0 0 2rem; }
   
   .cart-item { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-  .cart-item strong { font-size: 16px; }
   .cart-item .price { color: var(--gold); font-family: var(--font-display); font-size: 26px; }
   
   .summary-card { background: var(--card-bg); border: 1px solid var(--border); padding: 2.5rem; border-radius: 16px; position: sticky; top: 100px; }
-  .summary-card h2 { font-family: var(--font-display); font-size: 28px; color: var(--white); margin: 0 0 1.5rem; }
+  .summary-card h2 { font-family: var(--font-display); font-size: 28px; margin: 0 0 1.5rem; }
   
   .checkout-form { display: none; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
-  
   input, textarea { width: 100%; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 14px; border-radius: 6px; margin-bottom: 15px; outline: none; font-family: inherit; font-size: 14px; box-sizing: border-box; }
   input:focus, textarea:focus { border-color: var(--gold); }
   
-  button.submit-btn { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 16px; font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; transition: opacity 0.2s; }
-  button.submit-btn:hover { opacity: 0.9; }
+  button.submit-btn { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 16px; font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; font-family: inherit; }
+  
+  @media(max-width: 768px) {
+    .container { grid-template-columns: 1fr; }
+    .summary-card { position: relative; top: 0; }
+  }
 </style>
 </head>
 <body>
@@ -44,30 +46,25 @@
 <div class="container">
   <div>
     <h1>Active Cart</h1>
-    <div id="itemsBox"><p style="color:var(--muted);">Synchronizing secure ledger cache...</p></div>
+    <div id="itemsBox"><p style="color:var(--muted);">Parsing synchronized transaction vectors...</p></div>
   </div>
   
   <div class="summary-card" id="summaryBox" style="display:none;">
     <h2>Order Summary</h2>
-    
     <div style="display:flex; justify-content:space-between; align-items:center; margin: 1.5rem 0; padding-bottom: 1.5rem; border-bottom:1px solid var(--border);">
-      <span style="font-size:12px; font-weight:600; text-transform:uppercase; color:var(--muted);">Compound Total</span>
+      <span style="font-size:12px; font-weight:600; text-transform:uppercase; color:var(--muted);">Total Ledger Due</span>
       <span style="font-family:var(--font-display); font-size:36px; color:var(--gold);" id="totalDisplay">₹0</span>
     </div>
 
-    <!-- Step 1 Button -->
     <button class="submit-btn" id="startCheckoutBtn" onclick="revealCheckoutForm()">Checkout</button>
     
-    <!-- Step 2 Form (Hidden until Checkout is clicked) -->
     <div class="checkout-form" id="checkoutFormBlock">
-      <h3 style="font-size: 14px; text-transform: uppercase; color: var(--muted); margin-top: 0;">Delivery Address Details</h3>
-      <input type="text" id="c-name" required placeholder="Full Legal Name">
-      <input type="tel" id="c-phone" required placeholder="Contact Number">
-      <textarea id="c-address" rows="3" required placeholder="Complete Shipping Address (Area, City, Pincode)"></textarea>
-      
+      <h3 style="font-size: 11px; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; letter-spacing:1px;">Logistics Form</h3>
+      <input type="text" id="c-name" required placeholder="Collector Full Legal Name">
+      <input type="tel" id="c-phone" required placeholder="Primary Mobile Number">
+      <textarea id="c-address" rows="3" required placeholder="Complete Delivery Address (Maharashtra, India Pincode mandatory)"></textarea>
       <button class="submit-btn" onclick="processPayment()">Place Order & Pay</button>
     </div>
-
   </div>
 </div>
 
@@ -78,10 +75,10 @@
   let cartData = [];
   let userSession = null;
 
-  async function load() {
+  async function loadCartLedger() {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
-      document.getElementById('itemsBox').innerHTML = "<p style='color:var(--gold)'>Please log in to view active ledgers.</p>"
+      document.getElementById('itemsBox').innerHTML = "<p style='color:var(--gold)'>Access authorization missing. Please verify account parameters.</p>"
       return;
     }
     userSession = session;
@@ -89,11 +86,14 @@
     const { data } = await supabase.from('cart_items').select('quantity, products(id, name, price, discount_price)').eq('profile_id', session.user.id)
     cartData = data || [];
     
-    if (cartData.length === 0) return document.getElementById('itemsBox').innerHTML = "Your logistics cart is empty."
+    if (cartData.length === 0) {
+      document.getElementById('itemsBox').innerHTML = "Your current allocation matrix contains 0 records."
+      return;
+    }
     
     document.getElementById('itemsBox').innerHTML = cartData.map(i => `
       <div class="cart-item">
-        <div><strong>${i.products.name}</strong><br><small style="color:var(--muted)">Allocated Quantity: ${i.quantity}</small></div>
+        <div><strong>${i.products.name}</strong><br><small style="color:var(--muted)">Allocated Quantity Unit: ${i.quantity}</small></div>
         <div class="price">₹${((i.products.discount_price || i.products.price) * i.quantity) / 100}</div>
       </div>
     `).join('')
@@ -112,13 +112,13 @@
     const name = document.getElementById('c-name').value
     const phone = document.getElementById('c-phone').value
     const address = document.getElementById('c-address').value
-    if(!name || !phone || !address) return alert("Please fill out all logistics delivery details.");
+    if(!name || !phone || !address) return alert("Verify all necessary delivery details are populated completely.");
 
     let totalPaisa = cartData.reduce((s, i) => s + ((i.products.discount_price || i.products.price) * i.quantity), 0)
 
     const opts = {
       "key": "rzp_live_SskOYlu2pHt0Qp", 
-      "amount": totalPaisa, "currency": "INR", "name": "CastWheelz HQ",
+      "amount": totalPaisa, "currency": "INR", "name": "CastWheelz Premium",
       "handler": async function (resp) {
         const { data: order } = await supabase.from('orders').insert([{
           profile_id: userSession.user.id, customer_name: name, customer_email: userSession.user.email,
@@ -126,7 +126,7 @@
         }]).select().single()
         
         await supabase.from('cart_items').delete().eq('profile_id', userSession.user.id)
-        alert('Payment Processed Successfully! Tracking ID: ' + order.id.substring(0,8).toUpperCase())
+        alert('Transaction Complete. Reference Tracking System Token ID: ' + order.id.substring(0,8).toUpperCase())
         window.location.href = 'index.html'
       },
       "prefill": { "name": name, "email": userSession.user.email, "contact": phone },
@@ -135,7 +135,7 @@
     new Razorpay(opts).open()
   }
 
-  load()
+  loadCartLedger()
 </script>
 </body>
 </html>
