@@ -110,18 +110,15 @@
 
     if (btnElement) { btnElement.disabled = true; btnElement.textContent = "Processing..."; }
 
-    const { data: existingItem } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
-    
-    if (existingItem) {
-      await supabase.from('cart_items').update({ quantity: existingItem.quantity + 1 }).eq('id', existingItem.id);
-    } else {
-      const { error } = await supabase.from('cart_items').insert([{ profile_id: session.user.id, product_id: pid, quantity: 1 }]);
-      
-      if (error && (error.code === '23505' || error.message.includes('duplicate'))) {
-        const { data: retry } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
-        if (retry) await supabase.from('cart_items').update({ quantity: retry.quantity + 1 }).eq('id', retry.id);
-      }
-    }
+    // Fetch current quantity
+    const { data: exist } = await supabase.from('cart_items').select('quantity').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
+    const newQty = exist ? exist.quantity + 1 : 1;
+
+    // Safely Upsert to avoid 409 Conflicts
+    await supabase.from('cart_items').upsert(
+      { profile_id: session.user.id, product_id: pid, quantity: newQty },
+      { onConflict: 'profile_id, product_id' }
+    );
     
     window.location.href = 'cart.html'
   }
