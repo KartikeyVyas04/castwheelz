@@ -2,155 +2,42 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Logistics Cart — CastWheelz</title>
+<title>Your Cart — CastWheelz</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
-  :root {
-    --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
-    --gold: #c9a84c; --white: #f4f2ee; --muted: #7a7d88;
-    --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
-  }
-  body { background: var(--black); color: var(--white); font-family: var(--font-body); margin: 0; padding-top: 80px; }
-  
-  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; padding: 0 2rem; z-index: 100; }
-  .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
-  .logo span { color: var(--white); }
-  
-  .container { max-width: 1100px; margin: 3rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr 420px; gap: 3rem; align-items: start; }
-  h1 { font-family: var(--font-display); font-size: 42px; margin: 0 0 2rem; }
-  
-  .cart-item { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-  .cart-item .price { color: var(--gold); font-family: var(--font-display); font-size: 26px; }
-  
-  .summary-card { background: var(--card-bg); border: 1px solid var(--border); padding: 2.5rem; border-radius: 16px; position: sticky; top: 100px; }
-  .summary-card h2 { font-family: var(--font-display); font-size: 28px; margin: 0 0 1.5rem; }
-  
-  .checkout-form { display: none; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
-  input, textarea { width: 100%; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 14px; border-radius: 6px; margin-bottom: 15px; outline: none; font-family: inherit; font-size: 14px; box-sizing: border-box; }
-  input:focus, textarea:focus { border-color: var(--gold); }
-  
-  button.submit-btn { width: 100%; background: var(--gold); color: var(--black); border: none; padding: 16px; font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; font-family: inherit; }
-  
-  @media(max-width: 768px) {
-    .container { grid-template-columns: 1fr; }
-    .summary-card { position: relative; top: 0; }
-  }
+  body { background: #0a0a0a; color: #fff; font-family: sans-serif; padding: 2rem; }
+  .item { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 1rem 0; }
 </style>
 </head>
 <body>
-
-<nav><a href="index.html" class="logo">CAST<span>WHEELZ</span></a></nav>
-
-<div class="container">
-  <div>
-    <h1>Active Cart</h1>
-    <div id="itemsBox"><p style="color:var(--muted);">Parsing synchronized transaction vectors...</p></div>
-  </div>
-  
-  <div class="summary-card" id="summaryBox" style="display:none;">
-    <h2>Order Summary</h2>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin: 1.5rem 0; padding-bottom: 1.5rem; border-bottom:1px solid var(--border);">
-      <span style="font-size:12px; font-weight:600; text-transform:uppercase; color:var(--muted);">Total Ledger Due</span>
-      <span style="font-family:var(--font-display); font-size:36px; color:var(--gold);" id="totalDisplay">₹0</span>
-    </div>
-
-    <button class="submit-btn" id="startCheckoutBtn" onclick="revealCheckoutForm()">Checkout</button>
-    
-    <div class="checkout-form" id="checkoutFormBlock">
-      <h3 style="font-size: 11px; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; letter-spacing:1px;">Logistics Form</h3>
-      <input type="text" id="c-name" required placeholder="Collector Full Legal Name">
-      <input type="tel" id="c-phone" required placeholder="Primary Mobile Number">
-      <textarea id="c-address" rows="3" required placeholder="Complete Delivery Address (Maharashtra, India Pincode mandatory)"></textarea>
-      <button class="submit-btn" onclick="processPayment()">Place Order & Pay</button>
-    </div>
-  </div>
-</div>
+<h1>Your Cart</h1>
+<div id="cartList">Loading...</div>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
   const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
-  
-  let finalCartPayload = [];
-  let userSession = null;
 
-  async function loadCartLedger() {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      document.getElementById('itemsBox').innerHTML = "<p style='color:var(--gold)'>Access authorization missing. Please verify account parameters.</p>"
-      return;
-    }
-    userSession = session;
+  async function renderCart() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return document.getElementById('cartList').innerHTML = "Login required.";
 
-    // STEP 1: Fetch items securely
-    const { data: cartItems } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id)
+    const { data: cart } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id);
     
-    if (!cartItems || cartItems.length === 0) {
-      document.getElementById('itemsBox').innerHTML = "Your current allocation matrix contains 0 records."
-      return;
-    }
+    if (!cart || cart.length === 0) return document.getElementById('cartList').innerHTML = "Cart is empty.";
 
-    // STEP 2: Fetch corresponding products directly to bypass any missing Foreign Key links
-    const productIds = cartItems.map(c => c.product_id);
-    const { data: productsData } = await supabase.from('products').select('*').in('id', productIds);
-
-    // STEP 3: Merge them
-    finalCartPayload = cartItems.map(item => {
-      return {
-        ...item,
-        productDetails: productsData.find(p => p.id === item.product_id) || null
+    let html = '';
+    for (const item of cart) {
+      const { data: prod } = await supabase.from('products').select('*').eq('id', item.product_id).single();
+      if (prod) {
+        html += `<div class="item">
+                  <span>${prod.name} (x${item.quantity})</span>
+                  <span>₹${(prod.price * item.quantity) / 100}</span>
+                 </div>`;
       }
-    }).filter(item => item.productDetails !== null); // Drop ghost records
-    
-    // Render Items
-    document.getElementById('itemsBox').innerHTML = finalCartPayload.map(i => `
-      <div class="cart-item">
-        <div><strong>${i.productDetails.name}</strong><br><small style="color:var(--muted)">Allocated Quantity Unit: ${i.quantity}</small></div>
-        <div class="price">₹${((i.productDetails.discount_price || i.productDetails.price) * i.quantity) / 100}</div>
-      </div>
-    `).join('')
-    
-    // Calculate compound total
-    let totalPaisa = finalCartPayload.reduce((s, i) => s + ((i.productDetails.discount_price || i.productDetails.price) * i.quantity), 0)
-    document.getElementById('totalDisplay').textContent = `₹${totalPaisa / 100}`
-    document.getElementById('summaryBox').style.display = 'block'
-  }
-
-  window.revealCheckoutForm = function() {
-    document.getElementById('startCheckoutBtn').style.display = 'none';
-    document.getElementById('checkoutFormBlock').style.display = 'block';
-  }
-
-  window.processPayment = function() {
-    const name = document.getElementById('c-name').value
-    const phone = document.getElementById('c-phone').value
-    const address = document.getElementById('c-address').value
-    if(!name || !phone || !address) return alert("Verify all necessary delivery details are populated completely.");
-
-    let totalPaisa = finalCartPayload.reduce((s, i) => s + ((i.productDetails.discount_price || i.productDetails.price) * i.quantity), 0)
-
-    const opts = {
-      "key": "rzp_live_SskOYlu2pHt0Qp", 
-      "amount": totalPaisa, "currency": "INR", "name": "CastWheelz Premium",
-      "handler": async function (resp) {
-        const { data: order } = await supabase.from('orders').insert([{
-          profile_id: userSession.user.id, customer_name: name, customer_email: userSession.user.email,
-          customer_phone: phone, delivery_address: address, total_amount: totalPaisa, razorpay_payment_id: resp.razorpay_payment_id, payment_status: 'Paid'
-        }]).select().single()
-        
-        await supabase.from('cart_items').delete().eq('profile_id', userSession.user.id)
-        alert('Transaction Complete. Reference Tracking System Token ID: ' + order.id.substring(0,8).toUpperCase())
-        window.location.href = 'index.html'
-      },
-      "prefill": { "name": name, "email": userSession.user.email, "contact": phone },
-      "theme": { "color": "#c9a84c" }
     }
-    new Razorpay(opts).open()
+    document.getElementById('cartList').innerHTML = html;
   }
-
-  loadCartLedger()
+  renderCart();
 </script>
 </body>
 </html>
