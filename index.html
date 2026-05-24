@@ -243,13 +243,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CastWheelz — Premium Die Cast Models</title>
-<!-- Mutes the 404 favicon error -->
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
-    --gold: #c9a84c; --gold-light: #e8c97a; --gold-dark: #8a6a22; --silver: #b8bcc8; 
+    --gold: #c9a84c; --gold-light: #e8c97a; --silver: #b8bcc8; 
     --red: #d63333; --white: #f4f2ee; --muted: #7a7d88;
     --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
@@ -396,12 +395,16 @@
       const btn = document.getElementById('authBtn')
       btn.textContent = 'Logout'
       btn.onclick = async () => { await supabase.auth.signOut(); window.location.reload(); }
-      
-      const { data } = await supabase.from('cart_items').select('quantity').eq('profile_id', session.user.id)
-      if(data) document.getElementById('cartBadge').textContent = data.reduce((a, b) => a + b.quantity, 0)
+      await updateCartBadge();
     }
     await loadCats()
     await loadProducts()
+  }
+
+  async function updateCartBadge() {
+    if (!sessionUser) return;
+    const { data } = await supabase.from('cart_items').select('quantity').eq('profile_id', sessionUser.id)
+    if(data) document.getElementById('cartBadge').textContent = data.reduce((a, b) => a + b.quantity, 0)
   }
 
   async function loadCats() {
@@ -446,27 +449,25 @@
       return;
     }
     
-    // Lock button
     if (btnElement) { btnElement.disabled = true; btnElement.textContent = "Adding..."; }
 
-    // Fetch current quantity
-    const { data: exist } = await supabase.from('cart_items').select('quantity').eq('profile_id', sessionUser.id).eq('product_id', pid).maybeSingle();
-    const newQty = exist ? exist.quantity + 1 : 1;
-
-    // Safely Upsert to avoid 409 Conflicts
-    await supabase.from('cart_items').upsert(
-      { profile_id: sessionUser.id, product_id: pid, quantity: newQty },
-      { onConflict: 'profile_id, product_id' }
-    );
+    const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', sessionUser.id).eq('product_id', pid).maybeSingle();
     
-    // Update Badge
-    const { data } = await supabase.from('cart_items').select('quantity').eq('profile_id', sessionUser.id)
-    if(data) document.getElementById('cartBadge').textContent = data.reduce((a, b) => a + b.quantity, 0)
+    if (exist) {
+      await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('id', exist.id);
+    } else {
+      const { error } = await supabase.from('cart_items').insert([{ profile_id: sessionUser.id, product_id: pid, quantity: 1 }]);
+      if (error) {
+        // Fallback for extreme network lag
+        const { data: retry } = await supabase.from('cart_items').select('*').eq('profile_id', sessionUser.id).eq('product_id', pid).maybeSingle();
+        if (retry) await supabase.from('cart_items').update({ quantity: retry.quantity + 1 }).eq('id', retry.id);
+      }
+    }
     
-    // Unlock button
+    await updateCartBadge();
+    
     if (btnElement) { btnElement.disabled = false; btnElement.textContent = "Add to Cart"; }
     
-    // Toast
     const toast = document.getElementById('toastComponent')
     document.getElementById('toastTargetItemName').textContent = name
     toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000)
