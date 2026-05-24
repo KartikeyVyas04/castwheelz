@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Model Details — CastWheelz</title>
+<!-- Mutes the 404 favicon error -->
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -17,7 +19,6 @@
   .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
   .logo span { color: var(--white); }
   
-  /* RESPONSIVE BACK BUTTON GATEWAY */
   .btn-back-layout { display: inline-flex; align-items: center; background: none; border: 1px solid var(--border); color: var(--white); padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 11px; font-weight: 600; margin-bottom: 2rem; }
   .btn-back-layout:hover { border-color: var(--gold); color: var(--gold); }
 
@@ -31,10 +32,11 @@
   .desc { color: #b8bcc8; line-height: 1.8; margin-bottom: 2rem; font-size: 15px; }
   .price { font-family: var(--font-display); font-size: 42px; color: var(--white); margin-bottom: 2rem; }
   
-  .btn-action { background: var(--gold); color: var(--black); border: none; padding: 16px; font-size: 14px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; width: 100%; }
+  .btn-action { background: var(--gold); color: var(--black); border: none; padding: 16px; font-size: 14px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; width: 100%; transition: opacity 0.2s; }
+  .btn-action:hover { opacity: 0.9; }
+  .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
   
-  /* SUGGESTIONS ARCHITECTURE */
-  .suggestions-section { margin-top: 6rem; border-top: 1px solid var(--border); padding-top: 4rem; }
+  .suggestions-section { margin-top: 6rem; border-top: 1px solid var(--border); padding-top: 4rem; margin-bottom: 4rem; }
   .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
   .suggest-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.2s; }
   .suggest-card:hover { border-color: var(--gold); transform: translateY(-3px); }
@@ -43,7 +45,7 @@
 
   @media(max-width: 768px) {
     .main-split { grid-template-columns: 1fr; gap: 2rem; }
-    .btn-back-layout { display: none; } /* Drop back button cleanly on mobile Viewports */
+    .btn-back-layout { display: none; }
   }
 </style>
 </head>
@@ -62,7 +64,7 @@
   </div>
 
   <section class="suggestions-section">
-    <h2 style="font-family: var(--font-display); font-size: 32px; letter-spacing: 1px;">Recommended Fleet</h2>
+    <h2 style="font-family: var(--font-display); font-size: 32px; letter-spacing: 1px; margin:0;">Recommended Fleet</h2>
     <div class="grid-layout" id="suggestionsDynamicContainer"></div>
   </section>
 </div>
@@ -92,25 +94,35 @@
         <div class="meta">${p.brand} · ${p.scale} Configuration Series</div>
         <div class="desc">${p.description || 'Museum grade precision scaled metal layout configuration. Accurate mechanical design structures.'}</div>
         <div class="price">₹${(p.discount_price || p.price) / 100}</div>
-        <button class="btn-action" onclick="window.commitAllocation('${p.id}')">Add to Cart</button>
+        <button class="btn-action" onclick="window.commitAllocation('${p.id}', this)">Add to Cart</button>
       </div>
     `
     await injectSuggestionsList(p.category_id, p.id)
   }
 
-  window.commitAllocation = async function(pid) {
+  window.commitAllocation = async function(pid, btnElement) {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
       alert("Authentication payload missing. Login via secure panel root context first.");
       window.location.href = 'login.html';
       return;
     }
-    const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).single()
-    if (exist) {
-      await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('profile_id', session.user.id).eq('product_id', pid)
+
+    if (btnElement) { btnElement.disabled = true; btnElement.textContent = "Processing..."; }
+
+    const { data: existingItem } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
+    
+    if (existingItem) {
+      await supabase.from('cart_items').update({ quantity: existingItem.quantity + 1 }).eq('id', existingItem.id);
     } else {
-      await supabase.from('cart_items').insert({ profile_id: session.user.id, product_id: pid, quantity: 1 })
+      const { error } = await supabase.from('cart_items').insert([{ profile_id: session.user.id, product_id: pid, quantity: 1 }]);
+      
+      if (error && (error.code === '23505' || error.message.includes('duplicate'))) {
+        const { data: retry } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
+        if (retry) await supabase.from('cart_items').update({ quantity: retry.quantity + 1 }).eq('id', retry.id);
+      }
     }
+    
     window.location.href = 'cart.html'
   }
 
@@ -125,7 +137,7 @@
         <div class="suggest-img">
           <svg viewBox="0 0 280 160" fill="none"><path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#111" stroke="#c9a84c" stroke-width="1"/></svg>
         </div>
-        <div style="font-weight:600; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</div>
+        <div style="font-weight:600; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:white;">${item.name}</div>
         <div style="color:var(--gold); font-size:12px; font-weight:500; margin-top:4px;">₹${(item.discount_price || item.price)/100}</div>
       </div>
     `).join('')
