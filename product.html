@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Model Details — CastWheelz</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
@@ -13,34 +13,58 @@
   }
   body { background: var(--black); color: var(--white); font-family: var(--font-body); margin: 0; padding-top: 80px; }
   
-  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 3rem; z-index: 100; }
+  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; z-index: 100; }
   .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
   .logo span { color: var(--white); }
-  .nav-btn { background: none; border: 1px solid var(--border); color: var(--silver); border-radius: 6px; padding: 7px 16px; font-size: 13px; font-weight: 500; cursor: pointer; text-transform: uppercase; transition: color 0.2s; color: var(--white); text-decoration: none;}
-  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
   
-  .container { max-width: 1100px; margin: 4rem auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
-  .img-box { background: linear-gradient(135deg, var(--card-bg) 0%, #1c1e22 100%); border: 1px solid var(--border); border-radius: 16px; padding: 5rem 3rem; text-align: center; }
-  .img-box svg { width: 100%; max-width: 480px; filter: drop-shadow(0 20px 40px rgba(201,168,76,0.15)); }
+  /* RESPONSIVE BACK BUTTON GATEWAY */
+  .btn-back-layout { display: inline-flex; align-items: center; background: none; border: 1px solid var(--border); color: var(--white); padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 11px; font-weight: 600; margin-bottom: 2rem; }
+  .btn-back-layout:hover { border-color: var(--gold); color: var(--gold); }
+
+  .master-wrap { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+  .main-split { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .img-box { background: linear-gradient(135deg, var(--card-bg) 0%, #1c1e22 100%); border: 1px solid var(--border); border-radius: 16px; padding: 4rem 2rem; text-align: center; }
+  .img-box svg { width: 100%; max-width: 400px; filter: drop-shadow(0 20px 40px rgba(201,168,76,0.15)); }
   
-  h1 { font-family: var(--font-display); font-size: 54px; margin: 0 0 10px; line-height: 1; }
-  .meta { color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2rem; font-weight: 600; }
-  .desc { color: var(--silver); line-height: 1.8; margin-bottom: 2.5rem; font-size: 15px; color: #b8bcc8; }
-  .price { font-family: var(--font-display); font-size: 48px; color: var(--white); margin-bottom: 2rem; }
+  h1 { font-family: var(--font-display); font-size: clamp(36px, 5vw, 54px); margin: 0 0 10px; line-height: 1.1; }
+  .meta { color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; font-weight: 600; }
+  .desc { color: #b8bcc8; line-height: 1.8; margin-bottom: 2rem; font-size: 15px; }
+  .price { font-family: var(--font-display); font-size: 42px; color: var(--white); margin-bottom: 2rem; }
   
-  button.add-btn { background: var(--gold); color: var(--black); border: none; padding: 16px 32px; font-size: 15px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; width: 100%; transition: opacity 0.2s; }
-  button.add-btn:hover { opacity: 0.9; }
+  .btn-action { background: var(--gold); color: var(--black); border: none; padding: 16px; font-size: 14px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; width: 100%; }
+  
+  /* SUGGESTIONS ARCHITECTURE */
+  .suggestions-section { margin-top: 6rem; border-top: 1px solid var(--border); padding-top: 4rem; }
+  .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+  .suggest-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.2s; }
+  .suggest-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+  .suggest-img { height: 120px; background: #1a1c20; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 10px; }
+  .suggest-img svg { width: 65%; }
+
+  @media(max-width: 768px) {
+    .main-split { grid-template-columns: 1fr; gap: 2rem; }
+    .btn-back-layout { display: none; } /* Drop back button cleanly on mobile Viewports */
+  }
 </style>
 </head>
 <body>
 
 <nav>
   <a href="index.html" class="logo">CAST<span>WHEELZ</span></a>
-  <a href="cart.html" class="nav-btn">View Cart</a>
+  <button class="btn-action" style="padding:7px 14px; font-size:12px; width:auto; background:none; border:1px solid var(--border); color:white;" onclick="window.location.href='cart.html'">View Cart</button>
 </nav>
 
-<div class="container" id="content">
-  <div style="grid-column: 1/-1; text-align:center; color:var(--muted); padding: 5rem 0;">Synchronizing specifications layer...</div>
+<div class="master-wrap">
+  <button class="btn-back-layout" onclick="window.history.back()">← Previous Model</button>
+  
+  <div class="main-split" id="specificationsTargetViewport">
+    <div style="grid-column: 1/-1; text-align:center; color:var(--muted); padding: 4rem 0;">De-serializing matrix configuration data...</div>
+  </div>
+
+  <section class="suggestions-section">
+    <h2 style="font-family: var(--font-display); font-size: 32px; letter-spacing: 1px;">Recommended Fleet</h2>
+    <div class="grid-layout" id="suggestionsDynamicContainer"></div>
+  </section>
 </div>
 
 <script type="module">
@@ -49,14 +73,12 @@
   
   const id = new URLSearchParams(window.location.search).get('id')
   
-  async function load() {
-    if (!id) return document.getElementById('content').innerHTML = "Invalid Route Configuration."
+  async function loadDataSheet() {
+    if (!id) return document.getElementById('specificationsTargetViewport').innerHTML = "Invalid Route mapping reference value."
     const { data: p } = await supabase.from('products').select('*').eq('id', id).single()
-    if (!p) return document.getElementById('content').innerHTML = "Product matrix not found."
+    if (!p) return document.getElementById('specificationsTargetViewport').innerHTML = "Record missing in structural grid."
     
-    const activePrice = p.discount_price || p.price;
-    
-    document.getElementById('content').innerHTML = `
+    document.getElementById('specificationsTargetViewport').innerHTML = `
       <div class="img-box">
         <svg viewBox="0 0 420 220" fill="none">
           <ellipse cx="210" cy="205" rx="160" ry="12" fill="rgba(0,0,0,0.4)"/>
@@ -67,26 +89,49 @@
       </div>
       <div>
         <h1>${p.name}</h1>
-        <div class="meta">${p.brand} · ${p.scale} Precision Scale</div>
-        <div class="desc">${p.description || 'Museum grade precision scaled metal layout configuration. Accurate mechanical modeling built to last.'}</div>
-        <div class="price">₹${activePrice / 100}</div>
-        <button class="add-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
+        <div class="meta">${p.brand} · ${p.scale} Configuration Series</div>
+        <div class="desc">${p.description || 'Museum grade precision scaled metal layout configuration. Accurate mechanical design structures.'}</div>
+        <div class="price">₹${(p.discount_price || p.price) / 100}</div>
+        <button class="btn-action" onclick="window.commitAllocation('${p.id}')">Add to Cart</button>
       </div>
     `
+    await injectSuggestionsList(p.category_id, p.id)
   }
 
-  window.addToCart = async function(pid) {
+  window.commitAllocation = async function(pid) {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
-        alert("Please login first to allocate items to your cart.");
-        window.location.href = 'login.html';
-        return;
+      alert("Authentication payload missing. Login via secure panel root context first.");
+      window.location.href = 'login.html';
+      return;
     }
-    await supabase.from('cart_items').upsert({ profile_id: session.user.id, product_id: pid, quantity: 1 })
+    const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).single()
+    if (exist) {
+      await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('profile_id', session.user.id).eq('product_id', pid)
+    } else {
+      await supabase.from('cart_items').insert({ profile_id: session.user.id, product_id: pid, quantity: 1 })
+    }
     window.location.href = 'cart.html'
   }
 
-  load()
+  async function injectSuggestionsList(catId, omitId) {
+    const { data } = await supabase.from('products').select('*').eq('category_id', catId).not('id', 'eq', omitId).limit(4)
+    if (!data || data.length === 0) {
+      document.getElementById('suggestionsDynamicContainer').innerHTML = "<p style='color:var(--muted); font-size:13px;'>No alternative models located inside this custom scale grouping tier yet.</p>"
+      return
+    }
+    document.getElementById('suggestionsDynamicContainer').innerHTML = data.map(item => `
+      <div class="suggest-card" onclick="window.location.href='product.html?id=${item.id}'">
+        <div class="suggest-img">
+          <svg viewBox="0 0 280 160" fill="none"><path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#111" stroke="#c9a84c" stroke-width="1"/></svg>
+        </div>
+        <div style="font-weight:600; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</div>
+        <div style="color:var(--gold); font-size:12px; font-weight:500; margin-top:4px;">₹${(item.discount_price || item.price)/100}</div>
+      </div>
+    `).join('')
+  }
+
+  loadDataSheet()
 </script>
 </body>
 </html>
