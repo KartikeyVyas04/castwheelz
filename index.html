@@ -302,6 +302,7 @@
   .price { font-family: var(--font-display); font-size: 24px; color: var(--gold); margin-top: auto; }
   .btn-add { background: none; border: 1px solid var(--border); color: var(--white); border-radius: 6px; padding: 9px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase; transition: all 0.2s; width: 100%; margin-top: 12px; font-family: inherit; }
   .btn-add:hover { background: var(--gold); border-color: var(--gold); color: var(--black); }
+  .btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
 
   footer { border-top: 1px solid var(--border); padding: 3rem 0; background: var(--dark); text-align: center; }
   .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 1100; background: var(--card-bg); border: 1px solid var(--gold); border-radius: 8px; padding: 12px 18px; display: flex; align-items: center; gap: 10px; transform: translateX(130%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -432,30 +433,38 @@
           <div class="product-scale">${p.scale} Scale</div>
           <div class="product-name" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</div>
           <div class="price">₹${(p.discount_price || p.price) / 100}</div>
-          <button class="btn-add" onclick="quickAddToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}')">Add to Cart</button>
+          <button class="btn-add" onclick="quickAddToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}', this)">Add to Cart</button>
         </div>
       </div>
     `).join('') : '<p style="grid-column:1/-1; text-align:center; color:var(--muted)">No fleet records available.</p>'
   }
 
-  window.quickAddToCart = async function(pid, name) {
+  window.quickAddToCart = async function(pid, name, btnElement) {
     if (!sessionUser) {
       alert("Authentication context required. Redirecting to account terminal.");
       window.location.href = 'login.html';
       return;
     }
     
-    // BULLETPROOF CART LOGIC: Use a standard array check to prevent the 406 & 409 errors
-    const { data: existingItems } = await supabase.from('cart_items').select('*').eq('profile_id', sessionUser.id).eq('product_id', pid);
+    if (btnElement) { btnElement.disabled = true; btnElement.textContent = "Adding..."; }
+
+    const { data: existingItem } = await supabase.from('cart_items').select('*').eq('profile_id', sessionUser.id).eq('product_id', pid).maybeSingle();
     
-    if (existingItems && existingItems.length > 0) {
-      await supabase.from('cart_items').update({ quantity: existingItems[0].quantity + 1 }).eq('profile_id', sessionUser.id).eq('product_id', pid);
+    if (existingItem) {
+      await supabase.from('cart_items').update({ quantity: existingItem.quantity + 1 }).eq('id', existingItem.id);
     } else {
-      await supabase.from('cart_items').insert([{ profile_id: sessionUser.id, product_id: pid, quantity: 1 }]);
+      const { error } = await supabase.from('cart_items').insert([{ profile_id: sessionUser.id, product_id: pid, quantity: 1 }]);
+      
+      if (error && (error.code === '23505' || error.message.includes('duplicate'))) {
+        const { data: retry } = await supabase.from('cart_items').select('*').eq('profile_id', sessionUser.id).eq('product_id', pid).maybeSingle();
+        if (retry) await supabase.from('cart_items').update({ quantity: retry.quantity + 1 }).eq('id', retry.id);
+      }
     }
     
     const { data } = await supabase.from('cart_items').select('quantity').eq('profile_id', sessionUser.id)
-    if(data) document.getElementById('cartBadge').textContent = data.reduce((a, b) => a + b.quantity, 0)
+    if (data) document.getElementById('cartBadge').textContent = data.reduce((a, b) => a + b.quantity, 0)
+    
+    if (btnElement) { btnElement.disabled = false; btnElement.textContent = "Add to Cart"; }
     
     const toast = document.getElementById('toastComponent')
     document.getElementById('toastTargetItemName').textContent = name
