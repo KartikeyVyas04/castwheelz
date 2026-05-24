@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Logistics Cart — CastWheelz</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
@@ -72,7 +73,7 @@
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
   const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
   
-  let cartData = [];
+  let finalCartPayload = [];
   let userSession = null;
 
   async function loadCartLedger() {
@@ -83,22 +84,36 @@
     }
     userSession = session;
 
-    const { data } = await supabase.from('cart_items').select('quantity, products(id, name, price, discount_price)').eq('profile_id', session.user.id)
-    cartData = data || [];
+    // STEP 1: Fetch items securely
+    const { data: cartItems } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id)
     
-    if (cartData.length === 0) {
+    if (!cartItems || cartItems.length === 0) {
       document.getElementById('itemsBox').innerHTML = "Your current allocation matrix contains 0 records."
       return;
     }
+
+    // STEP 2: Fetch corresponding products directly to bypass any missing Foreign Key links
+    const productIds = cartItems.map(c => c.product_id);
+    const { data: productsData } = await supabase.from('products').select('*').in('id', productIds);
+
+    // STEP 3: Merge them
+    finalCartPayload = cartItems.map(item => {
+      return {
+        ...item,
+        productDetails: productsData.find(p => p.id === item.product_id) || null
+      }
+    }).filter(item => item.productDetails !== null); // Drop ghost records
     
-    document.getElementById('itemsBox').innerHTML = cartData.map(i => `
+    // Render Items
+    document.getElementById('itemsBox').innerHTML = finalCartPayload.map(i => `
       <div class="cart-item">
-        <div><strong>${i.products.name}</strong><br><small style="color:var(--muted)">Allocated Quantity Unit: ${i.quantity}</small></div>
-        <div class="price">₹${((i.products.discount_price || i.products.price) * i.quantity) / 100}</div>
+        <div><strong>${i.productDetails.name}</strong><br><small style="color:var(--muted)">Allocated Quantity Unit: ${i.quantity}</small></div>
+        <div class="price">₹${((i.productDetails.discount_price || i.productDetails.price) * i.quantity) / 100}</div>
       </div>
     `).join('')
     
-    let totalPaisa = cartData.reduce((s, i) => s + ((i.products.discount_price || i.products.price) * i.quantity), 0)
+    // Calculate compound total
+    let totalPaisa = finalCartPayload.reduce((s, i) => s + ((i.productDetails.discount_price || i.productDetails.price) * i.quantity), 0)
     document.getElementById('totalDisplay').textContent = `₹${totalPaisa / 100}`
     document.getElementById('summaryBox').style.display = 'block'
   }
@@ -114,7 +129,7 @@
     const address = document.getElementById('c-address').value
     if(!name || !phone || !address) return alert("Verify all necessary delivery details are populated completely.");
 
-    let totalPaisa = cartData.reduce((s, i) => s + ((i.products.discount_price || i.products.price) * i.quantity), 0)
+    let totalPaisa = finalCartPayload.reduce((s, i) => s + ((i.productDetails.discount_price || i.productDetails.price) * i.quantity), 0)
 
     const opts = {
       "key": "rzp_live_SskOYlu2pHt0Qp", 
