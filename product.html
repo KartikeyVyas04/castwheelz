@@ -33,7 +33,7 @@
 
 <nav>
   <a href="index.html" class="logo">CAST<span>WHEELZ</span></a>
-  <button onclick="window.location.href='cart.html'" style="background:none;border:1px solid var(--border);color:white;padding:8px 16px;border-radius:6px;cursor:pointer;">View Cart</button>
+  <button onclick="window.location.href='cart.html'" style="background:none;border:1px solid var(--border);color:white;padding:8px 16px;border-radius:6px;cursor:pointer;">Cart</button>
 </nav>
 
 <div class="container" id="view"><p style="grid-column:1/-1;text-align:center;">Loading model specifications...</p></div>
@@ -65,7 +65,7 @@
     `;
   }
 
-  // BULLETPROOF CART LOGIC
+  // BULLETPROOF RPC LOGIC
   window.pushToCart = async (pid, btn) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return window.location.href = 'login.html';
@@ -73,17 +73,7 @@
     btn.disabled = true; btn.textContent = "Processing...";
     
     try {
-      const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
-      
-      if(exist) {
-        await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('id', exist.id);
-      } else {
-        const { error } = await supabase.from('cart_items').insert({ profile_id: session.user.id, product_id: pid, quantity: 1 });
-        if(error && (error.code === '23505' || error.message.includes('duplicate'))) {
-          const { data: retry } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
-          if(retry) await supabase.from('cart_items').update({ quantity: retry.quantity + 1 }).eq('id', retry.id);
-        }
-      }
+      await supabase.rpc('add_to_cart', { user_id: session.user.id, item_id: pid });
     } catch(e) { 
       console.error(e); 
     }
