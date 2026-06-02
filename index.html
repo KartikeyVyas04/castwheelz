@@ -147,25 +147,32 @@
     `}).join('');
   }
 
-  // BULLETPROOF INSERT/UPDATE LOGIC
+  // BULLETPROOF CART LOGIC - NO 409 ERRORS
   window.addCart = async (pid, btn) => {
     if (!userSession) return window.location.href = 'login.html';
     
     btn.disabled = true; btn.textContent = "Processing...";
     
     try {
-      const { data: exist } = await supabase.from('cart_items').select('id, quantity').eq('profile_id', userSession.id).eq('product_id', pid).maybeSingle();
+      // Step 1: Safely check if the item is already there
+      const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', userSession.id).eq('product_id', pid).maybeSingle();
       
       if (exist) {
+        // Step 2a: It exists, securely update the quantity
         await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('id', exist.id);
       } else {
+        // Step 2b: It does not exist, insert it
         const { error } = await supabase.from('cart_items').insert({ profile_id: userSession.id, product_id: pid, quantity: 1 });
-        if (error) { // Catch 409 Race Condition
-          const { data: retry } = await supabase.from('cart_items').select('id, quantity').eq('profile_id', userSession.id).eq('product_id', pid).maybeSingle();
+        
+        // Failsafe: If a double-click slips through and triggers a 409 Unique Conflict, catch it and update instead!
+        if (error && (error.code === '23505' || error.message.includes('duplicate'))) {
+          const { data: retry } = await supabase.from('cart_items').select('*').eq('profile_id', userSession.id).eq('product_id', pid).maybeSingle();
           if(retry) await supabase.from('cart_items').update({ quantity: retry.quantity + 1 }).eq('id', retry.id);
         }
       }
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+      console.error("Cart Action Managed:", e); 
+    }
     
     await updateBadge();
     btn.disabled = false; btn.textContent = "Add to Cart";
