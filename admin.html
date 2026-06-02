@@ -6,18 +6,21 @@
 <title>Control Console</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #0a0a0a; --card: #161819; --border: #2a2b2e; --gold: #c9a84c; --white: #fff; }
+  :root { --bg: #0a0a0a; --card: #161819; --border: #2a2b2e; --gold: #c9a84c; --white: #fff; --muted: #888; }
   body { background: var(--bg); color: var(--white); font-family: 'DM Sans', sans-serif; padding: 2rem; }
-  h1 { font-family: 'Bebas Neue', sans-serif; color: var(--gold); }
+  h1 { font-family: 'Bebas Neue', sans-serif; color: var(--gold); letter-spacing:1px; }
+  
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
-  form { background: var(--card); padding: 2rem; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; gap: 10px; }
-  input, select, textarea { background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 4px; }
-  button { background: var(--gold); color: #000; border: none; padding: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
-  .list { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; height: 400px; overflow-y: auto; }
-  .item { border-bottom: 1px solid var(--border); padding: 10px 0; display:flex; justify-content:space-between; align-items:center; }
+  form { background: var(--card); padding: 2rem; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; gap: 12px; }
+  form h3 { font-family: 'Bebas Neue', sans-serif; font-size: 24px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+  input, select, textarea { background: #000; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 6px; }
+  button { background: var(--gold); color: #000; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform:uppercase; }
+  
+  .list-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; height: 400px; overflow-y: auto; }
+  .row-item { border-bottom: 1px solid var(--border); padding: 12px 0; display:flex; justify-content:space-between; align-items:center; }
   
   #gate { position: fixed; inset: 0; background: #0a0a0a; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-  #gate div { background: var(--card); padding: 3rem; text-align: center; border-radius: 12px; border: 1px solid var(--border); }
+  #gate div { background: var(--card); padding: 4rem; text-align: center; border-radius: 16px; border: 1px solid var(--border); }
   
   @media(max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 </style>
@@ -26,81 +29,88 @@
 
 <div id="gate">
   <div>
-    <h1>ADMIN TERMINAL</h1>
-    <button onclick="login()" style="margin-top:20px; width:100%;">Authorize Google Login</button>
+    <h1 style="font-size:42px;">HQ TERMINAL</h1>
+    <p style="color:var(--muted);margin-bottom:2rem;">Restricted to core administrators.</p>
+    <button onclick="authGate()" style="width:100%;">Authorize Google Login</button>
   </div>
 </div>
 
 <div style="display:flex; justify-content:space-between; align-items:center;">
-  <h1>HQ Console</h1>
-  <a href="index.html" style="color:var(--white);">Return to Site</a>
+  <h1>HQ Master Console</h1>
+  <a href="index.html" style="color:var(--white);text-decoration:none;border:1px solid #333;padding:8px 16px;border-radius:6px;">Return to Site</a>
 </div>
 
 <div class="grid">
-  <form id="addCat">
-    <h3>Add Category</h3>
-    <input id="c-name" placeholder="Name (e.g. Hypercars)" required>
-    <input id="c-slug" placeholder="Slug (e.g. hypercars)" required>
-    <input id="c-icon" placeholder="Emoji (e.g. 🏎️)" required>
-    <button type="submit">Save Category</button>
+  <form id="catForm">
+    <h3>Add Matrix Category</h3>
+    <input id="c-name" placeholder="Category Name" required>
+    <input id="c-slug" placeholder="URL Slug" required>
+    <input id="c-icon" placeholder="Emoji Icon" required>
+    <button type="submit">Deploy Category</button>
   </form>
-  <div class="list" id="catList">Loading...</div>
+  <div class="list-box" id="catList">Loading...</div>
 </div>
 
 <div class="grid">
-  <form id="addProd">
-    <h3>Add Product</h3>
+  <form id="prodForm">
+    <h3>Inject Product Node</h3>
     <input id="p-name" placeholder="Model Name" required>
-    <input id="p-brand" placeholder="Brand" required>
-    <select id="p-scale"><option>1:18</option><option>1:43</option></select>
+    <input id="p-brand" placeholder="Brand Name" required>
+    <select id="p-scale"><option>1:18</option><option>1:24</option><option>1:43</option><option>1:64</option></select>
     <select id="p-cat" required></select>
     <input id="p-price" type="number" placeholder="Price (INR)" required>
-    <button type="submit">Save Product</button>
+    <button type="submit">Deploy Product</button>
   </form>
-  <div class="list" id="prodList">Loading...</div>
+  <div class="list-box" id="prodList">Loading...</div>
 </div>
 
 <div class="grid" style="grid-template-columns:1fr; margin-top:2rem;">
-  <div class="list" id="orderList" style="height:auto;">Loading Orders...</div>
+  <div class="list-box" id="orderList" style="height:auto;">Loading Logistics...</div>
 </div>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
   const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
 
-  window.login = () => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
+  window.authGate = () => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
 
   supabase.auth.getSession().then(({data:{session}}) => {
     if(session && session.user.email === 'prakior@gmail.com') {
       document.getElementById('gate').style.display = 'none';
-      loadData();
+      fetchData();
     }
   });
 
-  async function loadData() {
+  async function fetchData() {
     const [cats, prods, orders] = await Promise.all([
       supabase.from('categories').select('*'),
       supabase.from('products').select('*').order('created_at', {ascending:false}),
       supabase.from('orders').select('*').order('created_at', {ascending:false})
     ]);
 
-    // Render Cats
     document.getElementById('p-cat').innerHTML = cats.data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-    document.getElementById('catList').innerHTML = cats.data.map(c => `<div class="item"><span>${c.display_icon} ${c.name}</span> <button style="background:none;color:red;" onclick="delCat('${c.id}')">X</button></div>`).join('');
+    document.getElementById('catList').innerHTML = cats.data.map(c => `<div class="row-item"><span>${c.display_icon} <strong>${c.name}</strong></span> <button style="background:transparent;border:1px solid #333;color:red;" onclick="xCat('${c.id}')">Del</button></div>`).join('');
+    document.getElementById('prodList').innerHTML = prods.data.map(p => `<div class="row-item"><span><strong>${p.name}</strong><br><small style="color:var(--muted)">${p.scale} | ₹${p.price/100}</small></span> <button style="background:transparent;border:1px solid #333;color:red;" onclick="xProd('${p.id}')">Del</button></div>`).join('');
     
-    // Render Prods
-    document.getElementById('prodList').innerHTML = prods.data.map(p => `<div class="item"><span>${p.name}</span> <button style="background:none;color:red;" onclick="delProd('${p.id}')">X</button></div>`).join('');
-    
-    // Render Orders
-    document.getElementById('orderList').innerHTML = orders.data.map(o => `<div class="item"><span>#${o.id.substring(0,8)} - ${o.customer_name} (₹${o.total_amount/100}) - <strong style="color:var(--gold)">${o.fulfillment_status}</strong></span> <button onclick="markDelivered('${o.id}')">Mark Delivered</button></div>`).join('');
+    document.getElementById('orderList').innerHTML = orders.data.map(o => `
+      <div class="row-item">
+        <div>
+          <strong style="font-family:'Bebas Neue'; font-size:20px; color:var(--gold);">#${o.id.substring(0,8).toUpperCase()}</strong>
+          <div style="font-size:13px; color:var(--muted);">${o.customer_name} | ₹${o.total_amount/100}</div>
+        </div>
+        <div style="text-align:right;">
+          <span style="display:inline-block; margin-bottom:5px; font-size:12px; padding:4px 8px; background:#111; border-radius:4px;">${o.fulfillment_status}</span><br>
+          <button style="background:none;border:1px solid var(--gold);color:var(--gold);padding:4px 8px;font-size:11px;" onclick="shipOrder('${o.id}')">Mark Shipped</button>
+        </div>
+      </div>`).join('');
   }
 
-  document.getElementById('addCat').onsubmit = async(e) => { e.preventDefault(); await supabase.from('categories').insert({ name: document.getElementById('c-name').value, slug: document.getElementById('c-slug').value, display_icon: document.getElementById('c-icon').value }); loadData(); }
-  document.getElementById('addProd').onsubmit = async(e) => { e.preventDefault(); await supabase.from('products').insert({ name: document.getElementById('p-name').value, brand: document.getElementById('p-brand').value, scale: document.getElementById('p-scale').value, category_id: document.getElementById('p-cat').value, price: parseInt(document.getElementById('p-price').value)*100, stock_quantity: 5 }); loadData(); }
+  document.getElementById('catForm').onsubmit = async(e) => { e.preventDefault(); await supabase.from('categories').insert({ name: document.getElementById('c-name').value, slug: document.getElementById('c-slug').value, display_icon: document.getElementById('c-icon').value }); fetchData(); e.target.reset(); }
+  document.getElementById('prodForm').onsubmit = async(e) => { e.preventDefault(); await supabase.from('products').insert({ name: document.getElementById('p-name').value, brand: document.getElementById('p-brand').value, scale: document.getElementById('p-scale').value, category_id: document.getElementById('p-cat').value, price: parseInt(document.getElementById('p-price').value)*100, stock_quantity: 5 }); fetchData(); e.target.reset(); }
   
-  window.delCat = async(id) => { await supabase.from('categories').delete().eq('id',id); loadData(); }
-  window.delProd = async(id) => { await supabase.from('products').delete().eq('id',id); loadData(); }
-  window.markDelivered = async(id) => { await supabase.from('orders').update({fulfillment_status: 'Delivered'}).eq('id', id); loadData(); }
+  window.xCat = async(id) => { await supabase.from('categories').delete().eq('id',id); fetchData(); }
+  window.xProd = async(id) => { await supabase.from('products').delete().eq('id',id); fetchData(); }
+  window.shipOrder = async(id) => { await supabase.from('orders').update({fulfillment_status: 'Shipped'}).eq('id', id); fetchData(); }
 </script>
 </body>
 </html>
