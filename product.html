@@ -3,36 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Model Details</title>
+<title>Model Specifications</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root { --bg: #0a0a0a; --card: #161819; --border: #2a2b2e; --gold: #c9a84c; --white: #fff; --muted: #888; }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
   body { background: var(--bg); color: var(--white); padding-top: 70px; }
+  
   nav { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(10,10,10,0.95); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; z-index: 100; }
   .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); text-decoration: none; }
   
-  .container { max-width: 1000px; margin: 3rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
-  .img-box { background: #111; padding: 4rem; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
+  .container { max-width: 1000px; margin: 3rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .img-box { background: #111; padding: 4rem 2rem; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
   .img-box svg { width: 100%; max-width: 350px; }
   
-  h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; margin-bottom: 5px; }
-  .meta { color: var(--gold); font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 1rem; }
-  .price { font-family: 'Bebas Neue', sans-serif; font-size: 36px; margin-bottom: 2rem; }
-  .btn-add { background: var(--gold); border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
-  .btn-add:hover { opacity: 0.8; }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 5vw, 54px); margin-bottom: 5px; line-height: 1; }
+  .meta { color: var(--gold); font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 1px; }
+  .price { font-family: 'Bebas Neue', sans-serif; font-size: 42px; margin-bottom: 2rem; }
+  .btn-add { background: var(--gold); color: #000; border: none; padding: 16px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 15px; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+  .btn-add:hover { opacity: 0.9; }
+  .btn-add:disabled { opacity: 0.6; cursor: not-allowed; }
   
-  @media(max-width: 768px) { .container { grid-template-columns: 1fr; gap: 2rem; } }
+  @media(max-width: 768px) { .container { grid-template-columns: 1fr; gap: 2rem; margin-top: 1rem; } }
 </style>
 </head>
 <body>
+
 <nav>
   <a href="index.html" class="logo">CASTWHEELZ</a>
-  <a href="cart.html" style="color:var(--white); font-weight:bold; text-decoration:none;">View Cart</a>
+  <a href="cart.html" style="color:var(--white); font-weight:bold; text-decoration:none; text-transform:uppercase; font-size:13px; border:1px solid var(--border); padding:8px 16px; border-radius:6px;">View Cart</a>
 </nav>
 
-<div class="container" id="detailsView"><p>Loading Model...</p></div>
+<div class="container" id="detailsView"><p style="color:var(--muted)">Querying master database...</p></div>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
@@ -41,33 +44,38 @@
   const pid = new URLSearchParams(window.location.search).get('id');
 
   async function load() {
+    if(!pid) return document.getElementById('detailsView').innerHTML = "Invalid routing matrix.";
     const { data: p } = await supabase.from('products').select('*').eq('id', pid).single();
-    if(!p) return document.getElementById('detailsView').innerHTML = "Product not found.";
+    if(!p) return document.getElementById('detailsView').innerHTML = "Data node not found.";
     
     document.getElementById('detailsView').innerHTML = `
       <div class="img-box">
          <svg viewBox="0 0 280 160" fill="none"><path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#222" stroke="#c9a84c" stroke-width="2"/></svg>
       </div>
       <div>
-        <button onclick="window.history.back()" style="background:none;border:1px solid #333;color:#fff;padding:5px 10px;border-radius:4px;cursor:pointer;margin-bottom:20px;">&larr; Back</button>
+        <button onclick="window.history.back()" style="background:none; border:1px solid var(--border); color:#fff; padding:6px 12px; border-radius:6px; cursor:pointer; margin-bottom:20px; font-size:12px; text-transform:uppercase;">← Go Back</button>
         <h1>${p.name}</h1>
-        <div class="meta">${p.brand} | ${p.scale}</div>
-        <p style="color:var(--muted); margin-bottom:2rem; line-height:1.6;">${p.description || 'Museum grade precision scaled metal layout configuration.'}</p>
+        <div class="meta">${p.brand} | ${p.scale} Configuration</div>
+        <p style="color:var(--muted); margin-bottom:2rem; line-height:1.6; font-size:15px;">${p.description || 'Museum grade precision scaled metal layout configuration. True mechanical structure.'}</p>
         <div class="price">₹${(p.discount_price || p.price)/100}</div>
-        <button class="btn-add" onclick="add('${p.id}', this)">Add to Cart</button>
+        <button class="btn-add" onclick="add('${p.id}', this)">Add to Cart Ledger</button>
       </div>
     `;
   }
 
   window.add = async (id, btn) => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { alert("Login required."); window.location.href='login.html'; return; }
+    if (!session) { alert("Authentication payload missing. Login first."); window.location.href='login.html'; return; }
     
-    btn.disabled = true; btn.textContent = "Processing...";
-    const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', id).maybeSingle();
+    btn.disabled = true; btn.textContent = "Writing to Ledger...";
     
-    if(exist) await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('id', exist.id);
-    else await supabase.from('cart_items').insert({ profile_id: session.user.id, product_id: id, quantity: 1 });
+    const { data: exist } = await supabase.from('cart_items').select('id, quantity').eq('profile_id', session.user.id).eq('product_id', id).maybeSingle();
+    const newQty = exist ? exist.quantity + 1 : 1;
+
+    await supabase.from('cart_items').upsert(
+      { profile_id: session.user.id, product_id: id, quantity: newQty },
+      { onConflict: 'profile_id, product_id' }
+    );
     
     window.location.href = 'cart.html';
   }
