@@ -3,145 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Model Details — CastWheelz</title>
+<title>Model Details</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
-    --gold: #c9a84c; --white: #f4f2ee; --muted: #7a7d88;
-    --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
-  }
-  body { background: var(--black); color: var(--white); font-family: var(--font-body); margin: 0; padding-top: 80px; }
+  :root { --bg: #0a0a0a; --card: #161819; --border: #2a2b2e; --gold: #c9a84c; --white: #fff; --muted: #888; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+  body { background: var(--bg); color: var(--white); padding-top: 70px; }
+  nav { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(10,10,10,0.95); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; z-index: 100; }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); text-decoration: none; }
   
-  nav { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; z-index: 100; }
-  .logo { font-family: var(--font-display); font-size: 26px; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
-  .logo span { color: var(--white); }
+  .container { max-width: 1000px; margin: 3rem auto; padding: 0 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+  .img-box { background: #111; padding: 4rem; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
+  .img-box svg { width: 100%; max-width: 350px; }
   
-  .btn-back-layout { display: inline-flex; align-items: center; background: none; border: 1px solid var(--border); color: var(--white); padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 11px; font-weight: 600; margin-bottom: 2rem; }
-  .btn-back-layout:hover { border-color: var(--gold); color: var(--gold); }
-
-  .master-wrap { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-  .main-split { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-  .img-box { background: linear-gradient(135deg, var(--card-bg) 0%, #1c1e22 100%); border: 1px solid var(--border); border-radius: 16px; padding: 4rem 2rem; text-align: center; }
-  .img-box svg { width: 100%; max-width: 400px; filter: drop-shadow(0 20px 40px rgba(201,168,76,0.15)); }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; margin-bottom: 5px; }
+  .meta { color: var(--gold); font-size: 14px; font-weight: bold; text-transform: uppercase; margin-bottom: 1rem; }
+  .price { font-family: 'Bebas Neue', sans-serif; font-size: 36px; margin-bottom: 2rem; }
+  .btn-add { background: var(--gold); border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+  .btn-add:hover { opacity: 0.8; }
   
-  h1 { font-family: var(--font-display); font-size: clamp(36px, 5vw, 54px); margin: 0 0 10px; line-height: 1.1; }
-  .meta { color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.5rem; font-weight: 600; }
-  .desc { color: #b8bcc8; line-height: 1.8; margin-bottom: 2rem; font-size: 15px; }
-  .price { font-family: var(--font-display); font-size: 42px; color: var(--white); margin-bottom: 2rem; }
-  
-  .btn-action { background: var(--gold); color: var(--black); border: none; padding: 16px; font-size: 14px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-radius: 6px; width: 100%; transition: opacity 0.2s; }
-  .btn-action:hover { opacity: 0.9; }
-  .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
-  
-  .suggestions-section { margin-top: 6rem; border-top: 1px solid var(--border); padding-top: 4rem; margin-bottom: 4rem; }
-  .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-  .suggest-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; cursor: pointer; transition: all 0.2s; }
-  .suggest-card:hover { border-color: var(--gold); transform: translateY(-3px); }
-  .suggest-img { height: 120px; background: #1a1c20; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 10px; }
-  .suggest-img svg { width: 65%; }
-
-  @media(max-width: 768px) {
-    .main-split { grid-template-columns: 1fr; gap: 2rem; }
-    .btn-back-layout { display: none; }
-  }
+  @media(max-width: 768px) { .container { grid-template-columns: 1fr; gap: 2rem; } }
 </style>
 </head>
 <body>
-
 <nav>
-  <a href="index.html" class="logo">CAST<span>WHEELZ</span></a>
-  <button class="btn-action" style="padding:7px 14px; font-size:12px; width:auto; background:none; border:1px solid var(--border); color:white;" onclick="window.location.href='cart.html'">View Cart</button>
+  <a href="index.html" class="logo">CASTWHEELZ</a>
+  <a href="cart.html" style="color:var(--white); font-weight:bold; text-decoration:none;">View Cart</a>
 </nav>
 
-<div class="master-wrap">
-  <button class="btn-back-layout" onclick="window.history.back()">← Previous Model</button>
-  
-  <div class="main-split" id="specificationsTargetViewport">
-    <div style="grid-column: 1/-1; text-align:center; color:var(--muted); padding: 4rem 0;">De-serializing matrix configuration data...</div>
-  </div>
-
-  <section class="suggestions-section">
-    <h2 style="font-family: var(--font-display); font-size: 32px; letter-spacing: 1px; margin:0;">Recommended Fleet</h2>
-    <div class="grid-layout" id="suggestionsDynamicContainer"></div>
-  </section>
-</div>
+<div class="container" id="detailsView"><p>Loading Model...</p></div>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
   const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
   
-  const id = new URLSearchParams(window.location.search).get('id')
-  
-  async function loadDataSheet() {
-    if (!id) return document.getElementById('specificationsTargetViewport').innerHTML = "Invalid Route mapping reference value."
-    const { data: p } = await supabase.from('products').select('*').eq('id', id).single()
-    if (!p) return document.getElementById('specificationsTargetViewport').innerHTML = "Record missing in structural grid."
+  const pid = new URLSearchParams(window.location.search).get('id');
+
+  async function load() {
+    const { data: p } = await supabase.from('products').select('*').eq('id', pid).single();
+    if(!p) return document.getElementById('detailsView').innerHTML = "Product not found.";
     
-    document.getElementById('specificationsTargetViewport').innerHTML = `
+    document.getElementById('detailsView').innerHTML = `
       <div class="img-box">
-        <svg viewBox="0 0 420 220" fill="none">
-          <ellipse cx="210" cy="205" rx="160" ry="12" fill="rgba(0,0,0,0.4)"/>
-          <path d="M60 155 L80 120 L120 95 L160 82 L260 80 L310 85 L350 110 L370 140 L370 165 L60 165 Z" fill="#1a1a2e" stroke="#c9a84c" stroke-width="1.5"/>
-          <circle cx="130" cy="168" r="28" fill="#0a0a15" stroke="#888" stroke-width="2"/>
-          <circle cx="300" cy="168" r="28" fill="#0a0a15" stroke="#888" stroke-width="2"/>
-        </svg>
+         <svg viewBox="0 0 280 160" fill="none"><path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#222" stroke="#c9a84c" stroke-width="2"/></svg>
       </div>
       <div>
+        <button onclick="window.history.back()" style="background:none;border:1px solid #333;color:#fff;padding:5px 10px;border-radius:4px;cursor:pointer;margin-bottom:20px;">&larr; Back</button>
         <h1>${p.name}</h1>
-        <div class="meta">${p.brand} · ${p.scale} Configuration Series</div>
-        <div class="desc">${p.description || 'Museum grade precision scaled metal layout configuration. Accurate mechanical design structures.'}</div>
-        <div class="price">₹${(p.discount_price || p.price) / 100}</div>
-        <button class="btn-action" onclick="window.commitAllocation('${p.id}', this)">Add to Cart</button>
+        <div class="meta">${p.brand} | ${p.scale}</div>
+        <p style="color:var(--muted); margin-bottom:2rem; line-height:1.6;">${p.description || 'Museum grade precision scaled metal layout configuration.'}</p>
+        <div class="price">₹${(p.discount_price || p.price)/100}</div>
+        <button class="btn-add" onclick="add('${p.id}', this)">Add to Cart</button>
       </div>
-    `
-    await injectSuggestionsList(p.category_id, p.id)
+    `;
   }
 
-  window.commitAllocation = async function(pid, btnElement) {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      alert("Authentication payload missing. Login via secure panel root context first.");
-      window.location.href = 'login.html';
-      return;
-    }
-
-    if (btnElement) { btnElement.disabled = true; btnElement.textContent = "Processing..."; }
-
-    const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
+  window.add = async (id, btn) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { alert("Login required."); window.location.href='login.html'; return; }
     
-    if (exist) {
-      await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('id', exist.id);
-    } else {
-      const { error } = await supabase.from('cart_items').insert([{ profile_id: session.user.id, product_id: pid, quantity: 1 }]);
-      if (error) {
-        const { data: retry } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
-        if (retry) await supabase.from('cart_items').update({ quantity: retry.quantity + 1 }).eq('id', retry.id);
-      }
-    }
+    btn.disabled = true; btn.textContent = "Processing...";
+    const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', id).maybeSingle();
     
-    window.location.href = 'cart.html'
+    if(exist) await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('id', exist.id);
+    else await supabase.from('cart_items').insert({ profile_id: session.user.id, product_id: id, quantity: 1 });
+    
+    window.location.href = 'cart.html';
   }
-
-  async function injectSuggestionsList(catId, omitId) {
-    const { data } = await supabase.from('products').select('*').eq('category_id', catId).not('id', 'eq', omitId).limit(4)
-    if (!data || data.length === 0) {
-      document.getElementById('suggestionsDynamicContainer').innerHTML = "<p style='color:var(--muted); font-size:13px;'>No alternative models located inside this custom scale grouping tier yet.</p>"
-      return
-    }
-    document.getElementById('suggestionsDynamicContainer').innerHTML = data.map(item => `
-      <div class="suggest-card" onclick="window.location.href='product.html?id=${item.id}'">
-        <div class="suggest-img">
-          <svg viewBox="0 0 280 160" fill="none"><path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#111" stroke="#c9a84c" stroke-width="1"/></svg>
-        </div>
-        <div style="font-weight:600; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:white;">${item.name}</div>
-        <div style="color:var(--gold); font-size:12px; font-weight:500; margin-top:4px;">₹${(item.discount_price || item.price)/100}</div>
-      </div>
-    `).join('')
-  }
-
-  loadDataSheet()
+  load();
 </script>
 </body>
 </html>
