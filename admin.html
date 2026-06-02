@@ -3,235 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CastWheelz Operator Control Room</title>
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Control Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
-    --gold: #c9a84c; --gold-light: #e8c97a; --white: #f4f2ee; --muted: #7a7d88;
-    --red: #d63333; --green: #22c55e;
-    --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
-  }
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--black); color: var(--white); font-family: var(--font-body); padding: 2rem; min-height: 100vh; }
+  :root { --bg: #0a0a0a; --card: #161819; --border: #2a2b2e; --gold: #c9a84c; --white: #fff; }
+  body { background: var(--bg); color: var(--white); font-family: 'DM Sans', sans-serif; padding: 2rem; }
+  h1 { font-family: 'Bebas Neue', sans-serif; color: var(--gold); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+  form { background: var(--card); padding: 2rem; border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; gap: 10px; }
+  input, select, textarea { background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 4px; }
+  button { background: var(--gold); color: #000; border: none; padding: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+  .list { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; height: 400px; overflow-y: auto; }
+  .item { border-bottom: 1px solid var(--border); padding: 10px 0; display:flex; justify-content:space-between; align-items:center; }
   
-  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-  h1 { font-family: var(--font-display); font-size: 36px; color: var(--gold); letter-spacing: 1px; }
-  .btn-nav-back { background: none; border: 1px solid var(--border); color: var(--white); padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 12px; font-weight: 600; text-decoration: none; }
-
-  .auth-gate-overlay { position: fixed; inset: 0; background: rgba(5,5,5,0.95); backdrop-filter: blur(20px); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
-  .auth-gate-overlay.hidden { display: none; }
-  .auth-gate-card { background: var(--card-bg); border: 1px solid var(--border); padding: 4rem 3rem; border-radius: 16px; width: 100%; max-width: 440px; box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
-
-  .btn-google { width: 100%; background: var(--white); color: var(--black); border: none; padding: 16px; font-weight: 600; cursor: pointer; border-radius: 6px; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 1rem; text-transform: uppercase; font-family: inherit;}
-
-  .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-  .metric-card { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 10px; text-align: center; }
-  .metric-card h4 { font-size: 11px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
-  .metric-card div { font-family: var(--font-display); font-size: 32px; color: var(--white); }
-
-  .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); }
-  .tab-btn { background: none; border: 1px solid transparent; color: var(--muted); padding: 12px 24px; cursor: pointer; text-transform: uppercase; font-size: 13px; font-weight: 600; font-family: inherit; }
-  .tab-btn.active { color: var(--gold); border: 1px solid var(--border); border-bottom-color: var(--black); background: var(--black); border-radius: 8px 8px 0 0; }
-
-  .panel { display: none; }
-  .panel.active { display: block; }
-  .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; align-items: start; }
-  form { display: flex; flex-direction: column; gap: 14px; background: var(--card-bg); padding: 2rem; border-radius: 12px; border: 1px solid var(--border); }
-  form h3 { font-family: var(--font-display); font-size: 22px; margin-bottom: 5px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  #gate { position: fixed; inset: 0; background: #0a0a0a; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+  #gate div { background: var(--card); padding: 3rem; text-align: center; border-radius: 12px; border: 1px solid var(--border); }
   
-  label { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
-  input, textarea, select { background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 12px; border-radius: 6px; font-size: 14px; font-family: inherit; }
-  input:focus, textarea:focus, select:focus { border-color: var(--gold); outline: none; }
-  button.submit-btn { background: var(--gold); color: var(--black); border: none; padding: 14px; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: inherit; font-size: 14px; }
-  
-  .table-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; width: 100%; }
-  table { width: 100%; border-collapse: collapse; text-align: left; }
-  th, td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: middle; white-space: nowrap;}
-  th { background: #1a1c1d; color: var(--gold); font-size: 11px; text-transform: uppercase; }
-  
-  .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-  .badge.paid { background: rgba(34,197,94,0.15); color: var(--green); }
-  .discount-field { width: 90px; background: var(--black); border: 1px solid var(--border); color: var(--white); padding: 6px; border-radius: 4px; text-align: center; font-family: inherit; }
-  .btn-control { background: none; border: 1px solid var(--border); color: var(--white); padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-family: inherit; }
-  
-  @media(max-width: 768px) {
-    body { padding: 1rem; }
-    header { flex-direction: column; gap: 1rem; align-items: flex-start; }
-  }
+  @media(max-width: 768px) { .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
-<div class="auth-gate-overlay" id="adminAuthGatewayBlock">
-  <div class="auth-gate-card">
-    <h2 style="font-family:var(--font-display); font-size:42px; color:var(--gold); margin:0 0 10px; letter-spacing: 2px;">CASTWHEELZ HQ</h2>
-    <p style="color:var(--muted); font-size:15px; margin-bottom:1rem;">Restricted administrative node terminal.</p>
-    
-    <button class="btn-google" id="gatewayLoginBtn">
-      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-      Login with Google
-    </button>
-    <div id="adminErr" style="color:var(--red); font-size:13px; margin-top:20px; display:none;">
-      Access Denied. Please clear browser storage metrics and authenticate via prakior@gmail.com context loops.
-      <br><br><button onclick="forceLogout()" style="background:none; border:1px solid var(--border); color:white; padding:8px 16px; border-radius:4px; cursor:pointer; text-transform:uppercase; font-size:11px;">Sign Out</button>
-    </div>
+<div id="gate">
+  <div>
+    <h1>ADMIN TERMINAL</h1>
+    <button onclick="login()" style="margin-top:20px; width:100%;">Authorize Google Login</button>
   </div>
 </div>
 
-<header>
-  <h1>Control Center Room</h1>
-  <a href="index.html" class="btn-nav-back">← View Storefront</a>
-</header>
-
-<div class="metrics-row">
-  <div class="metric-card"><h4>Active Inventory</h4><div id="statTotalProducts">0</div></div>
-  <div class="metric-card"><h4>Total Categories</h4><div id="statTotalCategories">0</div></div>
-  <div class="metric-card"><h4>Pending Logistics</h4><div id="statPendingOrders">0</div></div>
-  <div class="metric-card"><h4>Gross Revenue</h4><div id="statGrossRevenue" style="color: var(--green)">₹0</div></div>
+<div style="display:flex; justify-content:space-between; align-items:center;">
+  <h1>HQ Console</h1>
+  <a href="index.html" style="color:var(--white);">Return to Site</a>
 </div>
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchControlPanel('panel-inventory', this)">Manage Inventory</button>
-  <button class="tab-btn" onclick="switchControlPanel('panel-categories', this)">Manage Categories</button>
-  <button class="tab-btn" onclick="switchTabAndLoadOrders('panel-orders', this)">Fulfillment & Orders</button>
+<div class="grid">
+  <form id="addCat">
+    <h3>Add Category</h3>
+    <input id="c-name" placeholder="Name (e.g. Hypercars)" required>
+    <input id="c-slug" placeholder="Slug (e.g. hypercars)" required>
+    <input id="c-icon" placeholder="Emoji (e.g. 🏎️)" required>
+    <button type="submit">Save Category</button>
+  </form>
+  <div class="list" id="catList">Loading...</div>
 </div>
 
-<div id="panel-inventory" class="panel active">
-  <div class="grid-layout">
-    <form id="vehicleCreationForm">
-      <h3>List Premium Model</h3>
-      <label>Vehicle Name</label><input type="text" id="p-name" required placeholder="McLaren P1">
-      <label>Brand Builder</label><input type="text" id="p-brand" required placeholder="AUTOart">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div><label>Scale Spec</label><select id="p-scale"><option>1:64</option><option>1:43</option><option>1:24</option><option selected>1:18</option><option>1:12</option></select></div>
-        <div><label>Category</label><select id="p-category" required></select></div>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div><label>MSRP (INR)</label><input type="number" id="p-price" required></div>
-        <div><label>Stock Count</label><input type="number" id="p-stock" required value="5"></div>
-      </div>
-      <label>Specs / Details</label><textarea id="p-desc" rows="3"></textarea>
-      <button type="submit" class="submit-btn">Commit to Database</button>
-    </form>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Model Identity</th><th>Scale</th><th>MSRP Value</th><th>Active Discount</th><th>Options</th></tr></thead>
-        <tbody id="inventoryGridTableBody"></tbody>
-      </table>
-    </div>
-  </div>
+<div class="grid">
+  <form id="addProd">
+    <h3>Add Product</h3>
+    <input id="p-name" placeholder="Model Name" required>
+    <input id="p-brand" placeholder="Brand" required>
+    <select id="p-scale"><option>1:18</option><option>1:43</option></select>
+    <select id="p-cat" required></select>
+    <input id="p-price" type="number" placeholder="Price (INR)" required>
+    <button type="submit">Save Product</button>
+  </form>
+  <div class="list" id="prodList">Loading...</div>
 </div>
 
-<div id="panel-categories" class="panel">
-  <div class="grid-layout">
-    <form id="categoryConfigForm">
-      <h3>Create Category Group</h3>
-      <label>Group Name</label><input type="text" id="c-name" required placeholder="Exotic Hypercars">
-      <label>URL Slug</label><input type="text" id="c-slug" required placeholder="exotic-hypercars">
-      <label>UI Emoji Icon</label><input type="text" id="c-icon" value="🏎️" required>
-      <button type="submit" class="submit-btn">Deploy Matrix Node</button>
-    </form>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Symbol</th><th>Category Name</th><th>Slug Route</th><th>Options</th></tr></thead>
-        <tbody id="categoriesGridTableBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div id="panel-orders" class="panel">
-  <div class="table-container">
-    <table>
-      <thead><tr><th>Invoice ID</th><th>Collector Details</th><th>Financial Status</th><th>Total Amount</th><th>Fulfillment Routing</th></tr></thead>
-      <tbody id="ordersLedgerTableBody"></tbody>
-    </table>
-  </div>
+<div class="grid" style="grid-template-columns:1fr; margin-top:2rem;">
+  <div class="list" id="orderList" style="height:auto;">Loading Orders...</div>
 </div>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
   const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
 
-  async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      document.getElementById('adminAuthGatewayBlock').classList.remove('hidden')
-      return;
+  window.login = () => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
+
+  supabase.auth.getSession().then(({data:{session}}) => {
+    if(session && session.user.email === 'prakior@gmail.com') {
+      document.getElementById('gate').style.display = 'none';
+      loadData();
     }
-    if (session.user.email === 'prakior@gmail.com') {
-      document.getElementById('adminAuthGatewayBlock').classList.add('hidden')
-      loadAll()
-    } else {
-      document.getElementById('gatewayLoginBtn').style.display = 'none';
-      document.getElementById('adminErr').style.display = 'block';
-    }
+  });
+
+  async function loadData() {
+    const [cats, prods, orders] = await Promise.all([
+      supabase.from('categories').select('*'),
+      supabase.from('products').select('*').order('created_at', {ascending:false}),
+      supabase.from('orders').select('*').order('created_at', {ascending:false})
+    ]);
+
+    // Render Cats
+    document.getElementById('p-cat').innerHTML = cats.data.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    document.getElementById('catList').innerHTML = cats.data.map(c => `<div class="item"><span>${c.display_icon} ${c.name}</span> <button style="background:none;color:red;" onclick="delCat('${c.id}')">X</button></div>`).join('');
+    
+    // Render Prods
+    document.getElementById('prodList').innerHTML = prods.data.map(p => `<div class="item"><span>${p.name}</span> <button style="background:none;color:red;" onclick="delProd('${p.id}')">X</button></div>`).join('');
+    
+    // Render Orders
+    document.getElementById('orderList').innerHTML = orders.data.map(o => `<div class="item"><span>#${o.id.substring(0,8)} - ${o.customer_name} (₹${o.total_amount/100}) - <strong style="color:var(--gold)">${o.fulfillment_status}</strong></span> <button onclick="markDelivered('${o.id}')">Mark Delivered</button></div>`).join('');
   }
 
-  document.getElementById('gatewayLoginBtn').onclick = async () => {
-    await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } })
-  }
-
-  window.forceLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.reload();
-  }
-
-  window.switchControlPanel = function(id, btn) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
-    document.getElementById(id).classList.add('active'); btn.classList.add('active')
-    if(id === 'panel-orders') downloadOrders();
-  }
-
-  window.switchTabAndLoadOrders = function(id, btn) { window.switchControlPanel(id, btn); }
-
-  async function loadAll() {
-    const { data: fleet } = await supabase.from('products').select('*').order('created_at', { ascending: false })
-    const { data: tags } = await supabase.from('categories').select('*').order('name', { ascending: true })
-    const { data: orders } = await supabase.from('orders').select('total_amount, payment_status, fulfillment_status')
-
-    document.getElementById('statTotalProducts').textContent = fleet?.length || 0;
-    document.getElementById('statTotalCategories').textContent = tags?.length || 0;
-    if(orders) {
-      document.getElementById('statPendingOrders').textContent = orders.filter(o => o.fulfillment_status !== 'Delivered').length;
-      document.getElementById('statGrossRevenue').textContent = `₹${(orders.filter(o => o.payment_status === 'Paid').reduce((s, o) => s + o.total_amount, 0) / 100).toLocaleString('en-IN')}`;
-    }
-
-    if(tags) {
-      document.getElementById('p-category').innerHTML = tags.map(t => `<option value="${t.id}">${t.name}</option>`).join('')
-      document.getElementById('categoriesGridTableBody').innerHTML = tags.map(t => `<tr><td><span style="font-size:18px;">${t.display_icon}</span></td><td><strong>${t.name}</strong></td><td><code>/${t.slug}</code></td><td><button class="btn-control" style="color:var(--red); border-color:var(--red);" onclick="delCat('${t.id}')">Delete</button></td></tr>`).join('')
-    }
-    if(fleet) {
-      document.getElementById('inventoryGridTableBody').innerHTML = fleet.map(p => `<tr><td><strong>${p.name}</strong><br><small style="color:var(--muted)">${p.brand}</small></td><td><span style="color:var(--gold)">${p.scale}</span></td><td>₹${p.price/100}</td><td><div style="display:flex;gap:6px;"><input type="number" class="discount-field" id="promo-${p.id}" value="${p.discount_price ? p.discount_price/100 : ''}"><button class="btn-control" onclick="applyPromo('${p.id}')">Set</button></div></td><td><button class="btn-control" style="color:var(--red); border-color:var(--red);" onclick="delProd('${p.id}')">Delete</button></td></tr>`).join('')
-    }
-  }
-
-  document.getElementById('vehicleCreationForm').onsubmit = async (e) => {
-    e.preventDefault();
-    await supabase.from('products').insert([{
-      name: document.getElementById('p-name').value, brand: document.getElementById('p-brand').value, scale: document.getElementById('p-scale').value, category_id: document.getElementById('p-category').value, price: parseInt(document.getElementById('p-price').value)*100, stock_quantity: parseInt(document.getElementById('p-stock').value), description: document.getElementById('p-desc').value
-    }]); document.getElementById('vehicleCreationForm').reset(); loadAll();
-  }
-
-  document.getElementById('categoryConfigForm').onsubmit = async (e) => {
-    e.preventDefault();
-    await supabase.from('categories').insert([{ name: document.getElementById('c-name').value, slug: document.getElementById('c-slug').value, display_icon: document.getElementById('c-icon').value }]); document.getElementById('categoryConfigForm').reset(); loadAll();
-  }
-
-  window.applyPromo = async (id) => { const v = document.getElementById(`promo-${id}`).value; await supabase.from('products').update({ discount_price: v ? parseInt(v)*100 : null }).eq('id', id); loadAll(); }
-  window.delProd = async (id) => { if(confirm('Delete active model?')) { await supabase.from('products').delete().eq('id', id); loadAll(); } }
-  window.delCat = async (id) => { if(confirm('Delete category link?')) { await supabase.from('categories').delete().eq('id', id); loadAll(); } }
-
-  async function downloadOrders() {
-    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false })
-    if(data) document.getElementById('ordersLedgerTableBody').innerHTML = data.map(o => `<tr><td><code>#${o.id.substring(0,8).toUpperCase()}</code></td><td><strong>${o.customer_name}</strong><div style="font-size:12px; color:var(--muted)">📞 ${o.customer_phone} <br> 📍 ${o.delivery_address}</div></td><td><span class="badge paid">${o.fulfillment_status}</span></td><td><strong style="color:var(--gold)">₹${o.total_amount/100}</strong></td><td><button class="btn-control" style="color:var(--green); border-color:var(--green);" onclick="markDelivered('${o.id}')">Mark Delivered</button></td></tr>`).join('')
-  }
-  window.markDelivered = async (id) => { await supabase.from('orders').update({ fulfillment_status: 'Delivered' }).eq('id', id); downloadOrders(); }
-
-  checkAuth()
+  document.getElementById('addCat').onsubmit = async(e) => { e.preventDefault(); await supabase.from('categories').insert({ name: document.getElementById('c-name').value, slug: document.getElementById('c-slug').value, display_icon: document.getElementById('c-icon').value }); loadData(); }
+  document.getElementById('addProd').onsubmit = async(e) => { e.preventDefault(); await supabase.from('products').insert({ name: document.getElementById('p-name').value, brand: document.getElementById('p-brand').value, scale: document.getElementById('p-scale').value, category_id: document.getElementById('p-cat').value, price: parseInt(document.getElementById('p-price').value)*100, stock_quantity: 5 }); loadData(); }
+  
+  window.delCat = async(id) => { await supabase.from('categories').delete().eq('id',id); loadData(); }
+  window.delProd = async(id) => { await supabase.from('products').delete().eq('id',id); loadData(); }
+  window.markDelivered = async(id) => { await supabase.from('orders').update({fulfillment_status: 'Delivered'}).eq('id', id); loadData(); }
 </script>
 </body>
 </html>
