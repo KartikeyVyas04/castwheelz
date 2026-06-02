@@ -1,282 +1,144 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CastWheelz — Premium Die Cast Models</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>CastWheelz — Storefront</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --black: #0a0a0a; --dark: #111214; --card-bg: #161819; --border: #2a2b2e;
-    --gold: #c9a84c; --gold-light: #e8c97a; --gold-dark: #8a6a22; --silver: #b8bcc8; 
-    --red: #d63333; --white: #f4f2ee; --muted: #7a7d88;
-    --font-display: 'Bebas Neue', sans-serif; --font-body: 'DM Sans', sans-serif;
-  }
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { background: var(--black); color: var(--white); font-family: var(--font-body); font-size: 15px; line-height: 1.6; overflow-x: hidden; }
-
-  /* NAV LAYER */
-  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(10,10,10,0.92); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); height: 68px; display: flex; align-items: center; }
-  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; width: 100%; display: flex; align-items: center; gap: 2rem; }
-  .logo { font-family: var(--font-display); font-size: 26px; letter-spacing: 2px; color: var(--gold); text-decoration: none; line-height: 1; }
-  .logo span { color: var(--white); }
-  .nav-links { display: flex; align-items: center; list-style: none; margin-left: 1rem; gap: 1rem;}
-  .nav-links a { text-decoration: none; color: var(--silver); font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
-  .nav-links a:hover { color: var(--gold); }
-  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 0.5rem; }
+  :root { --bg: #0a0a0a; --card: #161819; --border: #2a2b2e; --gold: #c9a84c; --white: #fff; --muted: #888; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+  body { background: var(--bg); color: var(--white); padding-top: 70px; }
   
-  .btn-nav { background: none; border: 1px solid var(--border); color: var(--silver); border-radius: 6px; padding: 7px 14px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-body); text-transform: uppercase; letter-spacing: 0.06em; transition: all 0.2s; }
-  .btn-nav:hover { border-color: var(--gold); color: var(--gold); }
-  .btn-cart { background: var(--gold); border: none; color: var(--black); border-radius: 6px; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font-body); display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .btn-cart:hover { background: var(--gold-light); }
+  nav { position: fixed; top: 0; width: 100%; height: 70px; background: rgba(10,10,10,0.95); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 5%; z-index: 100; }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); text-decoration: none; }
+  .nav-links { display: flex; gap: 15px; align-items: center; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--white); padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; font-size: 13px; text-transform: uppercase; }
+  .btn-solid { background: var(--gold); border: none; color: #000; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: bold; font-size: 13px; text-transform: uppercase; }
 
-  /* HERO AREA */
-  .hero { min-height: 80vh; padding-top: 68px; display: flex; align-items: center; position: relative; overflow: hidden; }
-  .hero-bg { position: absolute; inset: 0; z-index: 0; background: radial-gradient(ellipse 80% 60% at 60% 40%, rgba(201,168,76,0.08) 0%, transparent 60%), linear-gradient(160deg, #0a0a0a 0%, #111214 40%, #0e0f11 100%); }
-  .hero-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; width: 100%; position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-  .hero h1 { font-family: var(--font-display); font-size: clamp(52px, 7vw, 88px); line-height: 0.95; color: var(--white); margin-bottom: 1rem; }
-  .hero h1 .accent { color: var(--gold); display: block; }
-  .hero-sub { font-size: 16px; color: var(--muted); max-width: 400px; margin-bottom: 2rem; }
-  
-  .hero-car-showcase { position: relative; background: linear-gradient(135deg, var(--card-bg) 0%, #1c1e22 100%); border: 1px solid var(--border); border-radius: 16px; padding: 3rem 2rem; text-align: center; }
-  .car-svg-wrap svg { width: 100%; max-width: 380px; filter: drop-shadow(0 20px 40px rgba(201,168,76,0.15)); }
-  .scale-badge { position: absolute; top: 1rem; right: 1rem; background: var(--gold); color: var(--black); font-family: var(--font-display); font-size: 18px; padding: 6px 14px; border-radius: 6px; }
+  .hero { text-align: center; padding: 4rem 1rem; border-bottom: 1px solid var(--border); }
+  .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; margin-bottom: 10px; }
+  .hero p { color: var(--muted); max-width: 500px; margin: 0 auto; }
 
-  /* GRIDS */
-  .section { padding: 6rem 0; }
-  .section-inner { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
-  .section-header { margin-bottom: 3rem; }
-  .section-eyebrow { font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem; }
-  .section-title { font-family: var(--font-display); font-size: clamp(36px, 5vw, 54px); letter-spacing: 1px; color: var(--white); }
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
   
-  .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
-  .cat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem 1rem 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s; }
-  .cat-card:hover { border-color: var(--gold); transform: translateY(-4px); }
-  .cat-icon { width: 52px; height: 52px; border-radius: 12px; background: rgba(201,168,76,0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 22px; }
-  .cat-name { font-weight: 600; font-size: 14px; color: var(--white); }
+  .filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 2rem; }
+  .filter-btn { background: var(--card); border: 1px solid var(--border); color: var(--white); padding: 10px 20px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--gold); color: var(--gold); }
 
-  .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
-  .product-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; position: relative; transition: all 0.3s; }
-  .product-card:hover { border-color: rgba(201,168,76,0.35); transform: translateY(-6px); }
-  .product-img { background: linear-gradient(135deg, #1a1c20, #222428); height: 200px; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
-  .product-img svg { width: 75%; max-height: 130px; z-index: 1; }
-  
-  .product-info { padding: 1rem 1.1rem 1.1rem; }
-  .product-scale { font-size: 10px; color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
-  .product-name { font-weight: 600; font-size: 14px; color: var(--white); line-height: 1.3; margin-bottom: 4px; cursor: pointer; }
-  .product-name:hover { color: var(--gold); }
-  .price { font-family: var(--font-display); font-size: 22px; color: var(--gold); }
-  
-  .btn-add { background: none; border: 1px solid var(--border); color: var(--white); border-radius: 6px; padding: 8px 12px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase; transition: all 0.2s; font-family: var(--font-body); width: 100%; margin-top: 10px; }
-  .btn-add:hover { background: var(--gold); border-color: var(--gold); color: var(--black); }
-
-  footer { margin-top: 5rem; border-top: 1px solid var(--border); padding: 4rem 0 2rem; background: var(--dark); text-align:center; }
-  .toast { position: fixed; bottom: 2rem; right: 2rem; z-index: 1100; background: var(--card-bg); border: 1px solid var(--gold); border-radius: 10px; padding: 14px 20px; display: flex; align-items: center; gap: 12px; transform: translateX(120%); transition: transform 0.4s ease; }
-  .toast.show { transform: translateX(0); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; transition: transform 0.2s; }
+  .card:hover { transform: translateY(-5px); border-color: var(--gold); }
+  .card-img { background: #111; height: 160px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .card-img svg { width: 60%; }
+  .card-title { font-weight: 600; font-size: 16px; margin-bottom: 5px; cursor: pointer; }
+  .card-price { color: var(--gold); font-family: 'Bebas Neue', sans-serif; font-size: 24px; margin-bottom: 15px; margin-top: auto; }
+  .btn-add { background: transparent; border: 1px solid var(--border); color: var(--white); padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; text-transform: uppercase; width: 100%; transition: 0.2s; }
+  .btn-add:hover { background: var(--gold); color: #000; border-color: var(--gold); }
 </style>
 </head>
 <body>
 
 <nav>
-  <div class="nav-inner">
-    <a href="index.html" class="logo">CAST<span>WHEELZ</span></a>
-    <ul class="nav-links">
-      <li><a href="#categories">Scales</a></li>
-      <li><a href="#products">Shop</a></li>
-      <li><a href="admin.html" style="color: var(--gold);">Console</a></li>
-    </ul>
-    <div class="nav-right">
-      <button class="btn-nav" id="authBtn" onclick="window.location.href='login.html'">Login</button>
-      <button class="btn-cart" onclick="window.location.href='cart.html'">Cart (<span id="cartBadge">0</span>)</button>
-    </div>
+  <a href="index.html" class="logo">CASTWHEELZ</a>
+  <div class="nav-links">
+    <a href="admin.html" class="btn-outline" style="border:none; color:var(--muted);">Admin</a>
+    <button id="authBtn" class="btn-outline" onclick="window.location.href='login.html'">Login</button>
+    <a href="cart.html" class="btn-solid">Cart (<span id="cartBadge">0</span>)</a>
   </div>
 </nav>
 
-<section class="hero" id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid-lines"></div>
-  <div class="hero-inner">
-    <div class="hero-content">
-      <div style="font-size: 11px; font-weight: 600; color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.5rem;">Live Cloud Fleet Connection</div>
-      <h1>Precision<br><span class="accent">Die-Cast</span> Legends</h1>
-      <p class="hero-sub">Museum-grade scale replicas. Handcrafted metal precision synchronized directly to secure system state maps.</p>
-      <button class="btn-nav" style="border-color:var(--gold); color:var(--gold);" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Explore Gallery</button>
-    </div>
-    <div class="hero-visual">
-      <div class="hero-car-showcase">
-        <div class="scale-badge">1:18</div>
-        <div class="car-svg-wrap">
-          <svg viewBox="0 0 420 220" fill="none">
-            <ellipse cx="210" cy="205" rx="160" ry="12" fill="rgba(0,0,0,0.4)"/>
-            <path d="M60 155 L80 120 L120 95 L160 82 L260 80 L310 85 L350 110 L370 140 L370 165 L60 165 Z" fill="#1a1a2e" stroke="#c9a84c" stroke-width="1.5"/>
-            <circle cx="130" cy="168" r="28" fill="#0a0a15" stroke="#888" stroke-width="2"/>
-            <circle cx="300" cy="168" r="28" fill="#0a0a15" stroke="#888" stroke-width="2"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section categories-bg" id="categories">
-  <div class="section-inner">
-    <div class="section-header">
-      <div class="section-eyebrow">Sort Fleet</div>
-      <div class="section-title">Scale Categories</div>
-    </div>
-    <div class="cat-grid" id="scalesFilterGrid"></div>
-  </div>
-</section>
-
-<section class="section" id="products">
-  <div class="section-inner">
-    <div class="section-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
-      <div>
-        <div class="section-eyebrow">Live Catalog</div>
-        <div class="section-title">Active Fleet</div>
-      </div>
-      <button class="btn-nav" onclick="window.clearActiveScaleFilters()">Show All Replicas</button>
-    </div>
-    <div class="products-grid" id="productsDynamicGrid"></div>
-  </div>
-</section>
-
-<div class="toast" id="toastComponent">
-  <span class="toast-icon">🛒</span>
-  <div class="toast-msg"><strong id="toastTargetItemName">Model</strong> added to cart.</div>
+<div class="hero">
+  <h1>Precision Die-Cast Fleet</h1>
+  <p>Authentic scale models synced directly to secure cloud ledgers.</p>
 </div>
 
-<footer>
-  <a href="index.html" class="logo" style="font-size: 32px;">CAST<span>WHEELZ</span></a>
-  <p style="font-size: 12px; color: var(--muted); margin-top:1rem;">© 2026 CastWheelz Master Control Suite.</p>
-</footer>
+<div class="container">
+  <div class="filters" id="catFilters">
+    <button class="filter-btn active" onclick="setFilter(null)">All Models</button>
+  </div>
+  <div class="grid" id="productGrid"><p style="color:var(--muted)">Loading catalog...</p></div>
+</div>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
   const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
   
-  let scaleFilter = null
-  let sessionUser = null
+  let currentUser = null;
+  let activeFilter = null;
 
-  async function appInit() {
-    const { data: { session } } = await supabase.auth.getSession()
+  async function init() {
+    const { data: { session } } = await supabase.auth.getSession();
     if (session) {
-      sessionUser = session.user;
-      const btn = document.getElementById('authBtn')
-      btn.textContent = 'Logout'
+      currentUser = session.user;
+      const btn = document.getElementById('authBtn');
+      btn.textContent = 'Logout';
       btn.onclick = async () => { await supabase.auth.signOut(); window.location.reload(); }
-      
-      const { data } = await supabase.from('cart_items').select('quantity').eq('profile_id', session.user.id)
-      if(data) document.getElementById('cartBadge').textContent = data.reduce((a, b) => a + b.quantity, 0)
+      updateBadge();
     }
-
-    await loadCats()
-    await loadProducts()
+    loadCategories();
+    loadProducts();
   }
 
-  async function loadCats() {
-    const { data } = await supabase.from('categories').select('*').order('name')
+  async function updateBadge() {
+    if(!currentUser) return;
+    const { data } = await supabase.from('cart_items').select('quantity').eq('profile_id', currentUser.id);
+    if(data) document.getElementById('cartBadge').textContent = data.reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  async function loadCategories() {
+    const { data } = await supabase.from('categories').select('*');
     if(data) {
-      document.getElementById('scalesFilterGrid').innerHTML = data.map(c => `
-        <div class="cat-card" onclick="window.filterByCat('${c.id}')">
-          <div class="cat-icon">${c.display_icon}</div>
-          <div class="cat-name">${c.name}</div>
-        </div>
-      `).join('')
+      const container = document.getElementById('catFilters');
+      data.forEach(c => {
+        container.innerHTML += `<button class="filter-btn" onclick="setFilter('${c.id}')">${c.display_icon} ${c.name}</button>`;
+      });
     }
   }
 
-  window.filterByCat = function(id) { scaleFilter = id; loadProducts(); document.getElementById('products').scrollIntoView({behavior:'smooth'})}
-  window.clearActiveScaleFilters = function() { scaleFilter = null; loadProducts(); }
+  window.setFilter = (id) => { activeFilter = id; loadProducts(); }
 
   async function loadProducts() {
-    let q = supabase.from('products').select('*').order('created_at', { ascending: false })
-    if (scaleFilter) q = q.eq('category_id', scaleFilter)
-    const { data } = await q
+    let query = supabase.from('products').select('*').order('created_at', { ascending: false });
+    if(activeFilter) query = query.eq('category_id', activeFilter);
+    const { data } = await query;
     
-    document.getElementById('productsDynamicGrid').innerHTML = data ? data.map(p => `
-      <div class="product-card">
-        <div class="product-img" onclick="window.location.href='product.html?id=${p.id}'">
-          <svg viewBox="0 0 280 160" fill="none"><ellipse cx="140" cy="148" rx="100" ry="8" fill="rgba(0,0,0,0.4)"/><path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#16163a" stroke="#c9a84c" stroke-width="1.2"/></svg>
+    const grid = document.getElementById('productGrid');
+    if(!data || data.length === 0) return grid.innerHTML = "<p>No products available.</p>";
+
+    grid.innerHTML = data.map(p => `
+      <div class="card">
+        <div class="card-img" onclick="window.location.href='product.html?id=${p.id}'">
+          <svg viewBox="0 0 280 160" fill="none"><path d="M40 110 L55 80 L85 62 L110 55 L175 54 L210 58 L240 78 L255 105 L255 118 L40 118 Z" fill="#222" stroke="#c9a84c" stroke-width="2"/></svg>
         </div>
-        <div class="product-info">
-          <div class="product-scale">${p.scale} Scale</div>
-          <div class="product-name" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</div>
-          <div class="price">₹${(p.discount_price || p.price) / 100}</div>
-          <button class="btn-add" onclick="quickAddToCart('${p.id}', '${p.name.replace(/'/g, "\\'")}')">Add to Cart</button>
-        </div>
+        <div style="font-size:11px; color:var(--muted);">${p.scale} | ${p.brand}</div>
+        <div class="card-title" onclick="window.location.href='product.html?id=${p.id}'">${p.name}</div>
+        <div class="card-price">₹${(p.discount_price || p.price)/100}</div>
+        <button class="btn-add" onclick="addToCart('${p.id}', this)">Add to Cart</button>
       </div>
-    `).join('') : '<p style="grid-column:1/-1; text-align:center; color:var(--muted)">No items found.</p>'
+    `).join('');
   }
 
-  window.quickAddToCart = async function(pid, name) {
-    if (!sessionUser) {
-      alert("Please login first to add items to your cart.");
-      window.location.href = 'login.html';
-      return;
-    }
-    await supabase.from('cart_items').upsert({ profile_id: sessionUser.id, product_id: pid, quantity: 1 })
+  window.addToCart = async (pid, btn) => {
+    if(!currentUser) { alert("Please login first."); window.location.href='login.html'; return; }
     
-    // Update Badge & Show Toast
-    const { data } = await supabase.from('cart_items').select('quantity').eq('profile_id', sessionUser.id)
-    if(data) document.getElementById('cartBadge').textContent = data.reduce((a, b) => a + b.quantity, 0)
+    btn.disabled = true; btn.textContent = "...";
     
-    const toast = document.getElementById('toastComponent')
-    document.getElementById('toastTargetItemName').textContent = name
-    toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2000)
-  }
-
-  appInit()
-</script>
-</body>
-</html> -->
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>CastWheelz Storefront</title>
-<link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
-<style>
-  body { background: #0a0a0a; color: #f4f2ee; font-family: 'DM Sans', sans-serif; }
-  /* Minimal styles to keep it clean; use your existing CSS */
-  .btn-add { background: #c9a84c; color: #000; border: none; padding: 10px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: 600; }
-  .btn-add:disabled { background: #555; }
-</style>
-</head>
-<body>
-<!-- ... [Keep your existing NAV and HERO structure] ... -->
-<div id="productsDynamicGrid"></div>
-
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-  const supabase = createClient('https://cjzvweakirjbmmacrqpk.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqenZ3ZWFraXJqYm1tYWNycXBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTE4OTcsImV4cCI6MjA5NTA4Nzg5N30.OxP-RUwhi2i7OlFLZruBEh9MjgXhbkzYWT55mEDb-Hg')
-
-  window.quickAddToCart = async function(pid, btn) {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return window.location.href = 'login.html';
+    // Check existing
+    const { data: exist } = await supabase.from('cart_items').select('*').eq('profile_id', currentUser.id).eq('product_id', pid).maybeSingle();
     
-    btn.disabled = true; btn.textContent = "Adding...";
-    
-    // UPSERT: Check existing, update if found, insert if not
-    const { data: existing } = await supabase.from('cart_items').select('*').eq('profile_id', session.user.id).eq('product_id', pid).maybeSingle();
-    
-    if (existing) {
-      await supabase.from('cart_items').update({ quantity: existing.quantity + 1 }).eq('id', existing.id);
+    if(exist) {
+      await supabase.from('cart_items').update({ quantity: exist.quantity + 1 }).eq('id', exist.id);
     } else {
-      await supabase.from('cart_items').insert({ profile_id: session.user.id, product_id: pid, quantity: 1 });
+      await supabase.from('cart_items').insert({ profile_id: currentUser.id, product_id: pid, quantity: 1 });
     }
     
+    await updateBadge();
     btn.disabled = false; btn.textContent = "Add to Cart";
-    alert("Added to cart!");
   }
+
+  init();
 </script>
 </body>
 </html>
