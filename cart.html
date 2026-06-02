@@ -69,7 +69,6 @@
     if (!session) return document.getElementById('cartBox').innerHTML = "Authentication required. Please login.";
     sessionUser = session.user;
 
-    // 1. Get raw cart rows
     const { data: rawCart } = await supabase.from('cart_items').select('*').eq('profile_id', sessionUser.id);
     if (!rawCart || rawCart.length === 0) {
       document.getElementById('cartBox').innerHTML = "Cart matrix is empty.";
@@ -77,17 +76,14 @@
       return;
     }
 
-    // 2. Extract IDs and fetch products completely independently to bypass strict FK Joins
     const pIds = rawCart.map(c => c.product_id);
     const { data: products } = await supabase.from('products').select('*').in('id', pIds);
 
-    // 3. Bind them logically
     cartData = rawCart.map(cartRow => {
       const pData = products.find(p => p.id === cartRow.product_id);
       return { cart_id: cartRow.id, qty: cartRow.quantity, product: pData };
     }).filter(i => i.product);
 
-    // 4. Render Interface
     document.getElementById('cartBox').innerHTML = cartData.map(i => {
       const unitPrice = i.product.discount_price ? i.product.discount_price : i.product.price;
       return `
@@ -101,7 +97,6 @@
       </div>
     `}).join('');
 
-    // 5. Calculate Total Amount
     const totalPaisa = cartData.reduce((sum, i) => {
       const price = i.product.discount_price ? i.product.discount_price : i.product.price;
       return sum + (price * i.qty);
@@ -131,7 +126,6 @@
       key: "rzp_live_SskOYlu2pHt0Qp", 
       amount: totalPaisa, currency: "INR", name: "CastWheelz HQ",
       handler: async function (res) {
-        // MAP EXACTLY TO YOUR JSON SCHEMA
         await supabase.from('orders').insert({
           profile_id: sessionUser.id,
           customer_name: name,
@@ -144,7 +138,6 @@
           fulfillment_status: 'Unshipped'
         });
         
-        // Clear Cart
         await supabase.from('cart_items').delete().eq('profile_id', sessionUser.id);
         alert('Transaction successful. Order registered.');
         window.location.href = 'index.html';
