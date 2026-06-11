@@ -1,14 +1,11 @@
-// supabase-config.js
-
 const SUPABASE_URL = "https://aasmoabdareuqlogjsui.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhc21vYWJkYXJldXFsb2dqc3VpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzM0MjYsImV4cCI6MjA5NjcwOTQyNn0.rNvYeDCbQCbBNWtWAI7jhxQzH8pdI-M3-kjCEKhcLxs";
 
 window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// 1. The Universal Navbar Injector
 function renderNavbar() {
     const navContainer = document.getElementById('global-nav');
-    if (!navContainer) return; // If the page doesn't need a nav, do nothing
+    if (!navContainer) return; 
 
     navContainer.innerHTML = `
     <header class="topbar">
@@ -24,11 +21,11 @@ function renderNavbar() {
         </div>
     </header>
     `;
+    updateCartCount(); // Ensure cart count is accurate globally
 }
 
-// 2. Global Authentication State
 async function checkAuthState() {
-    renderNavbar(); // Draw the navbar first before looking for the auth-link ID
+    renderNavbar(); 
 
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     const authLink = document.getElementById('auth-link');
@@ -49,4 +46,10 @@ async function checkAuthState() {
 async function signOut() {
     await window.supabaseClient.auth.signOut();
     window.location.reload();
+}
+
+function updateCartCount() {
+    let cart = JSON.parse(localStorage.getItem('castwheelz_cart')) || [];
+    const countElement = document.getElementById('cart-count');
+    if(countElement) countElement.innerText = cart.length;
 }
