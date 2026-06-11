@@ -9,77 +9,247 @@
 <style>
   :root{ --asphalt:#0c0c0e; --amber:#ff7a1a; --amber-soft:#ffb056; --cyan:#1fe0d0; --magenta:#ff2e6e; --bone:#f4efe6; --muted:#807d76; }
   *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{width:100%;background:var(--asphalt);font-family:'Archivo',sans-serif;color:var(--bone);overflow-x:hidden;}
+  html,body{width:100%;background:var(--asphalt);font-family:'Archivo',sans-serif;color:var(--bone);overflow-x:hidden; scroll-behavior: smooth;}
   
+  /* Fixed 3D Background */
   #scene{position:fixed;inset:0;z-index:1;pointer-events:none;}
-  .atmo{position:fixed;inset:0;z-index:2;pointer-events:none; background: radial-gradient(120% 90% at 50% -10%, rgba(255,122,26,.16), transparent 55%), radial-gradient(90% 70% at 85% 110%, rgba(31,224,208,.12), transparent 60%), radial-gradient(140% 120% at 50% 50%, transparent 42%, rgba(0,0,0,.78) 100%); mix-blend-mode:screen;}
-  .vignette{position:fixed;inset:0;z-index:3;pointer-events:none; box-shadow: inset 0 0 220px 60px rgba(0,0,0,.85);}
-  .grain{position:fixed;inset:-50%;z-index:4;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
+  .atmo{position:fixed;inset:0;z-index:2;pointer-events:none; background: radial-gradient(120% 90% at 50% -10%, rgba(255,122,26,.12), transparent 55%), radial-gradient(90% 70% at 85% 110%, rgba(31,224,208,.08), transparent 60%), radial-gradient(140% 120% at 50% 50%, transparent 42%, rgba(0,0,0,.85) 100%); mix-blend-mode:screen;}
+  .vignette{position:fixed;inset:0;z-index:3;pointer-events:none; box-shadow: inset 0 0 250px 80px rgba(0,0,0,.9);}
   
-  /* Global Nav CSS */
-  .topbar{display:flex;justify-content:space-between;align-items:flex-start; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;}
-  .brand{display:flex;align-items:center;gap:12px; text-decoration: none; color: inherit;}
-  .mark{width:34px;height:34px;border:2px solid var(--amber);border-radius:50%; display:grid;place-items:center;position:relative;box-shadow:0 0 18px rgba(255,122,26,.45);}
-  .mark::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--amber);}
-  .brand b{font-family:'Anton';letter-spacing:2px;font-size:18px;text-transform:uppercase;}
-  .brand span{font-family:'JetBrains Mono';font-size:9px;color:var(--muted);letter-spacing:3px;display:block;}
-  .nav-group { display: flex; align-items: center; gap: 20px;}
-  .nav-link { font-family:'JetBrains Mono'; font-size:11px; color:var(--muted); text-decoration:none; transition: 0.3s; letter-spacing: 2px;}
-  .nav-link:hover { color: var(--bone); }
-  .cart-link { color:var(--cyan); border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; }
+  /* Foreground Content Layer */
+  .content-layer { position: relative; z-index: 10; padding-top: 100px; } /* padding for fixed navbar */
 
-  .ui{position:relative;z-index:10;display:flex;flex-direction:column;padding:clamp(20px,3vw,42px);min-height:100vh;}
-  .hero-title { font-family:'Anton'; font-size:clamp(40px,8vw,80px); text-transform:uppercase; letter-spacing:1px; background:linear-gradient(180deg,#fff 0%,#cfc9bd 55%,#8d8678 100%); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom: 30px; text-align: center; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; width: 100%;}
-  .card { background: rgba(12, 12, 14, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; text-align: center; backdrop-filter: blur(10px); transition: 0.3s ease; cursor: pointer;}
-  .card:hover { border-color: var(--amber); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,122,26,0.15); }
-  .card img { max-width: 100%; height: 200px; object-fit: cover; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;}
-  .title { font-family: 'JetBrains Mono'; font-size: 14px; margin-bottom: 10px; color: var(--bone); text-transform: uppercase; letter-spacing: 1px;}
-  .price { font-family: 'Anton'; font-size: 24px; color: var(--cyan); letter-spacing: 1px;}
+  /* Cinematic Hero Section */
+  .hero { height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; }
+  .kicker { font-family: 'JetBrains Mono', monospace; font-size: clamp(10px, 1.5vw, 14px); letter-spacing: 8px; color: var(--cyan); text-transform: uppercase; margin-bottom: 20px; opacity: 0; animation: fadeUp 1s 1s forwards;}
+  .hero-title { font-family:'Anton'; font-size:clamp(60px, 15vw, 180px); text-transform:uppercase; line-height: 0.85; letter-spacing: 2px; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.2); position: relative; margin-bottom: 40px; opacity: 0; animation: fadeUp 1s 1.2s forwards;}
+  .hero-title span { color: var(--bone); -webkit-text-stroke: 0px; text-shadow: 0 10px 40px rgba(0,0,0,0.8); }
   
-  #loader{position:fixed;inset:0;z-index:50;background:var(--asphalt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;transition:opacity .8s ease, visibility .8s;}
+  .scroll-indicator { position: absolute; bottom: 40px; display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0; animation: fadeUp 1s 1.5s forwards; font-family: 'JetBrains Mono'; font-size: 10px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; }
+  .mouse { width: 24px; height: 36px; border: 1px solid var(--muted); border-radius: 12px; position: relative; }
+  .wheel { width: 2px; height: 6px; background: var(--amber); position: absolute; top: 6px; left: 50%; transform: translateX(-50%); border-radius: 2px; animation: scrollDown 1.5s infinite; }
+  @keyframes scrollDown { 0% { top: 6px; opacity: 1; } 100% { top: 20px; opacity: 0; } }
+  @keyframes fadeUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+
+  /* Premium Product Grid */
+  .catalog-section { padding: 100px 5%; background: linear-gradient(to bottom, transparent, rgba(8,8,10,1) 20%); }
+  .section-header { font-family: 'Anton'; font-size: 40px; color: var(--bone); margin-bottom: 50px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; max-width: 1400px; margin: 0 auto; width: 100%;}
+  
+  /* 3D Tilt Card Styling */
+  .card-wrapper { perspective: 1000px; opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+  .card-wrapper.visible { opacity: 1; transform: translateY(0); }
+  .card { background: rgba(18, 18, 22, 0.4); border: 1px solid rgba(255,255,255,0.03); padding: 25px; text-align: center; backdrop-filter: blur(20px); transform-style: preserve-3d; transition: border-color 0.4s; cursor: pointer; border-radius: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
+  .card:hover { border-color: rgba(255,122,26,0.3); }
+  .card-image-wrap { transform: translateZ(40px); margin-bottom: 25px; position: relative; }
+  .card img { max-width: 100%; height: 220px; object-fit: contain; filter: drop-shadow(0 20px 20px rgba(0,0,0,0.7)); transition: transform 0.4s; }
+  .card:hover img { transform: scale(1.05); }
+  
+  .card-info { transform: translateZ(30px); }
+  .title { font-family: 'JetBrains Mono'; font-size: 15px; margin-bottom: 10px; color: var(--bone); text-transform: uppercase; letter-spacing: 1px;}
+  .price { font-family: 'Anton'; font-size: 28px; color: var(--cyan); letter-spacing: 1px; margin-bottom: 20px;}
+  
+  .btn-acquire { width: 100%; background: transparent; border: 1px solid var(--amber); color: var(--amber); font-family: 'JetBrains Mono'; font-size: 12px; font-weight: bold; letter-spacing: 4px; padding: 15px; cursor: pointer; text-transform: uppercase; transition: all 0.3s; transform: translateZ(20px); }
+  .btn-acquire:hover { background: var(--amber); color: var(--asphalt); box-shadow: 0 0 20px rgba(255,122,26,0.4); }
+
+  /* Loader */
+  #loader{position:fixed;inset:0;z-index:999;background:var(--asphalt);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.8s ease, visibility 0.8s;}
   #loader.hidden{opacity:0;visibility:hidden;}
+  .loader-text { font-family:'Anton'; font-size: 40px; color:var(--amber); letter-spacing:8px; text-transform: uppercase; animation: pulse 1s infinite alternate;}
+  @keyframes pulse { 0% { opacity: 0.5; filter: blur(2px); } 100% { opacity: 1; filter: blur(0px); text-shadow: 0 0 20px rgba(255,122,26,0.8); } }
 </style>
 </head>
 <body>
-  <div id="loader"><h1 style="font-family:'Anton'; color:var(--amber); letter-spacing:4px;">IGNITING ENGINE...</h1></div>
+  
+  <div id="loader"><div class="loader-text">IGNITION</div></div>
 
   <div id="scene"></div>
-  <div class="atmo"></div><div class="vignette"></div><div class="grain"></div>
+  <div class="atmo"></div><div class="vignette"></div>
 
-  <div class="ui">
+  <div class="content-layer">
     <div id="global-nav"></div>
-    <h1 class="hero-title">The Collection</h1>
-    <div id="product-grid" class="grid"><p style="font-family:'JetBrains Mono';text-align:center;width:100%;">Synchronizing...</p></div>
+
+    <section class="hero">
+        <div class="kicker">The Collectors' Pit Lane</div>
+        <h1 class="hero-title">DIE-CAST<br><span>EXCELLENCE</span></h1>
+        
+        <div class="scroll-indicator">
+            <div class="mouse"><div class="wheel"></div></div>
+            Descend to Arsenal
+        </div>
+    </section>
+
+    <section class="catalog-section" id="arsenal">
+        <div class="section-header">Verified Acquisitions</div>
+        <div id="product-grid" class="grid">
+            <p style="font-family:'JetBrains Mono';text-align:center;width:100%;grid-column: 1/-1;">Synchronizing telemetry...</p>
+        </div>
+    </section>
   </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="supabase-config.js"></script>
 <script>
-window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('loader').classList.add('hidden'),1500);});
+window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('loader').classList.add('hidden'),1200);});
 
+// --- E-Commerce Data Fetch & Render ---
 async function loadStorefront() {
     await checkAuthState();
     const { data: products, error } = await window.supabaseClient.from('products').select('*').eq('is_bestseller', true);
     const grid = document.getElementById('product-grid');
-    if (error || products.length === 0) { grid.innerHTML = "<p>NO ASSETS.</p>"; return; }
+    
+    if (error || products.length === 0) { 
+        grid.innerHTML = "<p style='font-family:JetBrains Mono; color:var(--magenta);'>NO ASSETS DETECTED IN QUADRANT.</p>"; 
+        return; 
+    }
+    
     grid.innerHTML = "";
+    
     products.forEach(p => {
-        const card = document.createElement('div'); card.className = 'card';
-        card.onclick = () => window.location.href = `product.html?id=${p.id}`;
-        card.innerHTML = `<img src="${p.image_url}" alt="${p.title}"><div class="title">${p.title}</div><div class="price">₹${p.price.toLocaleString('en-IN')}</div>`;
-        grid.appendChild(card);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-wrapper';
+        wrapper.innerHTML = `
+            <div class="card" onclick="window.location.href='product.html?id=${p.id}'">
+                <div class="card-image-wrap"><img src="${p.image_url}" alt="${p.title}"></div>
+                <div class="card-info">
+                    <div class="title">${p.title}</div>
+                    <div class="price">₹${p.price.toLocaleString('en-IN')}</div>
+                    <button class="btn-acquire" onclick="event.stopPropagation(); addToCart(${p.id}, this, ${JSON.stringify(p).replace(/"/g, '&quot;')})">ACQUIRE</button>
+                </div>
+            </div>
+        `;
+        grid.appendChild(wrapper);
+    });
+
+    initCardTilt();
+    initScrollReveal();
+}
+
+// --- Cart Logic with Button Animation ---
+function addToCart(productId, btnElement, productData) {
+    window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        if (!session) { window.location.href = 'login.html'; return; }
+        
+        let cart = JSON.parse(localStorage.getItem('castwheelz_cart')) || [];
+        cart.push(productData);
+        localStorage.setItem('castwheelz_cart', JSON.stringify(cart));
+        updateCartCount();
+        
+        btnElement.innerText = "SECURED";
+        btnElement.style.background = "var(--cyan)";
+        btnElement.style.borderColor = "var(--cyan)";
+        btnElement.style.color = "var(--asphalt)";
+        setTimeout(() => { 
+            btnElement.innerText = "ACQUIRE"; 
+            btnElement.style.background = "transparent"; 
+            btnElement.style.color = "var(--amber)"; 
+            btnElement.style.borderColor = "var(--amber)"; 
+        }, 2000);
     });
 }
+
+// --- Physics Tilt Effect for Cards ---
+function initCardTilt() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -15; // Max 15 deg tilt
+            const rotateY = ((x - centerX) / centerX) * 15;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+            card.style.transition = "transform 0.5s ease-out";
+        });
+        
+        card.addEventListener('mouseenter', () => {
+            card.style.transition = "none"; // Remove transition for instant mouse tracking
+        });
+    });
+}
+
+// --- Scroll Reveal Intersections ---
+function initScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.card-wrapper').forEach(wrapper => {
+        observer.observe(wrapper);
+    });
+}
+
 window.onload = loadStorefront;
 
-/* THREE.JS BACKGROUND SCENE */
-const scene=new THREE.Scene(); scene.fog=new THREE.FogExp2(0x0c0c0e,0.03);
-const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,0.1,260); camera.position.set(0,9,20);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setSize(innerWidth,innerHeight); document.getElementById('scene').appendChild(renderer.domElement);
-const grid3D=new THREE.GridHelper(100,100,0x2c2c33,0x1a1a1e); grid3D.material.transparent=true; grid3D.material.opacity=0.32; scene.add(grid3D);
-let camAngle=0; function animate(){ requestAnimationFrame(animate); camAngle+=0.002; camera.position.x = Math.sin(camAngle)*20; camera.position.z = Math.cos(camAngle)*20; camera.lookAt(0,0,0); renderer.render(scene,camera); }
+// --- Advanced THREE.JS Scroll-Linked Scene ---
+const scene=new THREE.Scene(); scene.fog=new THREE.FogExp2(0x0c0c0e,0.035);
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,260); 
+camera.position.set(0,2,-15); // Start low and close
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); 
+renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); 
+document.getElementById('scene').appendChild(renderer.domElement);
+
+// Cyberpunk-esque wireframe floor
+const gridGeo = new THREE.PlaneGeometry(200, 200, 80, 80);
+const gridMat = new THREE.MeshBasicMaterial({ color: 0x1fe0d0, wireframe: true, transparent: true, opacity: 0.08 });
+const grid3D = new THREE.Mesh(gridGeo, gridMat);
+grid3D.rotation.x = -Math.PI / 2;
+grid3D.position.y = -2;
+scene.add(grid3D);
+
+// Dynamic floating particles
+const pGeo = new THREE.BufferGeometry();
+const pCount = 500;
+const pArr = new Float32Array(pCount * 3);
+for(let i=0; i<pCount*3; i++) { pArr[i] = (Math.random() - 0.5) * 80; }
+pGeo.setAttribute('position', new THREE.BufferAttribute(pArr, 3));
+const pMat = new THREE.PointsMaterial({ size: 0.1, color: 0xff7a1a, transparent: true, opacity: 0.6 });
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+// Parallax Scroll Binding
+let scrollPercent = 0;
+document.body.onscroll = () => {
+    scrollPercent = (document.documentElement.scrollTop / (document.documentElement.scrollHeight - document.documentElement.clientHeight));
+};
+
+let time = 0;
+function animate(){ 
+    requestAnimationFrame(animate); 
+    time += 0.002;
+    
+    // Grid moves toward camera
+    grid3D.position.z = (time * 10) % 2.5;
+    particles.rotation.y = time * 0.5;
+    
+    // Camera reacts to scroll: Pulls back and rises up as user scrolls down
+    const targetZ = -15 + (scrollPercent * 40);
+    const targetY = 2 + (scrollPercent * 20);
+    
+    camera.position.z += (targetZ - camera.position.z) * 0.05;
+    camera.position.y += (targetY - camera.position.y) * 0.05;
+    camera.lookAt(0, 0, 10);
+    
+    renderer.render(scene,camera); 
+}
 animate();
+
+addEventListener('resize',()=>{ 
+    camera.aspect=innerWidth/innerHeight;
+    camera.updateProjectionMatrix(); 
+    renderer.setSize(innerWidth,innerHeight); 
+});
 </script>
 </body>
 </html>
