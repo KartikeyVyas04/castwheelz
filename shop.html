@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Arsenal — CastWheelz</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{ --asphalt:#0c0c0e; --amber:#ff7a1a; --cyan:#1fe0d0; --bone:#f4efe6; --muted:#807d76; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--asphalt);color:var(--bone);font-family:'Archivo',sans-serif;}
+  .grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
+  @keyframes grain{0%{transform:translate(0,0)} 50%{transform:translate(-3%,4%)} 100%{transform:translate(0,0)}}
+  
+  .ui{position:relative;z-index:10;padding:clamp(20px,3vw,42px); max-width: 1200px; margin: 0 auto;}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 40px;}
+  .brand{display:flex;align-items:center;gap:12px; text-decoration: none; color: inherit;}
+  .brand b{font-family:'Anton';letter-spacing:2px;font-size:24px;text-transform:uppercase; color: var(--amber);}
+  .nav-group { display: flex; align-items: center; gap: 20px;}
+  
+  .page-title { font-family:'Anton'; font-size:40px; text-transform:uppercase; letter-spacing:1px; color: var(--bone); margin-bottom: 30px; }
+  
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+  .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 20px; text-align: center; backdrop-filter: blur(10px); transition: 0.3s; cursor: pointer;}
+  .card:hover { border-color: var(--cyan); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(31,224,208,0.1); }
+  .card img { max-width: 100%; height: 200px; object-fit: cover; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;}
+  .title { font-family: 'JetBrains Mono'; font-size: 14px; margin-bottom: 10px; color: var(--bone); text-transform: uppercase;}
+  .price { font-family: 'Anton'; font-size: 24px; color: var(--amber); letter-spacing: 1px;}
+</style>
+</head>
+<body>
+  <div class="grain"></div>
+  <div class="ui">
+    <header class="topbar">
+      <a href="index.html" class="brand"><b>CastWheelz</b></a>
+      <div class="nav-group">
+        <span id="auth-link"></span>
+        <a href="cart.html" style="font-family:'JetBrains Mono'; font-size:11px; color:var(--cyan); text-decoration:none; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">CART [<span id="cart-count">0</span>]</a>
+      </div>
+    </header>
+
+    <div class="page-title">Full Arsenal</div>
+    <div id="product-grid" class="grid">
+        <p style="font-family: 'JetBrains Mono'; color: var(--muted);">Scanning database...</p>
+    </div>
+  </div>
+
+<script src="supabase-config.js"></script>
+<script>
+    async function loadCatalog() {
+        await checkAuthState();
+        updateCartCount();
+
+        // Fetch ALL products, not just bestsellers
+        const { data: products, error } = await window.supabaseClient.from('products').select('*');
+        const grid = document.getElementById('product-grid');
+
+        if (error || products.length === 0) {
+            grid.innerHTML = "<p style='font-family:JetBrains Mono;'>NO ASSETS FOUND.</p>";
+            return;
+        }
+
+        grid.innerHTML = "";
+        products.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            // Wrap the card in an onclick event that routes to the specific product detail page
+            card.onclick = () => window.location.href = `product.html?id=${product.id}`;
+            card.innerHTML = `
+                <img src="${product.image_url || 'https://via.placeholder.com/400x300/111/1fe0d0?text=ASSET'}" alt="${product.title}">
+                <div class="title">${product.title}</div>
+                <div class="price">₹${product.price.toLocaleString('en-IN')}</div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function updateCartCount() {
+        let cart = JSON.parse(localStorage.getItem('castwheelz_cart')) || [];
+        document.getElementById('cart-count').innerText = cart.length;
+    }
+
+    window.onload = loadCatalog;
+</script>
+</body>
+</html>
