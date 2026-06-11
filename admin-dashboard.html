@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Command Center — CastWheelz</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{ --asphalt:#0c0c0e; --amber:#ff7a1a; --cyan:#1fe0d0; --magenta:#ff2e6e; --bone:#f4efe6; --muted:#807d76; }
+  body{margin:0; background:var(--asphalt); color:var(--bone); font-family:'Archivo',sans-serif; min-height: 100vh;}
+  .grain{position:fixed;inset:-50%;z-index:2;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
+  @keyframes grain{0%{transform:translate(0,0)} 50%{transform:translate(-3%,4%)} 100%{transform:translate(0,0)}}
+  
+  .admin-warning { background: var(--magenta); color: var(--bone); font-family: 'JetBrains Mono'; font-size: 10px; text-align: center; padding: 5px; text-transform: uppercase; letter-spacing: 4px; position: fixed; top: 0; width: 100%; z-index: 1000;}
+  .ui-layer{position:relative;z-index:10;padding:clamp(20px,3vw,42px); padding-top: 100px; max-width: 1000px; margin: 0 auto;}
+  
+  .header { border-bottom: 1px solid rgba(255,46,110,0.3); padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;}
+  .page-title { font-family:'Anton'; font-size:48px; text-transform:uppercase; letter-spacing:2px; color: var(--bone); line-height: 1; margin-bottom: 5px;}
+  .sys-text { font-family: 'JetBrains Mono'; font-size: 10px; color: var(--magenta); letter-spacing: 4px; text-transform: uppercase; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+  
+  .admin-card { background: rgba(18, 18, 22, 0.6); border: 1px solid rgba(255,46,110,0.2); padding: 40px 30px; text-align: center; backdrop-filter: blur(20px); border-radius: 4px; transition: 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: block;}
+  .admin-card:hover { border-color: var(--magenta); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(255,46,110,0.15);}
+  .card-icon { font-size: 40px; margin-bottom: 20px; color: var(--cyan);}
+  .card-title { font-family: 'Anton'; font-size: 24px; letter-spacing: 1px; margin-bottom: 10px;}
+  .card-desc { font-family: 'JetBrains Mono'; font-size: 11px; color: var(--muted); line-height: 1.6;}
+</style>
+</head>
+<body>
+  <div class="admin-warning">RESTRICTED ACCESS // COMMAND OVERRIDE ACTIVE</div>
+  <div class="grain"></div>
+  <div id="global-nav" style="position:relative; z-index:20; margin-top: 20px;"></div>
+  
+  <div class="ui-layer">
+    <div class="header">
+      <div>
+        <div class="page-title">Command Center</div>
+        <div class="sys-text" id="admin-identity">VERIFYING PROTOCOLS...</div>
+      </div>
+    </div>
+    
+    <div class="grid" id="admin-grid" style="display: none;">
+      <a href="admin-products.html" class="admin-card">
+        <div class="card-icon">📦</div>
+        <div class="card-title">ARSENAL CONTROL</div>
+        <div class="card-desc">Add new die-cast assets, update pricing, and designate hero/bestseller models.</div>
+      </a>
+      
+      <a href="admin-orders.html" class="admin-card" style="border-color: rgba(31,224,208,0.3);">
+        <div class="card-icon" style="color: var(--amber);">⚡</div>
+        <div class="card-title">FULFILLMENT HUB</div>
+        <div class="card-desc">Monitor transactions, view shipping coordinates, and update delivery statuses.</div>
+      </a>
+      
+      <a href="admin-access.html" class="admin-card" style="border-color: rgba(255,122,26,0.3);">
+        <div class="card-icon" style="color: var(--magenta);">🛡️</div>
+        <div class="card-title">SECURITY CLEARANCE</div>
+        <div class="card-desc">Grant or revoke administrative backend access to other authorized Gmail accounts.</div>
+      </a>
+    </div>
+  </div>
+
+<script src="supabase-config.js"></script>
+<script>
+    async function verifyAdminAccess() {
+        const user = await checkAuthState();
+        if (!user) { window.location.href = 'login.html'; return; }
+
+        // Master Admin Check (Failsafe)
+        if (user.email === 'shivam69332@gmail.com') {
+            grantAccess(user.email, "MASTER OVERRIDE");
+            return;
+        }
+
+        // Standard Admin Check
+        const { data, error } = await window.supabaseClient.from('admin_users').select('email').eq('email', user.email).single();
+        
+        if (error || !data) {
+            alert("SECURITY BREACH: Unauthorized Access Attempt Logged.");
+            window.location.href = 'index.html'; // Kick them out
+        } else {
+            grantAccess(user.email, "STANDARD ADMIN");
+        }
+    }
+
+    function grantAccess(email, clearance) {
+        document.getElementById('admin-identity').innerText = `CLEARANCE: ${clearance} // ID: ${email}`;
+        document.getElementById('admin-grid').style.display = 'grid';
+    }
+
+    window.onload = verifyAdminAccess;
+</script>
+</body>
+</html>
