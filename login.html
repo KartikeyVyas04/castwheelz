@@ -32,13 +32,14 @@
         </button>
     </div>
 
-    <script src="js/supabase-config.js"></script>
+    <script src="supabase-config.js"></script>
+    
     <script>
         async function signInWithGoogle() {
             const { error } = await window.supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    // Using your exact production Vercel URL
+                    // Redirects back to your live Vercel store
                     redirectTo: 'https://castwheelz.vercel.app/index.html' 
                 }
             });
@@ -48,6 +49,7 @@
             }
         }
 
+        // If they are already logged in, redirect them immediately to the store
         window.onload = async () => {
             const { data: { session } } = await window.supabaseClient.auth.getSession();
             if (session) window.location.href = 'index.html';
