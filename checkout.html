@@ -7,74 +7,57 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 <style>
   :root{ --asphalt:#0c0c0e; --amber:#ff7a1a; --cyan:#1fe0d0; --bone:#f4efe6; --muted:#807d76; }
-  body{margin:0; background:var(--asphalt); color:var(--bone); font-family:'Archivo',sans-serif;}
-  .grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
-  @keyframes grain{0%{transform:translate(0,0)} 50%{transform:translate(-3%,4%)} 100%{transform:translate(0,0)}}
+  body{margin:0; background:var(--asphalt); color:var(--bone); font-family:'Archivo',sans-serif; min-height: 100vh;}
   
-  .ui{position:relative;z-index:10;padding:clamp(20px,3vw,42px); max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px;}
-  @media (max-width: 768px) { .ui { grid-template-columns: 1fr; } }
+  .atmo{position:fixed;inset:0;z-index:1;pointer-events:none; background: radial-gradient(120% 90% at 50% -10%, rgba(255,122,26,.12), transparent 55%), radial-gradient(140% 120% at 50% 50%, transparent 42%, rgba(0,0,0,.85) 100%);}
+  .grain{position:fixed;inset:-50%;z-index:2;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
   
-  .header { grid-column: 1 / -1; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px;}
-  .title { font-family: 'Anton'; font-size: 32px; text-transform: uppercase; letter-spacing: 1px; color: var(--amber); }
+  .ui-layer{position:relative;z-index:10;padding:clamp(20px,3vw,42px); padding-top: 120px; max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px;}
+  @media (max-width: 850px) { .ui-layer { grid-template-columns: 1fr; } }
   
-  .panel { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 30px; backdrop-filter: blur(10px); }
-  .panel-title { font-family: 'JetBrains Mono'; font-size: 14px; color: var(--cyan); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px;}
+  .header { grid-column: 1 / -1; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; margin-bottom: 10px;}
+  .title { font-family: 'Anton'; font-size: 36px; text-transform: uppercase; letter-spacing: 1px; color: var(--amber); }
   
-  .form-group { margin-bottom: 20px; }
-  label { display: block; font-family: 'JetBrains Mono'; font-size: 10px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-  input, textarea { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: var(--bone); padding: 12px; font-family: 'Archivo', sans-serif; box-sizing: border-box; transition: 0.3s; }
-  input:focus, textarea:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 10px rgba(255,122,26,0.2); }
+  .panel { background: rgba(18, 18, 22, 0.4); border: 1px solid rgba(255,255,255,0.05); padding: 40px; backdrop-filter: blur(20px); border-radius: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
+  .panel-title { font-family: 'JetBrains Mono'; font-size: 14px; color: var(--cyan); text-transform: uppercase; margin-bottom: 30px; letter-spacing: 2px;}
+  
+  .form-group { margin-bottom: 25px; }
+  label { display: block; font-family: 'JetBrains Mono'; font-size: 10px; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  input, textarea { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: var(--bone); padding: 15px; font-family: 'Archivo', sans-serif; box-sizing: border-box; transition: 0.3s; border-radius: 2px;}
+  input:focus, textarea:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 15px rgba(255,122,26,0.2); }
   
   .summary-item { display: flex; justify-content: space-between; font-family: 'JetBrains Mono'; font-size: 12px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;}
-  .total-row { display: flex; justify-content: space-between; font-family: 'Anton'; font-size: 24px; color: var(--cyan); margin-top: 20px;}
+  .total-row { display: flex; justify-content: space-between; font-family: 'Anton'; font-size: 28px; color: var(--cyan); margin-top: 30px;}
   
-  .btn-pay { width: 100%; background: var(--cyan); border: none; color: var(--asphalt); font-family: 'JetBrains Mono'; font-size: 14px; font-weight: bold; letter-spacing: 2px; padding: 15px; margin-top: 30px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
-  .btn-pay:hover { box-shadow: 0 0 20px rgba(31,224,208,0.5); background: #fff; }
-  .btn-pay:disabled { background: var(--muted); cursor: not-allowed; box-shadow: none; }
+  .btn-pay { width: 100%; background: var(--cyan); border: none; color: var(--asphalt); font-family: 'JetBrains Mono'; font-size: 14px; font-weight: bold; letter-spacing: 2px; padding: 18px; margin-top: 40px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
+  .btn-pay:hover { box-shadow: 0 0 30px rgba(31,224,208,0.4); background: #fff; }
+  .btn-pay:disabled { background: var(--muted); cursor: not-allowed; box-shadow: none; color: #333;}
 </style>
 </head>
 <body>
-  <div class="grain"></div>
+  <div class="atmo"></div><div class="grain"></div>
+  <div id="global-nav" style="position:relative; z-index:20;"></div>
   
-  <div class="ui">
+  <div class="ui-layer">
     <div class="header">
-      <div class="title">Encrypted Checkout</div>
-      <a href="cart.html" style="color:var(--muted); font-family:'JetBrains Mono'; text-decoration:none; align-self:flex-end; font-size: 12px;">&lt; MODIFY CARGO</a>
+      <div class="title">Secure Checkout</div>
+      <a href="cart.html" style="color:var(--muted); font-family:'JetBrains Mono'; text-decoration:none; align-self:flex-end; font-size: 12px; letter-spacing: 1px;">&lt; MODIFY CARGO</a>
     </div>
     
     <div class="panel">
       <div class="panel-title">Fulfillment Coordinates</div>
-      
-      <div class="form-group">
-        <label>Transmission Email</label>
-        <input type="email" id="email" readonly style="color: var(--muted);">
-      </div>
-      <div class="form-group">
-        <label>Recipient Full Name</label>
-        <input type="text" id="name" required>
-      </div>
-      <div class="form-group">
-        <label>Contact Number (For Courier)</label>
-        <input type="tel" id="phone" required placeholder="+91">
-      </div>
-      <div class="form-group">
-        <label>Complete Shipping Address</label>
-        <textarea id="address" rows="4" required placeholder="House No, Street, Landmark, City, State, Pincode"></textarea>
-      </div>
+      <div class="form-group"><label>Transmission Email</label><input type="email" id="email" readonly style="color: var(--muted);"></div>
+      <div class="form-group"><label>Recipient Full Name</label><input type="text" id="name" required></div>
+      <div class="form-group"><label>Contact Number (For Courier)</label><input type="tel" id="phone" required placeholder="+91"></div>
+      <div class="form-group"><label>Complete Shipping Address</label><textarea id="address" rows="4" required placeholder="House No, Street, Landmark, City, State, Pincode"></textarea></div>
     </div>
     
     <div class="panel">
       <div class="panel-title">Transaction Summary</div>
       <div id="checkout-items"></div>
-      
-      <div class="total-row">
-        <span>TOTAL</span>
-        <span>₹<span id="checkout-total">0</span></span>
-      </div>
-      
+      <div class="total-row"><span>TOTAL</span><span>₹<span id="checkout-total">0</span></span></div>
       <button class="btn-pay" id="pay-btn" onclick="processOrder()">AUTHORIZE PAYMENT</button>
       <div id="status-msg" style="margin-top:15px; font-family:'JetBrains Mono'; font-size:10px; color:var(--amber); text-align:center;"></div>
     </div>
@@ -88,25 +71,13 @@
 
       async function initCheckout() {
           currentUser = await checkAuthState();
-          if (!currentUser) {
-              window.location.href = 'login.html';
-              return;
-          }
-          if (cart.length === 0) {
-              window.location.href = 'index.html';
-              return;
-          }
+          if (!currentUser) { window.location.href = 'login.html'; return; }
+          if (cart.length === 0) { window.location.href = 'index.html'; return; }
 
-          // Pre-fill user data from Google Auth
           document.getElementById('email').value = currentUser.email;
           document.getElementById('name').value = currentUser.user_metadata.full_name || '';
 
-          renderSummary();
-      }
-
-      function renderSummary() {
           const container = document.getElementById('checkout-items');
-          orderTotal = 0;
           cart.forEach(item => {
               orderTotal += item.price;
               container.innerHTML += `
@@ -125,87 +96,42 @@
           const phone = document.getElementById('phone').value;
           const address = document.getElementById('address').value;
 
-          if (!name || !phone || !address) {
-              status.innerText = "ERROR: ALL COORDINATES ARE REQUIRED.";
-              return;
-          }
+          if (!name || !phone || !address) { status.innerText = "ERROR: ALL COORDINATES ARE REQUIRED."; return; }
 
-          btn.disabled = true;
-          btn.innerText = "ESTABLISHING CONNECTION...";
+          btn.disabled = true; btn.innerText = "ESTABLISHING CONNECTION...";
 
           try {
-              // 1. Create the Pending Order in Supabase
               const { data: order, error: orderError } = await window.supabaseClient
                   .from('orders')
-                  .insert([{
-                      user_id: currentUser.id,
-                      customer_name: name,
-                      customer_email: currentUser.email,
-                      customer_phone: phone,
-                      shipping_address: address,
-                      total_amount: orderTotal,
-                      status: 'Pending'
-                  }])
-                  .select()
-                  .single();
+                  .insert([{ user_id: currentUser.id, customer_name: name, customer_email: currentUser.email, customer_phone: phone, shipping_address: address, total_amount: orderTotal, status: 'Pending' }])
+                  .select().single();
 
               if (orderError) throw orderError;
 
-              // 2. Insert individual items into order_items
-              const orderItemsData = cart.map(item => ({
-                  order_id: order.id,
-                  product_id: item.id,
-                  quantity: 1,
-                  price_at_purchase: item.price
-              }));
-
-              const { error: itemsError } = await window.supabaseClient
-                  .from('order_items')
-                  .insert(orderItemsData);
-
+              const orderItemsData = cart.map(item => ({ order_id: order.id, product_id: item.id, quantity: 1, price_at_purchase: item.price }));
+              const { error: itemsError } = await window.supabaseClient.from('order_items').insert(orderItemsData);
               if (itemsError) throw itemsError;
 
-              // 3. Trigger Razorpay
               status.innerText = "CONTACTING PAYMENT GATEWAY...";
               launchRazorpay(order.id, orderTotal, name, currentUser.email, phone);
-
           } catch (error) {
-              console.error(error);
-              status.innerText = "SYSTEM FAILURE. TRY AGAIN.";
-              btn.disabled = false;
-              btn.innerText = "AUTHORIZE PAYMENT";
+              console.error(error); status.innerText = "SYSTEM FAILURE. TRY AGAIN.";
+              btn.disabled = false; btn.innerText = "AUTHORIZE PAYMENT";
           }
       }
 
       function launchRazorpay(orderId, amount, name, email, phone) {
-          // Razorpay requires amounts in smallest currency sub-unit (paise for INR)
           var options = {
-              "key": "YOUR_RAZORPAY_TEST_KEY_HERE", // Replace with your test key from Razorpay Dashboard
+              "key": "YOUR_RAZORPAY_TEST_KEY_HERE", 
               "amount": amount * 100, 
-              "currency": "INR",
-              "name": "CastWheelz",
-              "description": "Die-Cast Asset Acquisition",
+              "currency": "INR", "name": "CastWheelz", "description": "Die-Cast Asset Acquisition",
               "theme": { "color": "#ff7a1a" },
-              "prefill": {
-                  "name": name,
-                  "email": email,
-                  "contact": phone
-              },
+              "prefill": { "name": name, "email": email, "contact": phone },
               "handler": async function (response) {
-                  // Payment Succeeded! Update Supabase.
-                  await window.supabaseClient
-                      .from('orders')
-                      .update({ 
-                          status: 'Paid', 
-                          razorpay_payment_id: response.razorpay_payment_id 
-                      })
-                      .eq('id', orderId);
-
-                  // Redirect to Success Page
+                  await window.supabaseClient.from('orders').update({ status: 'Paid', razorpay_payment_id: response.razorpay_payment_id }).eq('id', orderId);
                   window.location.href = `success.html?order=${orderId}`;
               }
           };
-
           var rzp1 = new Razorpay(options);
           rzp1.on('payment.failed', function (response){
               document.getElementById('status-msg').innerText = "TRANSACTION FAILED OR CANCELLED.";
@@ -214,7 +140,6 @@
           });
           rzp1.open();
       }
-
       window.onload = initCheckout;
   </script>
 </body>
