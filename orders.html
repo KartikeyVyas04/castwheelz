@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Service Record — CastWheelz</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,18 +10,24 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--asphalt);color:var(--bone);font-family:'Archivo',sans-serif;}
   .grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
-  @keyframes grain{0%{transform:translate(0,0)} 50%{transform:translate(-3%,4%)} 100%{transform:translate(0,0)}}
   
+  /* Global Nav CSS */
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;}
+  .brand{display:flex;align-items:center;gap:12px; text-decoration: none; color: inherit;}
+  .mark{width:34px;height:34px;border:2px solid var(--amber);border-radius:50%; display:grid;place-items:center;position:relative;box-shadow:0 0 18px rgba(255,122,26,.45);}
+  .mark::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--amber);}
+  .brand b{font-family:'Anton';letter-spacing:2px;font-size:18px;text-transform:uppercase;}
+  .brand span{font-family:'JetBrains Mono';font-size:9px;color:var(--muted);letter-spacing:3px;display:block;}
+  .nav-group { display: flex; align-items: center; gap: 20px;}
+  .nav-link { font-family:'JetBrains Mono'; font-size:11px; color:var(--muted); text-decoration:none; transition: 0.3s; letter-spacing: 2px;}
+  .nav-link:hover { color: var(--bone); }
+  .cart-link { color:var(--cyan); border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; }
+
   .ui{position:relative;z-index:10;padding:clamp(20px,3vw,42px); max-width: 1000px; margin: 0 auto;}
-  .topbar{display:flex;justify-content:space-between;align-items:flex-start;border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 40px;}
-  .brand b{font-family:'Anton';letter-spacing:2px;font-size:24px;text-transform:uppercase; color: var(--amber); text-decoration: none;}
-  
   .page-title { font-family:'Anton'; font-size:40px; text-transform:uppercase; letter-spacing:1px; color: var(--bone); margin-bottom: 10px; }
   .sys-text { font-family: 'JetBrains Mono'; font-size: 10px; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px; }
 
   .order-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px);}
-  @media (max-width: 600px) { .order-card { flex-direction: column; align-items: flex-start; gap: 15px;} }
-  
   .order-meta { display: flex; flex-direction: column; gap: 8px;}
   .order-id { font-family: 'JetBrains Mono'; font-size: 14px; color: var(--bone); }
   .order-date { font-family: 'Archivo'; font-size: 12px; color: var(--muted); }
@@ -37,72 +42,35 @@
 <body>
   <div class="grain"></div>
   <div class="ui">
-    <header class="topbar">
-      <a href="index.html" class="brand" style="text-decoration:none;"><b>CastWheelz</b></a>
-      <span id="auth-link"></span>
-    </header>
-
+    <div id="global-nav"></div>
     <div class="page-title">Service Record</div>
     <div class="sys-text">Encrypted Transaction History</div>
-
-    <div id="orders-container">
-        <p style="font-family: 'JetBrains Mono'; color: var(--muted);">Retrieving historical data...</p>
-    </div>
+    <div id="orders-container"><p style="font-family: 'JetBrains Mono'; color: var(--muted);">Retrieving historical data...</p></div>
   </div>
 
 <script src="supabase-config.js"></script>
 <script>
     async function loadOrders() {
         const user = await checkAuthState();
+        if (!user) { window.location.href = 'login.html'; return; }
+        const { data: orders, error } = await window.supabaseClient.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
         const container = document.getElementById('orders-container');
-
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-
-        // Fetch orders securely for the logged-in user, newest first
-        const { data: orders, error } = await window.supabaseClient
-            .from('orders')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            container.innerHTML = "<p style='font-family:JetBrains Mono;'>ERROR: UNABLE TO ACCESS RECORDS.</p>";
-            return;
-        }
-
-        if (orders.length === 0) {
-            container.innerHTML = "<p style='font-family:JetBrains Mono;'>NO PREVIOUS TRANSACTIONS FOUND.</p>";
-            return;
-        }
-
+        if (error || orders.length === 0) { container.innerHTML = "<p>NO PREVIOUS TRANSACTIONS FOUND.</p>"; return; }
         container.innerHTML = "";
-
-        orders.forEach(order => {
-            // Format the database timestamp into a readable date
-            const dateObj = new Date(order.created_at);
-            const formattedDate = dateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
-            
-            // Determine badge styling based on status
-            let statusClass = 'status-pending';
-            if (order.status.toLowerCase() === 'paid') statusClass = 'status-paid';
-            if (order.status.toLowerCase() === 'shipped' || order.status.toLowerCase() === 'delivered') statusClass = 'status-shipped';
-
+        orders.forEach(o => {
+            const dateObj = new Date(o.created_at);
+            const dateStr = dateObj.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+            let statusClass = o.status.toLowerCase() === 'paid' ? 'status-paid' : (o.status.toLowerCase() === 'shipped' ? 'status-shipped' : 'status-pending');
             container.innerHTML += `
                 <div class="order-card">
                     <div class="order-meta">
-                        <div class="order-id">TRANSACTION ID: CWZ-${String(order.id).padStart(6, '0')}</div>
-                        <div class="order-date">Initiated on ${formattedDate}</div>
-                        <div class="order-total">₹${order.total_amount.toLocaleString('en-IN')}</div>
+                        <div class="order-id">TRANSACTION ID: CWZ-${String(o.id).padStart(6, '0')}</div>
+                        <div class="order-date">Initiated on ${dateStr}</div><div class="order-total">₹${o.total_amount.toLocaleString('en-IN')}</div>
                     </div>
-                    <div class="status-badge ${statusClass}">${order.status}</div>
-                </div>
-            `;
+                    <div class="status-badge ${statusClass}">${o.status}</div>
+                </div>`;
         });
     }
-
     window.onload = loadOrders;
 </script>
 </body>
