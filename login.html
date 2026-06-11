@@ -38,8 +38,8 @@
             const { error } = await window.supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    // This dynamically routes them back to the storefront after Google approves them
-                    redirectTo: window.location.origin + '/index.html' 
+                    // Using your exact production Vercel URL
+                    redirectTo: 'https://castwheelz.vercel.app/index.html' 
                 }
             });
             if (error) {
@@ -48,7 +48,6 @@
             }
         }
 
-        // If they visit login.html but are already logged in, send them to the store
         window.onload = async () => {
             const { data: { session } } = await window.supabaseClient.auth.getSession();
             if (session) window.location.href = 'index.html';
