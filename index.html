@@ -18,19 +18,21 @@
   .atmo{position:fixed;inset:0;z-index:2;pointer-events:none; background: radial-gradient(120% 90% at 50% -10%, rgba(255,122,26,.16), transparent 55%), radial-gradient(90% 70% at 85% 110%, rgba(31,224,208,.12), transparent 60%), radial-gradient(140% 120% at 50% 50%, transparent 42%, rgba(0,0,0,.78) 100%); mix-blend-mode:screen;}
   .vignette{position:fixed;inset:0;z-index:3;pointer-events:none; box-shadow: inset 0 0 220px 60px rgba(0,0,0,.85);}
   .grain{position:fixed;inset:-50%;z-index:4;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
-  @keyframes grain{0%{transform:translate(0,0)}10%{transform:translate(-4%,-3%)}30%{transform:translate(3%,-5%)} 50%{transform:translate(-3%,4%)}70%{transform:translate(4%,3%)}90%{transform:translate(-2%,2%)}100%{transform:translate(0,0)}}
-
-  /* Scrollable UI Overlay */
-  .ui{position:relative;z-index:10;display:flex;flex-direction:column;padding:clamp(20px,3vw,42px);min-height:100vh;}
-  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px; margin-bottom: 40px;}
+  
+  /* Global Navbar CSS (Applied to injected HTML) */
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;}
   .brand{display:flex;align-items:center;gap:12px; text-decoration: none; color: inherit;}
   .mark{width:34px;height:34px;border:2px solid var(--amber);border-radius:50%; display:grid;place-items:center;position:relative;box-shadow:0 0 18px rgba(255,122,26,.45);}
   .mark::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--amber);}
   .brand b{font-family:'Anton';letter-spacing:2px;font-size:18px;text-transform:uppercase;}
   .brand span{font-family:'JetBrains Mono';font-size:9px;color:var(--muted);letter-spacing:3px;display:block;}
   .nav-group { display: flex; align-items: center; gap: 20px;}
-  
-  /* E-Commerce Grid */
+  .nav-link { font-family:'JetBrains Mono'; font-size:11px; color:var(--muted); text-decoration:none; transition: 0.3s; }
+  .nav-link:hover { color: var(--bone); }
+  .cart-link { color:var(--cyan); border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; }
+
+  /* Main UI & Grid */
+  .ui{position:relative;z-index:10;display:flex;flex-direction:column;padding:clamp(20px,3vw,42px);min-height:100vh;}
   .hero-title { font-family:'Anton'; font-size:clamp(40px,8vw,80px); text-transform:uppercase; letter-spacing:1px; background:linear-gradient(180deg,#fff 0%,#cfc9bd 55%,#8d8678 100%); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom: 30px; text-align: center; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; width: 100%;}
   .card { background: rgba(12, 12, 14, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; text-align: center; backdrop-filter: blur(10px); transition: all 0.3s ease; }
@@ -41,7 +43,7 @@
   .btn-acquire { width: 100%; background: transparent; border: 1px solid var(--amber); color: var(--amber); font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: 3px; padding: 12px; margin-top: 20px; cursor: pointer; text-transform: uppercase; transition: all 0.3s; }
   .btn-acquire:hover { background: var(--amber); color: var(--asphalt); box-shadow: 0 0 15px rgba(255,122,26,0.4); }
 
-  /* LOADER - Kept exactly as your design */
+  /* LOADER */
   #loader{position:fixed;inset:0;z-index:50;background:var(--asphalt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;transition:opacity .8s ease, visibility .8s;}
   #loader.hidden{opacity:0;visibility:hidden;}
   .stage{position:relative;width:260px;height:170px;display:grid;place-items:center;}
@@ -81,16 +83,8 @@
   <div class="atmo"></div><div class="vignette"></div><div class="grain"></div>
 
   <div class="ui">
-    <header class="topbar">
-      <a href="index.html" class="brand">
-        <div class="mark"></div>
-        <div><b>CastWheelz</b><span>DIE-CAST RETAILER</span></div>
-      </a>
-      <div class="nav-group">
-        <span id="auth-link"></span>
-        <a href="cart.html" style="font-family:'JetBrains Mono'; font-size:11px; letter-spacing:2px; color:var(--cyan); text-decoration:none; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">CART [<span id="cart-count">0</span>]</a>
-      </div>
-    </header>
+    
+    <div id="global-nav"></div>
 
     <h1 class="hero-title">The Collection</h1>
     <div id="product-grid" class="grid">
@@ -143,7 +137,6 @@ function addToCart(productId) {
         localStorage.setItem('castwheelz_cart', JSON.stringify(cart));
         updateCartCount();
         
-        // Custom animated feedback instead of an alert
         const btn = event.target;
         btn.innerText = "SECURED";
         btn.style.background = "var(--cyan)";
@@ -155,18 +148,18 @@ function addToCart(productId) {
 
 function updateCartCount() {
     let cart = JSON.parse(localStorage.getItem('castwheelz_cart')) || [];
-    document.getElementById('cart-count').innerText = cart.length;
+    const countElement = document.getElementById('cart-count');
+    if(countElement) countElement.innerText = cart.length;
 }
 
 window.onload = loadStorefront;
 
-/* THREE.JS BACKGROUND SCENE - Simplified strictly for background ambiance */
+/* THREE.JS BACKGROUND SCENE */
 const scene=new THREE.Scene(); scene.fog=new THREE.FogExp2(0x0c0c0e,0.03);
 const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,0.1,260); camera.position.set(0,9,20);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); document.getElementById('scene').appendChild(renderer.domElement);
 scene.add(new THREE.AmbientLight(0x40404a,0.55));
 const grid3D=new THREE.GridHelper(100,100,0x2c2c33,0x1a1a1e); grid3D.material.transparent=true; grid3D.material.opacity=0.32; scene.add(grid3D);
-// Rotate camera slowly to create motion without interacting with scroll
 let camAngle=0;
 function animate(){ requestAnimationFrame(animate); camAngle+=0.002; camera.position.x = Math.sin(camAngle)*20; camera.position.z = Math.cos(camAngle)*20; camera.lookAt(0,0,0); renderer.render(scene,camera); }
 animate();
