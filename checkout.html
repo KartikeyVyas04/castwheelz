@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Secure Checkout — CastWheelz</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+  :root{ --asphalt:#0c0c0e; --amber:#ff7a1a; --cyan:#1fe0d0; --bone:#f4efe6; --muted:#807d76; }
+  body{margin:0; background:var(--asphalt); color:var(--bone); font-family:'Archivo',sans-serif;}
+  .grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
+  @keyframes grain{0%{transform:translate(0,0)} 50%{transform:translate(-3%,4%)} 100%{transform:translate(0,0)}}
+  
+  .ui{position:relative;z-index:10;padding:clamp(20px,3vw,42px); max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px;}
+  @media (max-width: 768px) { .ui { grid-template-columns: 1fr; } }
+  
+  .header { grid-column: 1 / -1; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px;}
+  .title { font-family: 'Anton'; font-size: 32px; text-transform: uppercase; letter-spacing: 1px; color: var(--amber); }
+  
+  .panel { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 30px; backdrop-filter: blur(10px); }
+  .panel-title { font-family: 'JetBrains Mono'; font-size: 14px; color: var(--cyan); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px;}
+  
+  .form-group { margin-bottom: 20px; }
+  label { display: block; font-family: 'JetBrains Mono'; font-size: 10px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  input, textarea { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: var(--bone); padding: 12px; font-family: 'Archivo', sans-serif; box-sizing: border-box; transition: 0.3s; }
+  input:focus, textarea:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 10px rgba(255,122,26,0.2); }
+  
+  .summary-item { display: flex; justify-content: space-between; font-family: 'JetBrains Mono'; font-size: 12px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;}
+  .total-row { display: flex; justify-content: space-between; font-family: 'Anton'; font-size: 24px; color: var(--cyan); margin-top: 20px;}
+  
+  .btn-pay { width: 100%; background: var(--cyan); border: none; color: var(--asphalt); font-family: 'JetBrains Mono'; font-size: 14px; font-weight: bold; letter-spacing: 2px; padding: 15px; margin-top: 30px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
+  .btn-pay:hover { box-shadow: 0 0 20px rgba(31,224,208,0.5); background: #fff; }
+  .btn-pay:disabled { background: var(--muted); cursor: not-allowed; box-shadow: none; }
+</style>
+</head>
+<body>
+  <div class="grain"></div>
+  
+  <div class="ui">
+    <div class="header">
+      <div class="title">Encrypted Checkout</div>
+      <a href="cart.html" style="color:var(--muted); font-family:'JetBrains Mono'; text-decoration:none; align-self:flex-end; font-size: 12px;">&lt; MODIFY CARGO</a>
+    </div>
+    
+    <div class="panel">
+      <div class="panel-title">Fulfillment Coordinates</div>
+      
+      <div class="form-group">
+        <label>Transmission Email</label>
+        <input type="email" id="email" readonly style="color: var(--muted);">
+      </div>
+      <div class="form-group">
+        <label>Recipient Full Name</label>
+        <input type="text" id="name" required>
+      </div>
+      <div class="form-group">
+        <label>Contact Number (For Courier)</label>
+        <input type="tel" id="phone" required placeholder="+91">
+      </div>
+      <div class="form-group">
+        <label>Complete Shipping Address</label>
+        <textarea id="address" rows="4" required placeholder="House No, Street, Landmark, City, State, Pincode"></textarea>
+      </div>
+    </div>
+    
+    <div class="panel">
+      <div class="panel-title">Transaction Summary</div>
+      <div id="checkout-items"></div>
+      
+      <div class="total-row">
+        <span>TOTAL</span>
+        <span>₹<span id="checkout-total">0</span></span>
+      </div>
+      
+      <button class="btn-pay" id="pay-btn" onclick="processOrder()">AUTHORIZE PAYMENT</button>
+      <div id="status-msg" style="margin-top:15px; font-family:'JetBrains Mono'; font-size:10px; color:var(--amber); text-align:center;"></div>
+    </div>
+  </div>
+
+  <script src="supabase-config.js"></script>
+  <script>
+      let cart = JSON.parse(localStorage.getItem('castwheelz_cart')) || [];
+      let currentUser = null;
+      let orderTotal = 0;
+
+      async function initCheckout() {
+          currentUser = await checkAuthState();
+          if (!currentUser) {
+              window.location.href = 'login.html';
+              return;
+          }
+          if (cart.length === 0) {
+              window.location.href = 'index.html';
+              return;
+          }
+
+          // Pre-fill user data from Google Auth
+          document.getElementById('email').value = currentUser.email;
+          document.getElementById('name').value = currentUser.user_metadata.full_name || '';
+
+          renderSummary();
+      }
+
+      function renderSummary() {
+          const container = document.getElementById('checkout-items');
+          orderTotal = 0;
+          cart.forEach(item => {
+              orderTotal += item.price;
+              container.innerHTML += `
+                  <div class="summary-item">
+                      <span style="color:var(--bone);">${item.title}</span>
+                      <span style="color:var(--cyan);">₹${item.price.toLocaleString('en-IN')}</span>
+                  </div>`;
+          });
+          document.getElementById('checkout-total').innerText = orderTotal.toLocaleString('en-IN');
+      }
+
+      async function processOrder() {
+          const btn = document.getElementById('pay-btn');
+          const status = document.getElementById('status-msg');
+          const name = document.getElementById('name').value;
+          const phone = document.getElementById('phone').value;
+          const address = document.getElementById('address').value;
+
+          if (!name || !phone || !address) {
+              status.innerText = "ERROR: ALL COORDINATES ARE REQUIRED.";
+              return;
+          }
+
+          btn.disabled = true;
+          btn.innerText = "ESTABLISHING CONNECTION...";
+
+          try {
+              // 1. Create the Pending Order in Supabase
+              const { data: order, error: orderError } = await window.supabaseClient
+                  .from('orders')
+                  .insert([{
+                      user_id: currentUser.id,
+                      customer_name: name,
+                      customer_email: currentUser.email,
+                      customer_phone: phone,
+                      shipping_address: address,
+                      total_amount: orderTotal,
+                      status: 'Pending'
+                  }])
+                  .select()
+                  .single();
+
+              if (orderError) throw orderError;
+
+              // 2. Insert individual items into order_items
+              const orderItemsData = cart.map(item => ({
+                  order_id: order.id,
+                  product_id: item.id,
+                  quantity: 1,
+                  price_at_purchase: item.price
+              }));
+
+              const { error: itemsError } = await window.supabaseClient
+                  .from('order_items')
+                  .insert(orderItemsData);
+
+              if (itemsError) throw itemsError;
+
+              // 3. Trigger Razorpay
+              status.innerText = "CONTACTING PAYMENT GATEWAY...";
+              launchRazorpay(order.id, orderTotal, name, currentUser.email, phone);
+
+          } catch (error) {
+              console.error(error);
+              status.innerText = "SYSTEM FAILURE. TRY AGAIN.";
+              btn.disabled = false;
+              btn.innerText = "AUTHORIZE PAYMENT";
+          }
+      }
+
+      function launchRazorpay(orderId, amount, name, email, phone) {
+          // Razorpay requires amounts in smallest currency sub-unit (paise for INR)
+          var options = {
+              "key": "YOUR_RAZORPAY_TEST_KEY_HERE", // Replace with your test key from Razorpay Dashboard
+              "amount": amount * 100, 
+              "currency": "INR",
+              "name": "CastWheelz",
+              "description": "Die-Cast Asset Acquisition",
+              "theme": { "color": "#ff7a1a" },
+              "prefill": {
+                  "name": name,
+                  "email": email,
+                  "contact": phone
+              },
+              "handler": async function (response) {
+                  // Payment Succeeded! Update Supabase.
+                  await window.supabaseClient
+                      .from('orders')
+                      .update({ 
+                          status: 'Paid', 
+                          razorpay_payment_id: response.razorpay_payment_id 
+                      })
+                      .eq('id', orderId);
+
+                  // Redirect to Success Page
+                  window.location.href = `success.html?order=${orderId}`;
+              }
+          };
+
+          var rzp1 = new Razorpay(options);
+          rzp1.on('payment.failed', function (response){
+              document.getElementById('status-msg').innerText = "TRANSACTION FAILED OR CANCELLED.";
+              document.getElementById('pay-btn').disabled = false;
+              document.getElementById('pay-btn').innerText = "RETRY PAYMENT";
+          });
+          rzp1.open();
+      }
+
+      window.onload = initCheckout;
+  </script>
+</body>
+</html>
