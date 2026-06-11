@@ -1,7 +1,7 @@
 // js/supabase-config.js
 
-const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"; // Replace with your URL
-const SUPABASE_ANON_KEY = "YOUR_ANON_KEY"; // Replace with your Key
+const SUPABASE_URL = "https://aasmoabdareuqlogjsui.supabase.co"; // Replace with your URL
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhc21vYWJkYXJldXFsb2dqc3VpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMzM0MjYsImV4cCI6MjA5NjcwOTQyNn0.rNvYeDCbQCbBNWtWAI7jhxQzH8pdI-M3-kjCEKhcLxs"; // Replace with your Key
 
 window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
