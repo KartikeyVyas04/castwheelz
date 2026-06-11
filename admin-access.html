@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Security Clearance — CastWheelz</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{ --asphalt:#0c0c0e; --amber:#ff7a1a; --cyan:#1fe0d0; --magenta:#ff2e6e; --bone:#f4efe6; --muted:#807d76; }
+  body{margin:0; background:var(--asphalt); color:var(--bone); font-family:'Archivo',sans-serif; min-height: 100vh;}
+  .grain{position:fixed;inset:-50%;z-index:2;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
+  .admin-warning { background: var(--magenta); color: var(--bone); font-family: 'JetBrains Mono'; font-size: 10px; text-align: center; padding: 5px; text-transform: uppercase; letter-spacing: 4px; position: fixed; top: 0; width: 100%; z-index: 1000;}
+  
+  .ui-layer{position:relative;z-index:10;padding:clamp(20px,3vw,42px); padding-top: 100px; max-width: 800px; margin: 0 auto; display: none;}
+  
+  .header { border-bottom: 1px solid rgba(255,122,26,0.3); padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;}
+  .page-title { font-family:'Anton'; font-size:48px; text-transform:uppercase; letter-spacing:2px; color: var(--bone); margin-bottom: 5px;}
+  .sys-text { font-family: 'JetBrains Mono'; font-size: 10px; color: var(--amber); letter-spacing: 4px; text-transform: uppercase; }
+
+  .panel { background: rgba(18, 18, 22, 0.6); border: 1px solid rgba(255,122,26,0.3); padding: 30px; margin-bottom: 30px; backdrop-filter: blur(20px); border-radius: 4px;}
+  
+  .input-group { display: flex; gap: 15px;}
+  input { flex-grow: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: var(--bone); padding: 15px; font-family: 'JetBrains Mono', monospace; font-size: 12px; transition: 0.3s; border-radius: 2px;}
+  input:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 15px rgba(255,122,26,0.2); }
+  .btn-add { background: var(--amber); border: none; color: var(--asphalt); font-family: 'JetBrains Mono'; font-size: 12px; font-weight: bold; letter-spacing: 2px; padding: 0 30px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
+  .btn-add:hover { box-shadow: 0 0 20px rgba(255,122,26,0.5); background: #fff; }
+
+  .admin-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px 0;}
+  .admin-email { font-family: 'JetBrains Mono'; font-size: 14px; color: var(--cyan); }
+  .btn-revoke { background: transparent; border: 1px solid var(--magenta); color: var(--magenta); font-family: 'JetBrains Mono'; font-size: 10px; padding: 8px 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
+  .btn-revoke:hover { background: var(--magenta); color: var(--bone); }
+</style>
+</head>
+<body>
+  <div class="admin-warning">RESTRICTED ACCESS // COMMAND OVERRIDE ACTIVE</div>
+  <div class="grain"></div>
+  <div id="global-nav" style="position:relative; z-index:20; margin-top: 20px;"></div>
+  
+  <div class="ui-layer" id="auth-layer">
+    <div class="header">
+      <div>
+        <div class="page-title">Security Clearance</div>
+        <div class="sys-text">Manage Authorized Operatives</div>
+      </div>
+      <a href="admin-dashboard.html" style="color:var(--muted); font-family:'JetBrains Mono'; text-decoration:none; font-size: 11px;">&lt; COMMAND CENTER</a>
+    </div>
+
+    <div class="panel">
+        <div style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted); margin-bottom: 15px;">GRANT NEW ACCESS (GMAIL ONLY):</div>
+        <div class="input-group">
+            <input type="email" id="new-admin-email" placeholder="operative@gmail.com">
+            <button class="btn-add" onclick="grantAdminAccess()">AUTHORIZE</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted); margin-bottom: 20px;">ACTIVE OPERATIVES:</div>
+        <div id="admin-list"></div>
+    </div>
+  </div>
+
+<script src="supabase-config.js"></script>
+<script>
+    let activeUser = null;
+
+    async function verifyAdminAccess() {
+        activeUser = await checkAuthState();
+        if (!activeUser) { window.location.href = 'login.html'; return; }
+
+        if (activeUser.email === 'shivam69332@gmail.com') {
+            document.getElementById('auth-layer').style.display = 'block';
+            fetchAdmins();
+            return;
+        }
+
+        const { data, error } = await window.supabaseClient.from('admin_users').select('email').eq('email', activeUser.email).single();
+        if (error || !data) { window.location.href = 'index.html'; } 
+        else {
+            document.getElementById('auth-layer').style.display = 'block';
+            fetchAdmins();
+        }
+    }
+
+    async function fetchAdmins() {
+        const { data: admins, error } = await window.supabaseClient.from('admin_users').select('*').order('created_at', { ascending: true });
+        const list = document.getElementById('admin-list');
+        list.innerHTML = "";
+        
+        admins.forEach(admin => {
+            const isMaster = admin.email === 'shivam69332@gmail.com';
+            list.innerHTML += `
+                <div class="admin-row">
+                    <div class="admin-email">${admin.email} <span style="color:var(--muted); font-size:10px; margin-left:10px;">[${admin.granted_by}]</span></div>
+                    ${isMaster ? 
+                        '<span style="color:var(--amber); font-family:JetBrains Mono; font-size:10px;">MASTER</span>' : 
+                        `<button class="btn-revoke" onclick="revokeAccess('${admin.email}')">REVOKE</button>`
+                    }
+                </div>
+            `;
+        });
+    }
+
+    async function grantAdminAccess() {
+        const email = document.getElementById('new-admin-email').value.trim();
+        if (!email) return;
+
+        const { error } = await window.supabaseClient.from('admin_users').insert([{ email: email, granted_by: activeUser.email }]);
+        if (error) { alert("ERROR: Operative might already exist."); } 
+        else {
+            document.getElementById('new-admin-email').value = '';
+            fetchAdmins();
+        }
+    }
+
+    async function revokeAccess(email) {
+        if(confirm(`REVOKE CLEARANCE FOR ${email}?`)) {
+            await window.supabaseClient.from('admin_users').delete().eq('email', email);
+            fetchAdmins();
+        }
+    }
+
+    window.onload = verifyAdminAccess;
+</script>
+</body>
+</html>
