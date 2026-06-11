@@ -4,8 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CastWheelz — The Collection</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -13,13 +11,12 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{width:100%;background:var(--asphalt);font-family:'Archivo',sans-serif;color:var(--bone);overflow-x:hidden;}
   
-  /* Fixed Background Elements */
   #scene{position:fixed;inset:0;z-index:1;pointer-events:none;}
   .atmo{position:fixed;inset:0;z-index:2;pointer-events:none; background: radial-gradient(120% 90% at 50% -10%, rgba(255,122,26,.16), transparent 55%), radial-gradient(90% 70% at 85% 110%, rgba(31,224,208,.12), transparent 60%), radial-gradient(140% 120% at 50% 50%, transparent 42%, rgba(0,0,0,.78) 100%); mix-blend-mode:screen;}
   .vignette{position:fixed;inset:0;z-index:3;pointer-events:none; box-shadow: inset 0 0 220px 60px rgba(0,0,0,.85);}
   .grain{position:fixed;inset:-50%;z-index:4;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
   
-  /* Global Navbar CSS (Applied to injected HTML) */
+  /* Global Nav CSS */
   .topbar{display:flex;justify-content:space-between;align-items:flex-start; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;}
   .brand{display:flex;align-items:center;gap:12px; text-decoration: none; color: inherit;}
   .mark{width:34px;height:34px;border:2px solid var(--amber);border-radius:50%; display:grid;place-items:center;position:relative;box-shadow:0 0 18px rgba(255,122,26,.45);}
@@ -27,143 +24,62 @@
   .brand b{font-family:'Anton';letter-spacing:2px;font-size:18px;text-transform:uppercase;}
   .brand span{font-family:'JetBrains Mono';font-size:9px;color:var(--muted);letter-spacing:3px;display:block;}
   .nav-group { display: flex; align-items: center; gap: 20px;}
-  .nav-link { font-family:'JetBrains Mono'; font-size:11px; color:var(--muted); text-decoration:none; transition: 0.3s; }
+  .nav-link { font-family:'JetBrains Mono'; font-size:11px; color:var(--muted); text-decoration:none; transition: 0.3s; letter-spacing: 2px;}
   .nav-link:hover { color: var(--bone); }
   .cart-link { color:var(--cyan); border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; }
 
-  /* Main UI & Grid */
   .ui{position:relative;z-index:10;display:flex;flex-direction:column;padding:clamp(20px,3vw,42px);min-height:100vh;}
   .hero-title { font-family:'Anton'; font-size:clamp(40px,8vw,80px); text-transform:uppercase; letter-spacing:1px; background:linear-gradient(180deg,#fff 0%,#cfc9bd 55%,#8d8678 100%); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom: 30px; text-align: center; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; width: 100%;}
-  .card { background: rgba(12, 12, 14, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; text-align: center; backdrop-filter: blur(10px); transition: all 0.3s ease; }
+  .card { background: rgba(12, 12, 14, 0.6); border: 1px solid rgba(255,255,255,0.05); padding: 20px; text-align: center; backdrop-filter: blur(10px); transition: 0.3s ease; cursor: pointer;}
   .card:hover { border-color: var(--amber); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,122,26,0.15); }
   .card img { max-width: 100%; height: 200px; object-fit: cover; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;}
   .title { font-family: 'JetBrains Mono'; font-size: 14px; margin-bottom: 10px; color: var(--bone); text-transform: uppercase; letter-spacing: 1px;}
   .price { font-family: 'Anton'; font-size: 24px; color: var(--cyan); letter-spacing: 1px;}
-  .btn-acquire { width: 100%; background: transparent; border: 1px solid var(--amber); color: var(--amber); font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: 3px; padding: 12px; margin-top: 20px; cursor: pointer; text-transform: uppercase; transition: all 0.3s; }
-  .btn-acquire:hover { background: var(--amber); color: var(--asphalt); box-shadow: 0 0 15px rgba(255,122,26,0.4); }
-
-  /* LOADER */
+  
   #loader{position:fixed;inset:0;z-index:50;background:var(--asphalt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;transition:opacity .8s ease, visibility .8s;}
   #loader.hidden{opacity:0;visibility:hidden;}
-  .stage{position:relative;width:260px;height:170px;display:grid;place-items:center;}
-  .tire{width:130px;height:130px;position:relative;animation:spin .9s linear infinite;z-index:2;}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .tire .outer{position:absolute;inset:0;border-radius:50%; background:repeating-conic-gradient(from 0deg, #0a0a0b 0deg 7deg, #18181b 7deg 14deg); box-shadow:0 0 0 3px #050506, inset 0 0 26px rgba(0,0,0,.9), 0 14px 40px rgba(0,0,0,.6);}
-  .tire .rim{position:absolute;inset:24px;border-radius:50%; background:radial-gradient(circle at 38% 32%, #565660, #1d1d22 70%); box-shadow:inset 0 0 14px rgba(0,0,0,.8), 0 0 0 3px #2a2a30;}
-  .tire .spokes{position:absolute;inset:24px;border-radius:50%;}
-  .tire .spokes i{position:absolute;top:50%;left:50%;width:6px;height:34px;margin:-34px 0 0 -3px; background:linear-gradient(180deg,var(--amber),#7a3500);transform-origin:bottom center;border-radius:3px; box-shadow:0 0 8px rgba(255,122,26,.5);}
-  .tire .hub{position:absolute;top:50%;left:50%;width:26px;height:26px;margin:-13px;border-radius:50%; background:radial-gradient(circle at 40% 35%,var(--amber-soft),#9c4400); box-shadow:0 0 14px rgba(255,122,26,.7), inset 0 -3px 6px rgba(0,0,0,.4);}
-  .smoke{position:absolute;bottom:24px;left:50%;width:46px;height:46px;border-radius:50%; background:radial-gradient(circle, rgba(220,220,225,.55), rgba(220,220,225,0) 70%); filter:blur(3px);opacity:0;z-index:1;}
-  .smoke.s1{animation:puff 1.9s linear infinite;} .smoke.s2{animation:puff 1.9s linear .5s infinite;} .smoke.s3{animation:puff 1.9s linear 1s infinite;} .smoke.s4{animation:puff 1.9s linear 1.4s infinite;}
-  @keyframes puff{ 0%{transform:translate(-50%,0) scale(.4);opacity:0;} 15%{opacity:.7;} 100%{transform:translate(calc(-50% + var(--dx,60px)), -70px) scale(2.1);opacity:0;} }
-  .mark-line{position:absolute;bottom:20px;left:50%;transform:translateX(-50%); width:150px;height:8px;border-radius:4px; background:linear-gradient(90deg,transparent,rgba(0,0,0,.85),transparent);filter:blur(1px);z-index:0;}
-  .loadtxt{font-family:'JetBrains Mono';letter-spacing:5px;font-size:11px;color:var(--muted);text-transform:uppercase;} .loadtxt b{color:var(--amber);}
-  .bar{width:200px;height:3px;background:#1d1d20;border-radius:3px;overflow:hidden;}
-  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--cyan)); box-shadow:0 0 12px var(--amber);animation:fill 2.6s ease forwards;}
-  @keyframes fill{to{width:100%}}
 </style>
 </head>
 <body>
-
-  <div id="loader">
-    <div class="stage">
-      <div class="mark-line"></div>
-      <div class="smoke s1" style="--dx:-70px"></div>
-      <div class="smoke s2" style="--dx:70px"></div>
-      <div class="smoke s3" style="--dx:-30px"></div>
-      <div class="smoke s4" style="--dx:45px"></div>
-      <div class="tire"><div class="outer"></div><div class="rim"></div><div class="spokes" id="spokes"></div><div class="hub"></div></div>
-    </div>
-    <div class="loadtxt">IGNITING ENGINE <b id="pct">0%</b></div>
-    <div class="bar"><i></i></div>
-  </div>
+  <div id="loader"><h1 style="font-family:'Anton'; color:var(--amber); letter-spacing:4px;">IGNITING ENGINE...</h1></div>
 
   <div id="scene"></div>
   <div class="atmo"></div><div class="vignette"></div><div class="grain"></div>
 
   <div class="ui">
-    
     <div id="global-nav"></div>
-
     <h1 class="hero-title">The Collection</h1>
-    <div id="product-grid" class="grid">
-        <p style="font-family: 'JetBrains Mono'; text-align: center; width: 100%; color: var(--muted);">Synchronizing telemetry...</p>
-    </div>
+    <div id="product-grid" class="grid"><p style="font-family:'JetBrains Mono';text-align:center;width:100%;">Synchronizing...</p></div>
   </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="supabase-config.js"></script>
 <script>
-/* Loader Logic */
-(function(){ const wrap=document.getElementById('spokes'); for(let i=0;i<8;i++){const s=document.createElement('i');s.style.transform='rotate('+(i*45)+'deg)';wrap.appendChild(s);} let p=0;const pct=document.getElementById('pct'); const t=setInterval(()=>{p=Math.min(100,p+Math.random()*8);pct.textContent=Math.round(p)+'%';if(p>=100)clearInterval(t);},120); })();
-window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('loader').classList.add('hidden'),2600);});
+window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('loader').classList.add('hidden'),1500);});
 
-/* E-Commerce Logic */
-let globalCatalog = [];
 async function loadStorefront() {
     await checkAuthState();
-    updateCartCount();
-
     const { data: products, error } = await window.supabaseClient.from('products').select('*').eq('is_bestseller', true);
     const grid = document.getElementById('product-grid');
-
-    if (error || products.length === 0) {
-        grid.innerHTML = "<p style='text-align:center; width:100%; font-family:JetBrains Mono;'>NO ASSETS DETECTED IN DATABASE.</p>";
-        return;
-    }
-    globalCatalog = products;
+    if (error || products.length === 0) { grid.innerHTML = "<p>NO ASSETS.</p>"; return; }
     grid.innerHTML = "";
-
-    products.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <img src="${product.image_url || 'https://via.placeholder.com/400x300/111/ff7a1a?text=DIE-CAST'}" alt="${product.title}">
-            <div class="title">${product.title}</div>
-            <div class="price">₹${product.price.toLocaleString('en-IN')}</div>
-            <button class="btn-acquire" onclick="addToCart(${product.id})">ACQUIRE ASSET</button>
-        `;
+    products.forEach(p => {
+        const card = document.createElement('div'); card.className = 'card';
+        card.onclick = () => window.location.href = `product.html?id=${p.id}`;
+        card.innerHTML = `<img src="${p.image_url}" alt="${p.title}"><div class="title">${p.title}</div><div class="price">₹${p.price.toLocaleString('en-IN')}</div>`;
         grid.appendChild(card);
     });
 }
-
-function addToCart(productId) {
-    window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
-        if (!session) { window.location.href = 'login.html'; return; }
-        const product = globalCatalog.find(p => p.id === productId);
-        let cart = JSON.parse(localStorage.getItem('castwheelz_cart')) || [];
-        cart.push(product);
-        localStorage.setItem('castwheelz_cart', JSON.stringify(cart));
-        updateCartCount();
-        
-        const btn = event.target;
-        btn.innerText = "SECURED";
-        btn.style.background = "var(--cyan)";
-        btn.style.borderColor = "var(--cyan)";
-        btn.style.color = "var(--asphalt)";
-        setTimeout(() => { btn.innerText = "ACQUIRE ASSET"; btn.style.background = "transparent"; btn.style.color = "var(--amber)"; btn.style.borderColor = "var(--amber)"; }, 2000);
-    });
-}
-
-function updateCartCount() {
-    let cart = JSON.parse(localStorage.getItem('castwheelz_cart')) || [];
-    const countElement = document.getElementById('cart-count');
-    if(countElement) countElement.innerText = cart.length;
-}
-
 window.onload = loadStorefront;
 
 /* THREE.JS BACKGROUND SCENE */
 const scene=new THREE.Scene(); scene.fog=new THREE.FogExp2(0x0c0c0e,0.03);
 const camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,0.1,260); camera.position.set(0,9,20);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); document.getElementById('scene').appendChild(renderer.domElement);
-scene.add(new THREE.AmbientLight(0x40404a,0.55));
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setSize(innerWidth,innerHeight); document.getElementById('scene').appendChild(renderer.domElement);
 const grid3D=new THREE.GridHelper(100,100,0x2c2c33,0x1a1a1e); grid3D.material.transparent=true; grid3D.material.opacity=0.32; scene.add(grid3D);
-let camAngle=0;
-function animate(){ requestAnimationFrame(animate); camAngle+=0.002; camera.position.x = Math.sin(camAngle)*20; camera.position.z = Math.cos(camAngle)*20; camera.lookAt(0,0,0); renderer.render(scene,camera); }
+let camAngle=0; function animate(){ requestAnimationFrame(animate); camAngle+=0.002; camera.position.x = Math.sin(camAngle)*20; camera.position.z = Math.cos(camAngle)*20; camera.lookAt(0,0,0); renderer.render(scene,camera); }
 animate();
-addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
 </script>
 </body>
 </html>
