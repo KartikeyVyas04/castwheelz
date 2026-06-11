@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CastWheelz | Premium Collection</title>
+    <style>
+        body { font-family: 'Georgia', serif; margin: 0; background-color: #1a1a1a; color: #fcfbf8; }
+        header { background: #111; padding: 1.5rem 3rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d4af37; }
+        h1 { margin: 0; color: #d4af37; font-weight: normal; letter-spacing: 3px; text-transform: uppercase; font-size: 1.8rem; }
+        .nav-links { display: flex; gap: 30px; align-items: center; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; }
+        .nav-links a { color: #fcfbf8; text-decoration: none; transition: color 0.3s; }
+        .nav-links a:hover { color: #d4af37; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
+        .section-title { border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 30px; color: #d4af37; text-transform: uppercase; letter-spacing: 2px; font-size: 1.2rem; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px; }
+        .card { background: #222; border: 1px solid #333; padding: 20px; text-align: center; transition: all 0.4s ease; }
+        .card:hover { border-color: #d4af37; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .card img { max-width: 100%; height: 250px; object-fit: cover; margin-bottom: 15px; }
+        .title { font-size: 1.3rem; margin: 0 0 10px; font-weight: normal; }
+        .price { font-family: -apple-system, BlinkMacSystemFont, sans-serif; color: #d4af37; font-weight: 600; font-size: 1.1rem; }
+        
+        button { background: transparent; border: 1px solid #d4af37; color: #d4af37; padding: 12px 20px; width: 100%; margin-top: 20px; cursor: pointer; text-transform: uppercase; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 0.8rem; letter-spacing: 1.5px; transition: all 0.3s; }
+        button:hover { background: #d4af37; color: #111; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <header>
+        <h1>CastWheelz</h1>
+        <div class="nav-links">
+            <span id="auth-link">Loading...</span>
+            <a href="cart.html" style="border-left: 1px solid #444; padding-left: 30px;">Cart (0)</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="section-title">The Collection</div>
+        <div id="product-grid" class="grid">
+            <p style="font-family: sans-serif; color: #888;">Synchronizing catalog...</p>
+        </div>
+    </div>
+
+    <script src="js/supabase-config.js"></script>
+    <script>
+        async function loadStorefront() {
+            const user = await checkAuthState();
+
+            const { data: products, error } = await window.supabaseClient
+                .from('products')
+                .select('*')
+                .eq('is_bestseller', true);
+
+            const grid = document.getElementById('product-grid');
+
+            if (error) {
+                grid.innerHTML = "<p>System error. Unable to load the collection.</p>";
+                return;
+            }
+
+            if (products.length === 0) {
+                grid.innerHTML = "<p>The collection is currently being curated. Add items in your Supabase dashboard.</p>";
+                return;
+            }
+
+            grid.innerHTML = "";
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${product.image_url || 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&q=80&w=400'}" alt="${product.title}">
+                    <h3 class="title">${product.title}</h3>
+                    <p class="price">₹${product.price.toLocaleString('en-IN')}</p>
+                    <button onclick="addToCart(${product.id})">Acquire</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function addToCart(productId) {
+            window.supabaseClient.auth.getSession().then(({ data: { session } }) => {
+                if (!session) {
+                    window.location.href = 'login.html';
+                } else {
+                    alert("Item secured in your cart.");
+                }
+            });
+        }
+
+        window.onload = loadStorefront;
+    </script>
+</body>
+</html>
