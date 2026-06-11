@@ -2,60 +2,109 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The Arsenal — CastWheelz</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{ --asphalt:#0c0c0e; --amber:#ff7a1a; --cyan:#1fe0d0; --bone:#f4efe6; --muted:#807d76; }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--asphalt);color:var(--bone);font-family:'Archivo',sans-serif;}
-  .grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
+  body{margin:0; background:var(--asphalt); color:var(--bone); font-family:'Archivo',sans-serif; min-height: 100vh;}
   
-  /* Global Nav CSS */
-  .topbar{display:flex;justify-content:space-between;align-items:flex-start; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;}
-  .brand{display:flex;align-items:center;gap:12px; text-decoration: none; color: inherit;}
-  .mark{width:34px;height:34px;border:2px solid var(--amber);border-radius:50%; display:grid;place-items:center;position:relative;box-shadow:0 0 18px rgba(255,122,26,.45);}
-  .mark::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--amber);}
-  .brand b{font-family:'Anton';letter-spacing:2px;font-size:18px;text-transform:uppercase;}
-  .brand span{font-family:'JetBrains Mono';font-size:9px;color:var(--muted);letter-spacing:3px;display:block;}
-  .nav-group { display: flex; align-items: center; gap: 20px;}
-  .nav-link { font-family:'JetBrains Mono'; font-size:11px; color:var(--muted); text-decoration:none; transition: 0.3s; letter-spacing: 2px;}
-  .nav-link:hover { color: var(--bone); }
-  .cart-link { color:var(--cyan); border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; }
+  .atmo{position:fixed;inset:0;z-index:1;pointer-events:none; background: radial-gradient(120% 90% at 50% -10%, rgba(255,122,26,.08), transparent 55%), radial-gradient(140% 120% at 50% 50%, transparent 42%, rgba(0,0,0,.9) 100%);}
+  .grain{position:fixed;inset:-50%;z-index:2;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
+  
+  .ui-layer{position:relative;z-index:10;padding:clamp(20px,3vw,42px); padding-top: 120px; max-width: 1400px; margin: 0 auto;}
+  
+  .page-header { text-align: center; margin-bottom: 60px; animation: fadeUp 1s ease-out forwards; opacity: 0; transform: translateY(20px);}
+  .page-title { font-family:'Anton'; font-size:clamp(40px, 6vw, 80px); text-transform:uppercase; letter-spacing:2px; color: var(--bone); line-height: 1; margin-bottom: 10px;}
+  .sys-text { font-family: 'JetBrains Mono'; font-size: 12px; color: var(--cyan); letter-spacing: 4px; text-transform: uppercase; }
 
-  .ui{position:relative;z-index:10;padding:clamp(20px,3vw,42px); max-width: 1200px; margin: 0 auto;}
-  .page-title { font-family:'Anton'; font-size:40px; text-transform:uppercase; letter-spacing:1px; color: var(--bone); margin-bottom: 30px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; }
   
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-  .card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 20px; text-align: center; backdrop-filter: blur(10px); transition: 0.3s; cursor: pointer;}
-  .card:hover { border-color: var(--cyan); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(31,224,208,0.1); }
-  .card img { max-width: 100%; height: 200px; object-fit: cover; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;}
-  .title { font-family: 'JetBrains Mono'; font-size: 14px; margin-bottom: 10px; color: var(--bone); text-transform: uppercase;}
-  .price { font-family: 'Anton'; font-size: 24px; color: var(--amber); letter-spacing: 1px;}
+  /* 3D Tilt Cards */
+  .card-wrapper { perspective: 1000px; opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+  .card-wrapper.visible { opacity: 1; transform: translateY(0); }
+  .card { background: rgba(18, 18, 22, 0.4); border: 1px solid rgba(255,255,255,0.03); padding: 25px; text-align: center; backdrop-filter: blur(20px); transform-style: preserve-3d; transition: border-color 0.4s; cursor: pointer; border-radius: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);}
+  .card:hover { border-color: rgba(31,224,208,0.3); }
+  .card-image-wrap { transform: translateZ(40px); margin-bottom: 25px; }
+  .card img { max-width: 100%; height: 220px; object-fit: contain; filter: drop-shadow(0 20px 20px rgba(0,0,0,0.7)); transition: transform 0.4s; }
+  .card:hover img { transform: scale(1.05); }
+  
+  .card-info { transform: translateZ(30px); }
+  .title { font-family: 'JetBrains Mono'; font-size: 15px; margin-bottom: 10px; color: var(--bone); text-transform: uppercase; letter-spacing: 1px;}
+  .price { font-family: 'Anton'; font-size: 28px; color: var(--amber); letter-spacing: 1px;}
+  
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
-  <div class="grain"></div>
-  <div class="ui">
-    <div id="global-nav"></div>
-    <div class="page-title">Full Arsenal</div>
-    <div id="product-grid" class="grid"><p style="font-family: 'JetBrains Mono'; color: var(--muted);">Scanning database...</p></div>
+  <div class="atmo"></div><div class="grain"></div>
+  <div id="global-nav" style="position:relative; z-index:20;"></div>
+  
+  <div class="ui-layer">
+    <div class="page-header">
+      <div class="page-title">Full Arsenal</div>
+      <div class="sys-text">All Verified Acquisitions</div>
+    </div>
+    
+    <div id="product-grid" class="grid">
+        <p style="font-family: 'JetBrains Mono'; color: var(--muted); text-align:center; width:100%; grid-column:1/-1;">Scanning database...</p>
+    </div>
   </div>
+
 <script src="supabase-config.js"></script>
 <script>
     async function loadCatalog() {
         await checkAuthState();
         const { data: products, error } = await window.supabaseClient.from('products').select('*');
         const grid = document.getElementById('product-grid');
-        if (error || products.length === 0) return;
+
+        if (error || products.length === 0) {
+            grid.innerHTML = "<p style='font-family:JetBrains Mono; text-align:center;'>NO ASSETS FOUND.</p>";
+            return;
+        }
+
         grid.innerHTML = "";
-        products.forEach(p => {
-            const card = document.createElement('div'); card.className = 'card';
-            card.onclick = () => window.location.href = `product.html?id=${p.id}`;
-            card.innerHTML = `<img src="${p.image_url}" alt="${p.title}"><div class="title">${p.title}</div><div class="price">₹${p.price.toLocaleString('en-IN')}</div>`;
-            grid.appendChild(card);
+        products.forEach((p, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'card-wrapper';
+            wrapper.style.transitionDelay = `${index * 0.05}s`; // Staggered entrance
+            wrapper.innerHTML = `
+                <div class="card" onclick="window.location.href='product.html?id=${p.id}'">
+                    <div class="card-image-wrap"><img src="${p.image_url}" alt="${p.title}"></div>
+                    <div class="card-info">
+                        <div class="title">${p.title}</div>
+                        <div class="price">₹${p.price.toLocaleString('en-IN')}</div>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(wrapper);
+            
+            // Trigger entrance animation
+            setTimeout(() => wrapper.classList.add('visible'), 100);
+        });
+
+        initCardTilt();
+    }
+
+    function initCardTilt() {
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                const centerX = rect.width / 2; const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -15; 
+                const rotateY = ((x - centerX) / centerX) * 15;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+                card.style.transition = "transform 0.5s ease-out";
+            });
+            card.addEventListener('mouseenter', () => { card.style.transition = "none"; });
         });
     }
+
     window.onload = loadCatalog;
 </script>
 </body>
