@@ -8,35 +8,35 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{ --asphalt:#0c0c0e; --amber:#ff7a1a; --cyan:#1fe0d0; --bone:#f4efe6; --muted:#807d76; }
-  body{margin:0; background:var(--asphalt); color:var(--bone); font-family:'Archivo',sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; flex-direction: column;}
-  .grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
-  @keyframes grain{0%{transform:translate(0,0)} 50%{transform:translate(-3%,4%)} 100%{transform:translate(0,0)}}
+  body{margin:0; background:var(--asphalt); color:var(--bone); font-family:'Archivo',sans-serif; min-height: 100vh; display: flex; flex-direction: column;}
   
-  .success-panel { position:relative; z-index:10; background: rgba(12,12,14,0.8); border: 1px solid rgba(31,224,208,0.4); padding: 60px 40px; text-align: center; box-shadow: 0 0 50px rgba(31,224,208,0.1); max-width: 500px; backdrop-filter: blur(10px); }
-  h1 { font-family: 'Anton'; font-size: 40px; letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; margin-bottom: 10px; line-height: 1.1;}
+  .atmo{position:fixed;inset:0;z-index:1;pointer-events:none; background: radial-gradient(120% 90% at 50% -10%, rgba(31,224,208,.12), transparent 55%), radial-gradient(140% 120% at 50% 50%, transparent 42%, rgba(0,0,0,.85) 100%);}
+  .grain{position:fixed;inset:-50%;z-index:2;pointer-events:none;opacity:.06; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation:grain 6s steps(6) infinite;}
+  
+  .ui-layer { position: relative; z-index: 10; flex-grow: 1; display: flex; justify-content: center; align-items: center; padding-top: 80px;}
+
+  .success-panel { background: rgba(18, 18, 22, 0.6); border: 1px solid rgba(31,224,208,0.4); padding: 60px 40px; text-align: center; box-shadow: 0 0 60px rgba(31,224,208,0.15); max-width: 500px; backdrop-filter: blur(20px); border-radius: 4px;}
+  h1 { font-family: 'Anton'; font-size: 46px; letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; margin-bottom: 15px; line-height: 1.1;}
   
   .sys-text { font-family: 'JetBrains Mono'; font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; line-height: 1.6;}
-  .order-id { font-family: 'Anton'; font-size: 24px; color: var(--bone); background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 4px; display: inline-block; margin-bottom: 40px; border: 1px dashed rgba(255,255,255,0.2);}
+  .order-id { font-family: 'Anton'; font-size: 28px; color: var(--bone); background: rgba(0,0,0,0.5); padding: 15px 30px; border-radius: 4px; display: inline-block; margin-bottom: 40px; border: 1px dashed rgba(255,255,255,0.2);}
   
-  .btn-home { background: transparent; border: 1px solid var(--amber); color: var(--amber); padding: 15px 30px; font-family: 'JetBrains Mono'; font-size: 12px; letter-spacing: 2px; cursor: pointer; text-transform: uppercase; transition: all 0.3s; text-decoration: none; display: inline-block;}
-  .btn-home:hover { background: var(--amber); color: var(--asphalt); }
+  .btn-home { background: transparent; border: 1px solid var(--amber); color: var(--amber); padding: 18px 40px; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: bold; letter-spacing: 3px; cursor: pointer; text-transform: uppercase; transition: all 0.3s; text-decoration: none; display: inline-block;}
+  .btn-home:hover { background: var(--amber); color: var(--asphalt); box-shadow: 0 0 20px rgba(255,122,26,0.3); }
 </style>
 </head>
 <body>
-  <div class="grain"></div>
+  <div class="atmo"></div><div class="grain"></div>
+  <div id="global-nav" style="position:relative; z-index:20;"></div>
   
-  <div class="success-panel">
-    <h1>TRANSACTION<br>VERIFIED</h1>
-    <div class="sys-text">
-      FUNDS SECURED. LOGISTICS INITIATED.<br>
-      A TRANSMISSION HAS BEEN SENT TO YOUR EMAIL.
-    </div>
-    
-    <div class="sys-text" style="margin-bottom: 10px;">AUTHORIZATION CODE:</div>
-    <div class="order-id" id="display-order-id">PENDING...</div>
-    <br>
-    
-    <a href="index.html" class="btn-home">RETURN TO BASE</a>
+  <div class="ui-layer">
+      <div class="success-panel">
+        <h1>TRANSACTION<br>VERIFIED</h1>
+        <div class="sys-text">FUNDS SECURED. LOGISTICS INITIATED.<br>A TRANSMISSION HAS BEEN SENT TO YOUR EMAIL.</div>
+        <div class="sys-text" style="margin-bottom: 10px; color: var(--bone);">AUTHORIZATION CODE:</div>
+        <div class="order-id" id="display-order-id">PENDING...</div><br>
+        <a href="index.html" class="btn-home">RETURN TO BASE</a>
+      </div>
   </div>
 
   <script src="supabase-config.js"></script>
@@ -44,7 +44,6 @@
       async function completeSequence() {
           await checkAuthState();
           
-          // 1. Get the Order ID from the URL (e.g., success.html?order=14)
           const urlParams = new URLSearchParams(window.location.search);
           const orderId = urlParams.get('order');
           
@@ -54,10 +53,9 @@
               document.getElementById('display-order-id').innerText = "CWZ-UNKNOWN";
           }
 
-          // 2. Wipe the local cart memory now that they have bought the items
           localStorage.removeItem('castwheelz_cart');
+          updateCartCount();
       }
-
       window.onload = completeSequence;
   </script>
 </body>
