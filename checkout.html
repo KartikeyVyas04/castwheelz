@@ -98,47 +98,37 @@
 
           if (!name || !phone || !address) { status.innerText = "ERROR: ALL COORDINATES ARE REQUIRED."; status.style.color = "var(--magenta)"; return; }
 
-          btn.disabled = true; btn.innerText = "ESTABLISHING CONNECTION...";
+          btn.disabled = true; 
+          btn.innerText = "ESTABLISHING CONNECTION...";
           status.innerText = "";
 
           try {
-              // 1. Create the Order
+              // 1. Create the Pending Order in Supabase
               const orderPayload = { 
-                  user_id: currentUser.id, 
-                  customer_name: name, 
-                  customer_email: currentUser.email, 
-                  customer_phone: phone, 
-                  shipping_address: address, 
-                  total_amount: orderTotal, 
-                  status: 'Pending' 
+                  user_id: currentUser.id, customer_name: name, customer_email: currentUser.email, 
+                  customer_phone: phone, shipping_address: address, total_amount: orderTotal, status: 'Pending' 
               };
               
-              console.log("Creating Order:", orderPayload);
-              
-              const { data: order, error: orderError } = await window.supabaseClient
-                  .from('orders')
-                  .insert([orderPayload])
-                  .select().single();
-
+              const { data: order, error: orderError } = await window.supabaseClient.from('orders').insert([orderPayload]).select().single();
               if (orderError) throw new Error("Order Creation Failed: " + orderError.message);
 
               // 2. Insert the Order Items
-              const orderItemsData = cart.map(item => ({ 
-                  order_id: order.id, 
-                  product_id: item.id, 
-                  quantity: 1, 
-                  price_at_purchase: item.price 
-              }));
-              
-              console.log("Inserting Items:", orderItemsData);
-
+              const orderItemsData = cart.map(item => ({ order_id: order.id, product_id: item.id, quantity: 1, price_at_purchase: item.price }));
               const { error: itemsError } = await window.supabaseClient.from('order_items').insert(orderItemsData);
               if (itemsError) throw new Error("Item Insertion Failed: " + itemsError.message);
 
-              // 3. Trigger Razorpay
-              status.innerText = "CONTACTING PAYMENT GATEWAY...";
+              // 3. SECURE CALL: Ask Edge Function to generate the Razorpay Order ID
+              status.innerText = "GENERATING SECURE INVOICE...";
               status.style.color = "var(--cyan)";
-              launchRazorpay(order.id, orderTotal, name, currentUser.email, phone);
+
+              const { data: rpData, error: rpError } = await window.supabaseClient.functions.invoke('razorpay-checkout', {
+                  body: { amount: orderTotal * 100, receipt: order.id.toString() }
+              });
+
+              if (rpError || rpData.error) throw new Error("Secure Invoice Failed: " + (rpError?.message || rpData.error));
+
+              // 4. Trigger Razorpay using the Secure Order ID
+              launchRazorpay(order.id, rpData.id, orderTotal, name, currentUser.email, phone);
               
           } catch (error) {
               console.error("FULL CHECKOUT ERROR:", error); 
@@ -149,22 +139,28 @@
           }
       }
 
-      function launchRazorpay(orderId, amount, name, email, phone) {
-          // Live Razorpay Key Injected
-          const RAZORPAY_KEY = "rzp_live_SskOYlu2pHt0Qp";
+      function launchRazorpay(supabaseOrderId, razorpayOrderId, amount, name, email, phone) {
+          // Public Key ID - Safe to leave in frontend
+          const RAZORPAY_KEY_ID = "rzp_live_SskOYlu2pHt0Qp";
           
           var options = {
-              "key": RAZORPAY_KEY, 
-              "amount": amount * 100, // Razorpay accepts amounts in paise
+              "key": RAZORPAY_KEY_ID, 
+              "amount": amount * 100, 
               "currency": "INR", 
               "name": "CastWheelz", 
               "description": "Die-Cast Asset Acquisition",
+              "order_id": razorpayOrderId, // The secure ID from the Edge Function
               "theme": { "color": "#1fe0d0" },
               "prefill": { "name": name, "email": email, "contact": phone },
               "handler": async function (response) {
-                  // This runs after a successful payment
-                  await window.supabaseClient.from('orders').update({ status: 'Paid', razorpay_payment_id: response.razorpay_payment_id }).eq('id', orderId);
-                  window.location.href = `success.html?order=${orderId}`;
+                  // After successful payment, update database
+                  await window.supabaseClient.from('orders').update({ 
+                      status: 'Paid', 
+                      razorpay_payment_id: response.razorpay_payment_id,
+                      razorpay_order_id: response.razorpay_order_id
+                  }).eq('id', supabaseOrderId);
+                  
+                  window.location.href = `success.html?order=${supabaseOrderId}`;
               }
           };
           var rzp1 = new Razorpay(options);
