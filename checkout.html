@@ -117,15 +117,29 @@
               const { error: itemsError } = await window.supabaseClient.from('order_items').insert(orderItemsData);
               if (itemsError) throw new Error("Item Insertion Failed: " + itemsError.message);
 
-              // 3. SECURE CALL: Ask Edge Function to generate the Razorpay Order ID
+              // 3. SECURE CALL: Raw Fetch to bypass wrapper issues
               status.innerText = "GENERATING SECURE INVOICE...";
               status.style.color = "var(--cyan)";
 
-              const { data: rpData, error: rpError } = await window.supabaseClient.functions.invoke('razorpay-checkout', {
-                  body: { amount: orderTotal * 100, receipt: order.id.toString() }
+              // Get the active session token
+              const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+              // Send the raw request directly to your Edge Function URL
+              const rpRes = await fetch('https://aasmoabdareuqlogjsui.supabase.co/functions/v1/razorpay-checkout', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'apikey': window.supabaseClient.supabaseKey, // Uses the anon key from config
+                      'Authorization': `Bearer ${session.access_token}` // Uses the user's secure login token
+                  },
+                  body: JSON.stringify({ amount: orderTotal * 100, receipt: order.id.toString() })
               });
 
-              if (rpError || rpData.error) throw new Error("Secure Invoice Failed: " + (rpError?.message || rpData.error));
+              const rpData = await rpRes.json();
+
+              if (!rpRes.ok || rpData.error) {
+                  throw new Error("Secure Invoice Failed: " + (rpData.error || rpRes.statusText));
+              }
 
               // 4. Trigger Razorpay using the Secure Order ID
               launchRazorpay(order.id, rpData.id, orderTotal, name, currentUser.email, phone);
@@ -160,6 +174,8 @@
                       razorpay_order_id: response.razorpay_order_id
                   }).eq('id', supabaseOrderId);
                   
+                  // Clear the cart on successful purchase
+                  localStorage.removeItem('castwheelz_cart');
                   window.location.href = `success.html?order=${supabaseOrderId}`;
               }
           };
