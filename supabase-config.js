@@ -111,7 +111,13 @@ async function checkAuthState() {
 }
 
 async function signOut() {
+    // 1. Sign out of the Supabase database
     await window.supabaseClient.auth.signOut();
+    
+    // 2. CRITICAL FIX: Destroy the local cart data so the next user gets a clean slate
+    localStorage.removeItem('castwheelz_cart');
+    
+    // 3. Redirect appropriately
     if(window.location.pathname.includes('admin')) {
         window.location.href = 'index.html';
     } else {
