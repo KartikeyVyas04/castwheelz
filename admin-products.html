@@ -18,10 +18,11 @@
   .page-title { font-family:'Anton'; font-size:48px; text-transform:uppercase; letter-spacing:2px; color: var(--bone); margin-bottom: 5px;}
   .sys-text { font-family: 'JetBrains Mono'; font-size: 10px; color: var(--amber); letter-spacing: 4px; text-transform: uppercase; }
 
-  .layout { display: grid; grid-template-columns: 350px 1fr; gap: 40px; align-items: start;}
+  .layout { display: grid; grid-template-columns: 400px 1fr; gap: 40px; align-items: start;}
   @media (max-width: 950px) { .layout { grid-template-columns: 1fr; } }
 
-  .panel { background: rgba(18, 18, 22, 0.6); border: 1px solid rgba(255,122,26,0.3); padding: 30px; backdrop-filter: blur(20px); border-radius: 4px; margin-bottom: 30px;}
+  .panel { background: rgba(18, 18, 22, 0.6); border: 1px solid rgba(255,122,26,0.3); padding: 30px; backdrop-filter: blur(20px); border-radius: 4px; margin-bottom: 30px; transition: 0.3s;}
+  .panel.edit-mode { border-color: var(--cyan); box-shadow: 0 0 30px rgba(31,224,208,0.15); }
   .panel-title { font-family: 'JetBrains Mono'; font-size: 14px; color: var(--cyan); text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px;}
   
   .form-group { margin-bottom: 20px; }
@@ -30,13 +31,23 @@
   input:focus, textarea:focus, select:focus { border-color: var(--amber); }
   select option { background: var(--asphalt); color: var(--bone); }
   
+  .file-upload-wrapper { border: 1px dashed rgba(255,255,255,0.2); padding: 10px; text-align: center; margin-bottom: 10px; background: rgba(0,0,0,0.3); cursor: pointer; transition: 0.3s; }
+  .file-upload-wrapper:hover { border-color: var(--amber); background: rgba(255,122,26,0.05); }
+  input[type="file"] { width: 100%; font-family: 'JetBrains Mono'; font-size: 10px; color: var(--muted); cursor: pointer;}
+  
   .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 25px;}
   .checkbox-group input { width: 16px; height: 16px; accent-color: var(--amber);}
 
-  .btn-submit { width: 100%; background: var(--amber); border: none; color: var(--asphalt); font-family: 'JetBrains Mono'; font-size: 12px; font-weight: bold; letter-spacing: 2px; padding: 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
+  .btn-group { display: flex; gap: 10px; }
+  .btn-submit { flex-grow: 1; background: var(--amber); border: none; color: var(--asphalt); font-family: 'JetBrains Mono'; font-size: 12px; font-weight: bold; letter-spacing: 2px; padding: 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
   .btn-submit:hover { box-shadow: 0 0 20px rgba(255,122,26,0.5); background: #fff; }
+  .btn-submit.edit-mode { background: var(--cyan); color: var(--asphalt); }
+  .btn-submit.edit-mode:hover { box-shadow: 0 0 20px rgba(31,224,208,0.5); background: #fff; }
+  
+  .btn-cancel { display: none; background: transparent; border: 1px solid var(--muted); color: var(--muted); font-family: 'JetBrains Mono'; font-size: 12px; font-weight: bold; padding: 15px; cursor: pointer; transition: 0.3s;}
+  .btn-cancel:hover { background: rgba(255,255,255,0.1); color: var(--bone); }
 
-  /* Inventory & Category Items */
+  /* Inventory Items */
   .list-item { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 15px; margin-bottom: 10px; border-radius: 2px;}
   .inventory-meta { display: flex; align-items: center; gap: 15px;}
   .inventory-img { width: 50px; height: 50px; object-fit: cover; border-radius: 2px; border: 1px solid rgba(255,255,255,0.1);}
@@ -45,6 +56,9 @@
   .inventory-price { font-family: 'Anton'; font-size: 18px; color: var(--cyan); }
   .badge { font-size: 9px; font-family: 'JetBrains Mono'; padding: 3px 6px; background: rgba(255,122,26,0.2); color: var(--amber); border: 1px solid var(--amber); border-radius: 2px; margin-left: 10px;}
   
+  .action-btns { display: flex; gap: 10px; }
+  .btn-edit { background: transparent; border: 1px solid rgba(31,224,208,0.3); color: var(--cyan); font-family: 'JetBrains Mono'; font-size: 10px; padding: 8px 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
+  .btn-edit:hover { background: var(--cyan); color: var(--asphalt); }
   .btn-delete { background: transparent; border: 1px solid rgba(255,46,110,0.3); color: var(--magenta); font-family: 'JetBrains Mono'; font-size: 10px; padding: 8px 15px; cursor: pointer; text-transform: uppercase; transition: 0.3s;}
   .btn-delete:hover { background: var(--magenta); color: var(--bone); }
   
@@ -69,6 +83,43 @@
 
     <div class="layout">
         <div>
+            <div class="panel" id="product-form-panel">
+                <div class="panel-title" id="form-header">Register New Asset</div>
+                <div class="form-group"><label>Asset Title</label><input type="text" id="p-title" required></div>
+                
+                <div class="form-group">
+                    <label>Classification (Category)</label>
+                    <select id="p-category">
+                        <option value="">Unclassified</option>
+                    </select>
+                </div>
+
+                <div class="form-group"><label>Acquisition Price (₹)</label><input type="number" id="p-price" required></div>
+                
+                <div class="form-group">
+                    <label>Image (Upload file OR Paste Link)</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="p-image-file" accept="image/png, image/jpeg, image/webp">
+                    </div>
+                    <div style="text-align:center; font-family:'JetBrains Mono'; font-size:9px; color:var(--muted); margin-bottom:5px;">-- OR --</div>
+                    <input type="text" id="p-image-url" placeholder="https://...">
+                    <div id="current-image-preview" style="display:none; margin-top:10px; font-family:'JetBrains Mono'; font-size:10px; color:var(--cyan);">Currently assigned: <a href="#" id="preview-link" target="_blank" style="color:var(--cyan);">View Image</a></div>
+                </div>
+
+                <div class="form-group"><label>Tactical Description</label><textarea id="p-desc" rows="3"></textarea></div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="p-bestseller">
+                    <label style="margin:0; color:var(--bone);">Feature on Homepage (Bestseller)</label>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn-submit" id="main-submit-btn" onclick="saveProduct()">INITIALIZE DEPLOYMENT</button>
+                    <button class="btn-cancel" id="cancel-btn" onclick="cancelEdit()">CANCEL</button>
+                </div>
+                <div id="status-msg" style="margin-top:15px; font-family:'JetBrains Mono'; font-size:10px; color:var(--cyan); text-align:center;"></div>
+            </div>
+
             <div class="panel">
                 <div class="panel-title" style="color: var(--bone);">Category Protocols</div>
                 <div class="input-row">
@@ -77,30 +128,6 @@
                 </div>
                 <div id="category-list"></div>
                 <div id="cat-status" style="margin-top:10px; font-family:'JetBrains Mono'; font-size:10px; color:var(--magenta); text-align:center;"></div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">Register New Asset</div>
-                <div class="form-group"><label>Asset Title</label><input type="text" id="p-title" required></div>
-                
-                <div class="form-group">
-                    <label>Classification (Category)</label>
-                    <select id="p-category">
-                        <option value="">Unclassified</option>
-                        </select>
-                </div>
-
-                <div class="form-group"><label>Acquisition Price (₹)</label><input type="number" id="p-price" required></div>
-                <div class="form-group"><label>Image URL (Direct Link)</label><input type="text" id="p-image" placeholder="https://..."></div>
-                <div class="form-group"><label>Tactical Description</label><textarea id="p-desc" rows="3"></textarea></div>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="p-bestseller">
-                    <label style="margin:0; color:var(--bone);">Feature on Homepage (Bestseller)</label>
-                </div>
-                
-                <button class="btn-submit" onclick="addProduct()">INITIALIZE DEPLOYMENT</button>
-                <div id="status-msg" style="margin-top:15px; font-family:'JetBrains Mono'; font-size:10px; color:var(--cyan); text-align:center;"></div>
             </div>
         </div>
 
@@ -113,6 +140,10 @@
 
 <script src="supabase-config.js"></script>
 <script>
+    let globalProductsData = [];
+    let isEditing = false;
+    let editProductId = null;
+
     async function verifyAdminAccess() {
         const user = await checkAuthState();
         if (!user) { window.location.href = 'login.html'; return; }
@@ -131,7 +162,6 @@
     async function fetchCategories() {
         const { data: categories, error } = await window.supabaseClient.from('categories').select('*').order('name');
         if (error) return;
-
         const list = document.getElementById('category-list');
         const dropdown = document.getElementById('p-category');
         
@@ -139,46 +169,34 @@
         dropdown.innerHTML = '<option value="">Unclassified</option>';
 
         categories.forEach(c => {
-            // Populate List
             list.innerHTML += `
                 <div class="list-item" style="padding: 10px;">
                     <div style="font-family:'JetBrains Mono'; font-size:12px; color:var(--bone);">${c.name}</div>
                     <button class="btn-delete" style="padding: 5px 10px;" onclick="deleteCategory(${c.id}, '${c.name.replace(/'/g, "\\'")}')">PURGE</button>
                 </div>
             `;
-            // Populate Dropdown
             dropdown.innerHTML += `<option value="${c.id}">${c.name}</option>`;
         });
     }
 
     async function addCategory() {
         const nameInput = document.getElementById('cat-name');
-        const status = document.getElementById('cat-status');
         const name = nameInput.value.trim();
-
         if (!name) return;
-
-        const { error } = await window.supabaseClient.from('categories').insert([{ name: name }]);
-        if (error) { 
-            status.innerText = "ERROR: MIGHT ALREADY EXIST."; 
-            setTimeout(() => status.innerText = "", 3000);
-        } else {
-            nameInput.value = '';
-            fetchCategories();
-        }
+        await window.supabaseClient.from('categories').insert([{ name: name }]);
+        nameInput.value = '';
+        fetchCategories();
     }
 
     async function deleteCategory(id, name) {
         if(confirm(`PURGE CATEGORY: ${name}?\nAssets in this category will become Unclassified.`)) {
             await window.supabaseClient.from('categories').delete().eq('id', id);
-            fetchCategories();
-            fetchInventory(); // Refresh inventory to show null categories
+            fetchCategories(); fetchInventory();
         }
     }
 
-    /* --- PRODUCT LOGIC --- */
+    /* --- PRODUCT LOGIC (CRUD + STORAGE) --- */
     async function fetchInventory() {
-        // Fetch products and join with categories table to get the category name
         const { data: products, error } = await window.supabaseClient
             .from('products')
             .select('*, categories(name)')
@@ -187,7 +205,9 @@
         const list = document.getElementById('inventory-list');
         if (error) return;
         
+        globalProductsData = products; // Save to global state for editing
         list.innerHTML = "";
+        
         products.forEach(p => {
             const catName = p.categories ? p.categories.name : 'Unclassified';
             list.innerHTML += `
@@ -200,58 +220,164 @@
                             <div class="inventory-price" style="margin-top: 5px;">₹${p.price.toLocaleString('en-IN')}</div>
                         </div>
                     </div>
-                    <button class="btn-delete" onclick="deleteProduct(${p.id}, '${p.title.replace(/'/g, "\\'")}')">PURGE</button>
+                    <div class="action-btns">
+                        <button class="btn-edit" onclick="startEdit(${p.id})">EDIT</button>
+                        <button class="btn-delete" onclick="deleteProduct(${p.id}, '${p.title.replace(/'/g, "\\'")}')">PURGE</button>
+                    </div>
                 </div>
             `;
         });
     }
 
-    async function addProduct() {
+    // Handles the actual file upload to Supabase Storage
+    async function uploadImageFile() {
+        const fileInput = document.getElementById('p-image-file');
+        if (!fileInput.files || fileInput.files.length === 0) return null;
+
+        const file = fileInput.files[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `public/${fileName}`;
+
+        const { error: uploadError } = await window.supabaseClient.storage
+            .from('product-images')
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data } = window.supabaseClient.storage
+            .from('product-images')
+            .getPublicUrl(filePath);
+        
+        return data.publicUrl;
+    }
+
+    async function saveProduct() {
         const title = document.getElementById('p-title').value;
         const price = document.getElementById('p-price').value;
-        const image = document.getElementById('p-image').value;
         const desc = document.getElementById('p-desc').value;
         const catId = document.getElementById('p-category').value;
         const bestseller = document.getElementById('p-bestseller').checked;
+        let imageUrl = document.getElementById('p-image-url').value;
         const msg = document.getElementById('status-msg');
 
         if(!title || !price) { msg.innerText = "TITLE AND PRICE REQUIRED."; msg.style.color = "var(--magenta)"; return; }
 
-        msg.innerText = "UPLOADING...";
+        msg.innerText = isEditing ? "UPDATING ASSET..." : "UPLOADING ASSET...";
         msg.style.color = "var(--cyan)";
 
-        const payload = {
-            title: title, 
-            price: price, 
-            image_url: image, 
-            description: desc, 
-            is_bestseller: bestseller
-        };
-        
-        if (catId) payload.category_id = catId; // Only attach if a category is selected
+        try {
+            // 1. If user selected a file, upload it and override the manual URL string
+            const uploadedUrl = await uploadImageFile();
+            if (uploadedUrl) {
+                imageUrl = uploadedUrl;
+            }
 
-        const { error } = await window.supabaseClient.from('products').insert([payload]);
+            // 2. Prepare payload
+            const payload = {
+                title: title, 
+                price: price, 
+                image_url: imageUrl, 
+                description: desc, 
+                is_bestseller: bestseller,
+                category_id: catId ? catId : null
+            };
 
-        if(error) { 
-            msg.innerText = "SYSTEM ERROR."; 
-            msg.style.color = "var(--magenta)"; 
-            console.error(error);
-        } else {
-            msg.innerText = "ASSET DEPLOYED SUCCESSFULLY.";
-            document.getElementById('p-title').value = '';
-            document.getElementById('p-price').value = '';
-            document.getElementById('p-image').value = '';
-            document.getElementById('p-desc').value = '';
-            document.getElementById('p-category').value = '';
-            document.getElementById('p-bestseller').checked = false;
+            // 3. Execute Insert or Update
+            if (isEditing) {
+                const { error } = await window.supabaseClient.from('products').update(payload).eq('id', editProductId);
+                if (error) throw error;
+                msg.innerText = "ASSET UPDATED SUCCESSFULLY.";
+                cancelEdit(); // Reset form after successful edit
+            } else {
+                const { error } = await window.supabaseClient.from('products').insert([payload]);
+                if (error) throw error;
+                msg.innerText = "ASSET DEPLOYED SUCCESSFULLY.";
+                clearForm();
+            }
+
             fetchInventory();
             setTimeout(() => msg.innerText = "", 3000);
+
+        } catch (error) {
+            msg.innerText = "SYSTEM ERROR: " + error.message; 
+            msg.style.color = "var(--magenta)"; 
+            console.error(error);
         }
+    }
+
+    // Enter Edit Mode
+    function startEdit(id) {
+        const product = globalProductsData.find(p => p.id === id);
+        if (!product) return;
+
+        isEditing = true;
+        editProductId = id;
+
+        // UI Updates
+        document.getElementById('product-form-panel').classList.add('edit-mode');
+        document.getElementById('form-header').innerText = `Editing: ${product.title}`;
+        document.getElementById('form-header').style.color = "var(--bone)";
+        
+        const submitBtn = document.getElementById('main-submit-btn');
+        submitBtn.innerText = "UPDATE ASSET";
+        submitBtn.classList.add('edit-mode');
+        document.getElementById('cancel-btn').style.display = "block";
+
+        // Populate Form
+        document.getElementById('p-title').value = product.title;
+        document.getElementById('p-price').value = product.price;
+        document.getElementById('p-desc').value = product.description || '';
+        document.getElementById('p-category').value = product.category_id || '';
+        document.getElementById('p-bestseller').checked = product.is_bestseller;
+        document.getElementById('p-image-url').value = product.image_url || '';
+        document.getElementById('p-image-file').value = ""; // Clear file input
+
+        // Show current image link
+        if(product.image_url) {
+            document.getElementById('current-image-preview').style.display = "block";
+            document.getElementById('preview-link').href = product.image_url;
+        } else {
+            document.getElementById('current-image-preview').style.display = "none";
+        }
+        
+        // Scroll to top to see the form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Exit Edit Mode
+    function cancelEdit() {
+        isEditing = false;
+        editProductId = null;
+        
+        // UI Reset
+        document.getElementById('product-form-panel').classList.remove('edit-mode');
+        document.getElementById('form-header').innerText = "Register New Asset";
+        document.getElementById('form-header').style.color = "var(--cyan)";
+        
+        const submitBtn = document.getElementById('main-submit-btn');
+        submitBtn.innerText = "INITIALIZE DEPLOYMENT";
+        submitBtn.classList.remove('edit-mode');
+        document.getElementById('cancel-btn').style.display = "none";
+        document.getElementById('current-image-preview').style.display = "none";
+
+        clearForm();
+    }
+
+    function clearForm() {
+        document.getElementById('p-title').value = '';
+        document.getElementById('p-price').value = '';
+        document.getElementById('p-image-url').value = '';
+        document.getElementById('p-image-file').value = '';
+        document.getElementById('p-desc').value = '';
+        document.getElementById('p-category').value = '';
+        document.getElementById('p-bestseller').checked = false;
     }
 
     async function deleteProduct(id, title) {
         if(confirm(`INITIATE PURGE PROTOCOL FOR: ${title}?`)) {
             await window.supabaseClient.from('products').delete().eq('id', id);
+            if (isEditing && editProductId === id) cancelEdit(); // Cancel edit if they delete the item they are editing
             fetchInventory();
         }
     }
