@@ -231,6 +231,8 @@
 
     // Handles the actual file upload to Supabase Storage
     async function uploadImageFile() {
+      console.log("USER:", await window.supabaseClient.auth.getUser());
+console.log("PATH:", filePath);
         const fileInput = document.getElementById('p-image-file');
 
         if (!fileInput.files || fileInput.files.length === 0) {
